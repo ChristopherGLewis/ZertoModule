@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
-<ModuleObject xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" fVersion="1.1" type="Script" mclass="External" useSupports="false">
+<ModuleObject xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" fVersion="1.1" type="Script" mclass="External" useSupports="true">
   <Name>ZertoModule</Name>
   <Version>1.0</Version>
   <Description>Zerto REST API Powershell Wrapping module</Description>
   <ModulePath>C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1</ModulePath>
   <HasManifest>false</HasManifest>
+  <Provider>
+    <FetchPostCount>50</FetchPostCount>
+  </Provider>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
   <Cmdlets>
@@ -4962,11 +4965,12 @@ ZORG An organization set up in the Zerto Cloud</Description>
     <CmdletObject verb="Add" noun="ZertoVPG">
       <Name>Add-ZertoVPG</Name>
       <Syntax>
-        <string>Add-ZertoVPG [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-VPGName] &lt;String&gt; [-Priority] &lt;ZertoVPGPriority&gt; [-RecoverySiteName] &lt;String&gt; [[-RPOAlertInSeconds] &lt;Int32&gt;] [[-TestIntervalInMinutes] &lt;Int32&gt;] [[-ClusterName] &lt;String&gt;] [[-HostName] &lt;String&gt;] [-FailoverNetwork] &lt;String&gt; [-TestNetwork] &lt;String&gt; [[-DatastoreName] &lt;String&gt;] [[-DatastoreclusterName] &lt;String&gt;] [-JournalDatastoreName] &lt;String&gt; [[-JournalHistoryInHours] &lt;Int32&gt;] [[-JournalHardLimitMB] &lt;Int32&gt;] [[-JournalWarningThresholdMB] &lt;Int32&gt;] [-vCenterFolder] &lt;String&gt; [-VmNames] &lt;String[]&gt;</string>
+        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] -ZertoToken &lt;Hashtable&gt; -VPGName &lt;String&gt; -Priority &lt;ZertoVPGPriority&gt; -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] -FailoverNetwork &lt;String&gt; -TestNetwork &lt;String&gt; [-DatastoreName &lt;String&gt;] [-DatastoreclusterName &lt;String&gt;] -JournalDatastoreName &lt;String&gt; [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] -vCenterFolder &lt;String&gt; -VmNames &lt;String[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
+        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] -ZertoToken &lt;Hashtable&gt; -VPGName &lt;String&gt; -Priority &lt;ZertoVPGPriority&gt; -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] -FailoverNetwork &lt;String&gt; -TestNetwork &lt;String&gt; [-DatastoreName &lt;String&gt;] [-DatastoreclusterName &lt;String&gt;] -JournalDatastoreName &lt;String&gt; [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] -vCenterFolder &lt;String&gt; -VPGVirtualMachines &lt;VPGVirtualMachine[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Adds a new Zerto VPG Setting</Synopsis>
-        <Description>Adds a new Zerto VPG Setting</Description>
+        <Description>Adds a new Zerto VPG Setting and Commits it if -COMMIT is true</Description>
         <Notes>A Zerto VPG Setting is used to construct a Zerto VPG.  Commiting a Zerto VPG Setting converts it into a live VPG</Notes>
         <InputType />
         <InputUrl />
@@ -4976,10 +4980,11 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <ReturnTypeDescription />
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName Priority RecoverySiteName RPOAlertInSeconds TestIntervalInMinutes ClusterName HostName FailoverNetwork TestNetwork DatastoreName DatastoreclusterName JournalDatastoreName JournalHistoryInHours JournalHardLimitMB JournalWarningThresholdMB vCenterFolder VmNames Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="VMNames" Params="ZertoServer ZertoPort ZertoToken VPGName Priority RecoverySiteName RPOAlertInSeconds TestIntervalInMinutes ClusterName HostName FailoverNetwork TestNetwork DatastoreName DatastoreclusterName JournalDatastoreName JournalHistoryInHours JournalHardLimitMB JournalWarningThresholdMB vCenterFolder VmNames VPGCommit DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="VMClass" Params="ZertoServer ZertoPort ZertoToken VPGName Priority RecoverySiteName RPOAlertInSeconds TestIntervalInMinutes ClusterName HostName FailoverNetwork TestNetwork DatastoreName DatastoreclusterName JournalDatastoreName JournalHistoryInHours JournalHardLimitMB JournalWarningThresholdMB vCenterFolder VPGVirtualMachines VPGCommit DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ZertoServer</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -4989,7 +4994,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Zerto RestAPI URL server name </Description>
           <DefaultValue>il1zerto.nuveen.com</DefaultValue>
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ZertoPort</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -4999,7 +5004,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Zerto RestAPI URL Port</Description>
           <DefaultValue>9669</DefaultValue>
         </ParameterDescription>
-        <ParameterDescription type="Hashtable" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="true" pos="2" globbing="false">
+        <ParameterDescription type="Hashtable" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ZertoToken</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5009,7 +5014,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>VPGName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5019,7 +5024,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>VPG Name</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>Priority</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5029,7 +5034,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Zerto Priority</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>RecoverySiteName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5039,7 +5044,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Zerto Recovery Site Name </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>RPOAlertInSeconds</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateRangeAttribute</string>
@@ -5050,7 +5055,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>RPO Alert in seconds</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestIntervalInMinutes</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateRangeAttribute</string>
@@ -5061,7 +5066,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Test Interval in minutes </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ClusterName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5071,7 +5076,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Cluster Name </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>FailoverNetwork</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5081,7 +5086,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Failover Network</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestNetwork</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5091,7 +5096,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Test Network </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DatastoreName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5101,7 +5106,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Datastore Name </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="14" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>JournalDatastoreName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5111,7 +5116,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Journal Datastore Name</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="15" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>JournalHistoryInHours</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateRangeAttribute</string>
@@ -5122,7 +5127,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Journal History In Hours</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="16" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>JournalHardLimitMB</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateRangeAttribute</string>
@@ -5133,7 +5138,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Journal Hard Limit MB</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="17" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>JournalWarningThresholdMB</Name>
           <Attributes>
             <string>System.Management.Automation.ValidateRangeAttribute</string>
@@ -5144,7 +5149,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>Journal Warning Threshold MB</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="18" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>vCenterFolder</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5154,7 +5159,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>vCenter FOlder</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="19" globbing="false">
+        <ParameterDescription type="String[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>VmNames</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5164,7 +5169,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description>VM Names</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>HostName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5174,8 +5179,38 @@ ZORG An organization set up in the Zerto Cloud</Description>
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DatastoreclusterName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGCommit</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DumpJson</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="VPGVirtualMachine[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGVirtualMachines</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
@@ -7204,245 +7239,14 @@ ZORG An organization set up in the Zerto Cloud</Description>
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
       <Publish>false</Publish>
     </CmdletObject>
-    <CmdletObject verb="Add" noun="ZertoVPGWithIPAddress">
-      <Name>Add-ZertoVPGWithIPAddress</Name>
-      <Syntax>
-        <string>Add-ZertoVPGWithIPAddress [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-VPGName] &lt;String&gt; [-Priority] &lt;ZertoVPGPriority&gt; [-RecoverySiteName] &lt;String&gt; [[-RPOAlertInSeconds] &lt;Int32&gt;] [[-TestIntervalInMinutes] &lt;Int32&gt;] [[-ClusterName] &lt;String&gt;] [[-HostName] &lt;String&gt;] [-FailoverNetwork] &lt;String&gt; [-TestNetwork] &lt;String&gt; [[-DatastoreName] &lt;String&gt;] [[-DatastoreclusterName] &lt;String&gt;] [-JournalDatastoreName] &lt;String&gt; [[-JournalHistoryInHours] &lt;Int32&gt;] [[-JournalHardLimitMB] &lt;Int32&gt;] [[-JournalWarningThresholdMB] &lt;Int32&gt;] [-vCenterFolder] &lt;String&gt; [-VmNamesAndIPAddresses] &lt;VMIPAddress[]&gt;</string>
-      </Syntax>
-      <GeneralHelp>
-        <Synopsis />
-        <Description />
-        <Notes />
-        <InputType />
-        <InputUrl />
-        <InputTypeDescription />
-        <ReturnType />
-        <ReturnUrl />
-        <ReturnTypeDescription />
-      </GeneralHelp>
-      <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName Priority RecoverySiteName RPOAlertInSeconds TestIntervalInMinutes ClusterName HostName FailoverNetwork TestNetwork DatastoreName DatastoreclusterName JournalDatastoreName JournalHistoryInHours JournalHardLimitMB JournalWarningThresholdMB vCenterFolder VmNamesAndIPAddresses Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-      </ParamSets>
-      <Parameters>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
-          <Name>ZertoServer</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto RestAPI URL server name </Description>
-          <DefaultValue>il1zerto.nuveen.com</DefaultValue>
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
-          <Name>ZertoPort</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto RestAPI URL Port</Description>
-          <DefaultValue>9669</DefaultValue>
-        </ParameterDescription>
-        <ParameterDescription type="Hashtable" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="true" pos="2" globbing="false">
-          <Name>ZertoToken</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto token from Get-ZertoAuthToken</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
-          <Name>VPGName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
-          <Name>Priority</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
-          <Name>RecoverySiteName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
-          <Name>RPOAlertInSeconds</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
-          <Name>TestIntervalInMinutes</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
-          <Name>ClusterName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
-          <Name>HostName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
-          <Name>FailoverNetwork</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
-          <Name>TestNetwork</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
-          <Name>DatastoreName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
-          <Name>DatastoreclusterName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="14" globbing="false">
-          <Name>JournalDatastoreName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="15" globbing="false">
-          <Name>JournalHistoryInHours</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="16" globbing="false">
-          <Name>JournalHardLimitMB</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="17" globbing="false">
-          <Name>JournalWarningThresholdMB</Name>
-          <Attributes>
-            <string>System.Management.Automation.ValidateRangeAttribute</string>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="18" globbing="false">
-          <Name>vCenterFolder</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="VMIPAddress[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="19" globbing="false">
-          <Name>VmNamesAndIPAddresses</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-      </Parameters>
-      <Examples />
-      <RelatedLinks />
-      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
-      <Publish>false</Publish>
-    </CmdletObject>
     <CmdletObject verb="Convert" noun="ZertoVPGToVPGSetting">
       <Name>Convert-ZertoVPGToVPGSetting</Name>
       <Syntax>
         <string>Convert-ZertoVPGToVPGSetting [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Converts an active Zerto VPG to a VPG Settings object</Synopsis>
+        <Description>Converts an active Zerto VPG to a VPG Settings object for modification</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7507,8 +7311,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Get-ZertoVPGCheckpointID [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] -ZertoToken &lt;Hashtable&gt; -ZertoVpgIdentifier &lt;String&gt; -ZertoVpgCheckpointTag &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Returns a Zerto VPG Checkpoint ID</Synopsis>
+        <Description>Returns a Zerto VPG Checkpoints for a given VPG ID and Checkpoint Tag</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7568,7 +7372,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Checkpoint Tag</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -7583,8 +7387,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Get-ZertoVPGCheckpointLastID [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Returns the latest Zerto VPG Checkpoint ID</Synopsis>
+        <Description>Returns the latest Zerto VPG Checkpoint IDf or a given VPG ID</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7649,8 +7453,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Get-ZertoVPGCheckpoints [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-StartDate] &lt;String&gt;] [[-EndDate] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Returns all Zerto VPG Checkpoints</Synopsis>
+        <Description>Returns all Zerto VPG Checkpoints for a given Zerto VPG ID</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7735,8 +7539,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Get-ZertoVPGCheckpointSummary [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Returns a Zerto VPG Checkpoint summary </Synopsis>
+        <Description>Returns a Zerto VPG Checkpoint summary for a given Zerto VPG ID</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7933,8 +7737,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Invoke-ZertoVPGFailoverCommit [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Commits a a Zerto VPG failover</Synopsis>
+        <Description>Commits a a Zerto VPG failover given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -7999,8 +7803,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Invoke-ZertoVPGFailoverRollback [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Rollback a a Zerto VPG failover</Synopsis>
+        <Description>Rollback a a Zerto VPG failover given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -8065,8 +7869,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Invoke-ZertoVPGForceSync [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Force synchronizes a Zerto VPG</Synopsis>
+        <Description>Force synchronizes a Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -8117,162 +7921,6 @@ ZORG An organization set up in the Zerto Cloud</Description>
           </Attributes>
           <Aliases />
           <Description>Zerto VPG Identifier</Description>
-          <DefaultValue />
-        </ParameterDescription>
-      </Parameters>
-      <Examples />
-      <RelatedLinks />
-      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
-      <Publish>false</Publish>
-    </CmdletObject>
-    <CmdletObject verb="New" noun="ZertoIPAddress">
-      <Name>New-ZertoIPAddress</Name>
-      <Syntax>
-        <string>New-ZertoIPAddress [-VMName] &lt;String&gt; [-IPAddress] &lt;String&gt; [-SubnetMask] &lt;String&gt; [-Gateway] &lt;String&gt; [-DNS1] &lt;String&gt; [-DNS2] &lt;String&gt; [-DNSSuffix] &lt;String&gt; [[-TestIPAddress] &lt;String&gt;] [[-TestSubnetMask] &lt;String&gt;] [[-TestGateway] &lt;String&gt;] [[-TestDNS1] &lt;String&gt;] [[-TestDNS2] &lt;String&gt;] [[-TestDNSSuffix] &lt;String&gt;]</string>
-      </Syntax>
-      <GeneralHelp>
-        <Synopsis />
-        <Description />
-        <Notes />
-        <InputType />
-        <InputUrl />
-        <InputTypeDescription />
-        <ReturnType />
-        <ReturnUrl />
-        <ReturnTypeDescription />
-      </GeneralHelp>
-      <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="VMName IPAddress SubnetMask Gateway DNS1 DNS2 DNSSuffix TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 TestDNSSuffix Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-      </ParamSets>
-      <Parameters>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
-          <Name>VMName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
-          <Name>IPAddress</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="2" globbing="false">
-          <Name>SubnetMask</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
-          <Name>Gateway</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
-          <Name>DNS1</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
-          <Name>DNS2</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
-          <Name>DNSSuffix</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
-          <Name>TestIPAddress</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
-          <Name>TestSubnetMask</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
-          <Name>TestGateway</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
-          <Name>TestDNS1</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
-          <Name>TestDNS2</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
-          <Name>TestDNSSuffix</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description />
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -8649,8 +8297,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Remove-ZertoVPG [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-Force] &lt;Boolean&gt;] [[-KeepRecoveryVolumes] &lt;Boolean&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Removes a Zerto VPG</Synopsis>
+        <Description>Removes a Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -8710,7 +8358,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Force the removal of the VPG</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
@@ -8720,8 +8368,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
-          <DefaultValue />
+          <Description>Keeps the Recovery Volumes on the remote site</Description>
+          <DefaultValue>$false</DefaultValue>
         </ParameterDescription>
       </Parameters>
       <Examples />
@@ -8811,8 +8459,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Start-ZertoVPGClone [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-ZertoVpgCheckpointIdentifier] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Starts a clone of a Zerto VPG</Synopsis>
+        <Description>Starts a clone of a Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -8887,8 +8535,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Start-ZertoVPGFailover [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-ZertoVpgCheckpointIdentifier] &lt;String&gt;] [[-CommitPolicy] &lt;ZertoCommitPolicy&gt;] [[-CommitInSeconds] &lt;String&gt;] [[-ShutdownPolicy] &lt;ZertoShutdownPolicy&gt;] [-TimeToWaitBeforeShutdownInSec] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Starts a Zerto VPG failover</Synopsis>
+        <Description>Starts a Zerto VPG failover given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -8948,8 +8596,14 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
-          <DefaultValue />
+          <Description>The policy to use after the failover enters a Before Commit state. Possible values are (Json/XML):
+rollback – After the seconds specified in the commitValue setting have elapsed, the failover is rolled
+back.
+commit – After the seconds specified in the commitValue setting have elapsed, the failover continue,
+committing the virtual machines in the recovery site.
+none – The virtual machines in the VPG being failed over remain in the Before Commit state until
+either they are committed with Commit a failover, or rolled back with Roll back a failover</Description>
+          <DefaultValue>Commit</DefaultValue>
         </ParameterDescription>
         <ParameterDescription type="ZertoShutdownPolicy" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
           <Name>ShutdownPolicy</Name>
@@ -8958,8 +8612,18 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
-          <DefaultValue />
+          <Description>The shutdown policy to apply to the virtual machines on the protected site that are being failed over
+Possible values are (Json/XML):
+None – The protected virtual machines are not touched before starting the failover. This assumes
+that you do not have access to the protected virtual machines.
+shutdown – If the protected virtual machines have VMware Tools or Microsoft Integration Services
+available, the virtual machines are gracefully shut down, otherwise the failover operation fails. This is
+similar to performing a Move operation to a specified checkpoint.
+forceshutdown – The protected virtual machines are forcibly shut down before starting the failover. If
+the protected virtual machines have VMware Tools or Microsoft Integration Services available, the
+procedure waits five minutes for the virtual machines to be gracefully shut down before forcibly
+powering them off. This is similar to performing a Move operation to a specified checkpoint.</Description>
+          <DefaultValue>Shutdown</DefaultValue>
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
           <Name>TimeToWaitBeforeShutdownInSec</Name>
@@ -8968,7 +8632,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>The amount of time in seconds the failover waits in a Before Commit state to enable checking that
+the failover is as required before performing the commitPolicy setting.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
@@ -8978,8 +8643,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
-          <DefaultValue />
+          <Description>The identifier of the checkpoint to use for the failover. A checkpoint must be specified. (default is latest)</Description>
+          <DefaultValue>(default is latest)</DefaultValue>
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
           <Name>CommitInSeconds</Name>
@@ -8988,7 +8653,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Number of seconds after failover to commit.</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -9003,8 +8668,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Stop-ZertoVPGClone [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Stops a clone of a Zerto VPG</Synopsis>
+        <Description>Stops a clone of a Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9135,8 +8800,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Invoke-ZertoVPGPause [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Pauses a Zerto VPG</Synopsis>
+        <Description>Pauses a Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9176,7 +8841,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
@@ -9186,7 +8851,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -9201,8 +8866,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Invoke-ZertoVPGResume [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Resumes a paused Zerto VPG</Synopsis>
+        <Description>Resumes a paused Zerto VPG given a VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9242,7 +8907,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
@@ -9252,7 +8917,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -9267,8 +8932,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Remove-ZertoVRA [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVraIdentifier] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Removes a Zerto VRA</Synopsis>
+        <Description>Removes a Zerto VRA given a Zerto VRA Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9308,7 +8973,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
@@ -9318,7 +8983,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VRA Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -9333,8 +8998,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Start-ZertoVPGFailoverTest [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-ZertoVpgCheckpointIdentifier] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Starts a Zerto Failover Test</Synopsis>
+        <Description>Starts a Zerto Failover Test given a Zerto VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9374,7 +9039,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
@@ -9384,7 +9049,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
@@ -9394,7 +9059,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Checkpoint Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -9409,8 +9074,8 @@ ZORG An organization set up in the Zerto Cloud</Description>
         <string>Stop-ZertoVPGFailoverTest [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [-ZertoToken] &lt;Hashtable&gt; [-ZertoVpgIdentifier] &lt;String&gt; [[-FailoverTestSuccess] &lt;String&gt;] [[-FailoverTestSummary] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Stops a Zerto Failover Test</Synopsis>
+        <Description>Stops a Zerto Failover Test given a Zerto VPG Identifier</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9450,7 +9115,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
@@ -9460,7 +9125,7 @@ ZORG An organization set up in the Zerto Cloud</Description>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VPG Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
@@ -9481,6 +9146,218 @@ ZORG An organization set up in the Zerto Cloud</Description>
           </Attributes>
           <Aliases />
           <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoFailoverIPAddress">
+      <Name>New-ZertoFailoverIPAddress</Name>
+      <Syntax>
+        <string>New-ZertoFailoverIPAddress [-NICName] &lt;String&gt; [[-ReplaceMAC] &lt;Boolean&gt;] [-IPAddress] &lt;String&gt; [-SubnetMask] &lt;String&gt; [-Gateway] &lt;String&gt; [-DNS1] &lt;String&gt; [-DNS2] &lt;String&gt; [-DNSSuffix] &lt;String&gt; [[-TestIPAddress] &lt;String&gt;] [[-TestSubnetMask] &lt;String&gt;] [[-TestGateway] &lt;String&gt;] [[-TestDNS1] &lt;String&gt;] [[-TestDNS2] &lt;String&gt;] [[-TestDNSSuffix] &lt;String&gt;]</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creats a new Zerto Failover IP Address for a VPG</Synopsis>
+        <Description>Creats a new Zerto Failover IP Address for a VPG</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="NICName ReplaceMAC IPAddress SubnetMask Gateway DNS1 DNS2 DNSSuffix TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 TestDNSSuffix Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+          <Name>NICName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>NIC Name</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+          <Name>ReplaceMAC</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Replace the MAC address on failover</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="2" globbing="false">
+          <Name>IPAddress</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover IP Address</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+          <Name>SubnetMask</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Subnet Mask</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+          <Name>Gateway</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover IP Gateway</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
+          <Name>DNS1</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover DNS Server 1</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
+          <Name>DNS2</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover DNS Server 1</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
+          <Name>DNSSuffix</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover DNS Suffix</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
+          <Name>TestIPAddress</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Test IP Address</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
+          <Name>TestSubnetMask</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Subnet MaskSubnet Mask</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
+          <Name>TestGateway</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Test Gateway</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
+          <Name>TestDNS1</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Test DNS Server 1</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
+          <Name>TestDNS2</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Test DNS Server 2</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
+          <Name>TestDNSSuffix</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Failover Test DNS Suffix</Description>
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGVirtualMachine">
+      <Name>New-ZertoVPGVirtualMachine</Name>
+      <Syntax>
+        <string>New-ZertoVPGVirtualMachine [-VMName] &lt;String&gt; [[-FailoverIPAddress] &lt;FailoverIPAddress[]&gt;]</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Virtual Machine object</Synopsis>
+        <Description>Creates a new Zerto VPG Virtual Machine object for creating a new VPG</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="VMName FailoverIPAddress Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+          <Name>VMName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>VM Name</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="FailoverIPAddress[]" varLen="true" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+          <Name>FailoverIPAddress</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Array of Failover IP Address objects</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>

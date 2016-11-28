@@ -10181,155 +10181,326 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para>Adds a new Zerto VPG Setting</maml:para>
+		<maml:para>Adds a new Zerto VPG Setting and Commits it if -COMMIT is true</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
 			<maml:name>Add-ZertoVPG</maml:name>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoServer</maml:name>
 				<maml:description>
 					<maml:para>Zerto RestAPI URL server name </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoPort</maml:name>
 				<maml:description>
 					<maml:para>Zerto RestAPI URL Port</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
 				<maml:name>ZertoToken</maml:name>
 				<maml:description>
 					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VPGName</maml:name>
 				<maml:description>
 					<maml:para>VPG Name</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>Priority</maml:name>
 				<maml:description>
 					<maml:para>Zerto Priority</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">ZertoVPGPriority</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>RecoverySiteName</maml:name>
 				<maml:description>
 					<maml:para>Zerto Recovery Site Name </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>RPOAlertInSeconds</maml:name>
 				<maml:description>
 					<maml:para>RPO Alert in seconds</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>TestIntervalInMinutes</maml:name>
 				<maml:description>
 					<maml:para>Test Interval in minutes </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ClusterName</maml:name>
 				<maml:description>
 					<maml:para>Cluster Name </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>HostName</maml:name>
 				<maml:description>
 					<maml:para />
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="10">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>FailoverNetwork</maml:name>
 				<maml:description>
 					<maml:para>Failover Network</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="11">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>TestNetwork</maml:name>
 				<maml:description>
 					<maml:para>Test Network </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DatastoreName</maml:name>
 				<maml:description>
 					<maml:para>Datastore Name </maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DatastoreclusterName</maml:name>
 				<maml:description>
 					<maml:para />
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="14">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>JournalDatastoreName</maml:name>
 				<maml:description>
 					<maml:para>Journal Datastore Name</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="15">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>JournalHistoryInHours</maml:name>
 				<maml:description>
 					<maml:para>Journal History In Hours</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="16">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>JournalHardLimitMB</maml:name>
 				<maml:description>
 					<maml:para>Journal Hard Limit MB</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="17">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>JournalWarningThresholdMB</maml:name>
 				<maml:description>
 					<maml:para>Journal Warning Threshold MB</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="18">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>vCenterFolder</maml:name>
 				<maml:description>
 					<maml:para>vCenter FOlder</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="19">
+			<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VmNames</maml:name>
 				<maml:description>
 					<maml:para>VM Names</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="true">String[]</command:parameterValue>
 			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>VPGCommit</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DumpJson</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+		<command:syntaxItem>
+			<maml:name>Add-ZertoVPG</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>VPGName</maml:name>
+				<maml:description>
+					<maml:para>VPG Name</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>Priority</maml:name>
+				<maml:description>
+					<maml:para>Zerto Priority</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">ZertoVPGPriority</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>RecoverySiteName</maml:name>
+				<maml:description>
+					<maml:para>Zerto Recovery Site Name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>RPOAlertInSeconds</maml:name>
+				<maml:description>
+					<maml:para>RPO Alert in seconds</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>TestIntervalInMinutes</maml:name>
+				<maml:description>
+					<maml:para>Test Interval in minutes </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>ClusterName</maml:name>
+				<maml:description>
+					<maml:para>Cluster Name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>HostName</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>FailoverNetwork</maml:name>
+				<maml:description>
+					<maml:para>Failover Network</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>TestNetwork</maml:name>
+				<maml:description>
+					<maml:para>Test Network </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DatastoreName</maml:name>
+				<maml:description>
+					<maml:para>Datastore Name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DatastoreclusterName</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>JournalDatastoreName</maml:name>
+				<maml:description>
+					<maml:para>Journal Datastore Name</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>JournalHistoryInHours</maml:name>
+				<maml:description>
+					<maml:para>Journal History In Hours</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>JournalHardLimitMB</maml:name>
+				<maml:description>
+					<maml:para>Journal Hard Limit MB</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>JournalWarningThresholdMB</maml:name>
+				<maml:description>
+					<maml:para>Journal Warning Threshold MB</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>vCenterFolder</maml:name>
+				<maml:description>
+					<maml:para>vCenter FOlder</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="named">
+				<maml:name>VPGVirtualMachines</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="true">VPGVirtualMachine[]</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>VPGCommit</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DumpJson</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+			</command:parameter>
 		</command:syntaxItem>
 	</command:syntax>
 	<command:parameters>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoServer</maml:name>
 			<maml:description>
 				<maml:para>Zerto RestAPI URL server name </maml:para>
@@ -10341,7 +10512,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoPort</maml:name>
 			<maml:description>
 				<maml:para>Zerto RestAPI URL Port</maml:para>
@@ -10353,7 +10524,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue>9669</dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
 			<maml:name>ZertoToken</maml:name>
 			<maml:description>
 				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
@@ -10365,7 +10536,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>VPGName</maml:name>
 			<maml:description>
 				<maml:para>VPG Name</maml:para>
@@ -10377,7 +10548,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>Priority</maml:name>
 			<maml:description>
 				<maml:para>Zerto Priority</maml:para>
@@ -10389,7 +10560,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>RecoverySiteName</maml:name>
 			<maml:description>
 				<maml:para>Zerto Recovery Site Name </maml:para>
@@ -10401,7 +10572,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>RPOAlertInSeconds</maml:name>
 			<maml:description>
 				<maml:para>RPO Alert in seconds</maml:para>
@@ -10413,7 +10584,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>TestIntervalInMinutes</maml:name>
 			<maml:description>
 				<maml:para>Test Interval in minutes </maml:para>
@@ -10425,7 +10596,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ClusterName</maml:name>
 			<maml:description>
 				<maml:para>Cluster Name </maml:para>
@@ -10437,7 +10608,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="10">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>FailoverNetwork</maml:name>
 			<maml:description>
 				<maml:para>Failover Network</maml:para>
@@ -10449,7 +10620,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="11">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>TestNetwork</maml:name>
 			<maml:description>
 				<maml:para>Test Network </maml:para>
@@ -10461,7 +10632,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DatastoreName</maml:name>
 			<maml:description>
 				<maml:para>Datastore Name </maml:para>
@@ -10473,7 +10644,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="14">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>JournalDatastoreName</maml:name>
 			<maml:description>
 				<maml:para>Journal Datastore Name</maml:para>
@@ -10485,7 +10656,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="15">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>JournalHistoryInHours</maml:name>
 			<maml:description>
 				<maml:para>Journal History In Hours</maml:para>
@@ -10497,7 +10668,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="16">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>JournalHardLimitMB</maml:name>
 			<maml:description>
 				<maml:para>Journal Hard Limit MB</maml:para>
@@ -10509,7 +10680,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="17">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>JournalWarningThresholdMB</maml:name>
 			<maml:description>
 				<maml:para>Journal Warning Threshold MB</maml:para>
@@ -10521,7 +10692,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="18">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>vCenterFolder</maml:name>
 			<maml:description>
 				<maml:para>vCenter FOlder</maml:para>
@@ -10533,7 +10704,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="19">
+		<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="named">
 			<maml:name>VmNames</maml:name>
 			<maml:description>
 				<maml:para>VM Names</maml:para>
@@ -10545,7 +10716,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>HostName</maml:name>
 			<maml:description>
 				<maml:para />
@@ -10557,7 +10728,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DatastoreclusterName</maml:name>
 			<maml:description>
 				<maml:para />
@@ -10565,6 +10736,42 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
 				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<maml:name>VPGCommit</maml:name>
+			<maml:description>
+				<maml:para />
+			</maml:description>
+			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+			<dev:type>
+				<maml:name>Boolean</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<maml:name>DumpJson</maml:name>
+			<maml:description>
+				<maml:para />
+			</maml:description>
+			<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+			<dev:type>
+				<maml:name>SwitchParameter</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="named">
+			<maml:name>VPGVirtualMachines</maml:name>
+			<maml:description>
+				<maml:para />
+			</maml:description>
+			<command:parameterValue required="true" variableLength="true">VPGVirtualMachine[]</command:parameterValue>
+			<dev:type>
+				<maml:name>VPGVirtualMachine[]</maml:name>
 				<maml:uri/>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
@@ -11938,7 +12145,14 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>SiteIdentifier</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
 				<maml:name>ZertoServiceProfileName</maml:name>
 				<maml:description>
 					<maml:para>Zerto Service Profile Name</maml:para>
@@ -11984,10 +12198,22 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
 			<maml:name>ZertoServiceProfileName</maml:name>
 			<maml:description>
 				<maml:para>Zerto Service Profile Name</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>SiteIdentifier</maml:name>
+			<maml:description>
+				<maml:para />
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -14754,450 +14980,9 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
 <!--Generated by PS Cmdlet Help Editor-->
 	<command:details>
-		<command:name>Add-ZertoVPGWithIPAddress</command:name>
-		<maml:description>
-			<maml:para />
-		</maml:description>
-		<maml:copyright>
-			<maml:para />
-		</maml:copyright>
-		<command:verb>Add</command:verb>
-		<command:noun>ZertoVPGWithIPAddress</command:noun>
-		<dev:version />
-	</command:details>
-	<maml:description>
-		<maml:para />
-	</maml:description>
-	<command:syntax>
-		<command:syntaxItem>
-			<maml:name>Add-ZertoVPGWithIPAddress</maml:name>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
-				<maml:name>ZertoServer</maml:name>
-				<maml:description>
-					<maml:para>Zerto RestAPI URL server name </maml:para>
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
-				<maml:name>ZertoPort</maml:name>
-				<maml:description>
-					<maml:para>Zerto RestAPI URL Port</maml:para>
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
-				<maml:name>ZertoToken</maml:name>
-				<maml:description>
-					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
-				<maml:name>VPGName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-				<maml:name>Priority</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">ZertoVPGPriority</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-				<maml:name>RecoverySiteName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
-				<maml:name>RPOAlertInSeconds</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
-				<maml:name>TestIntervalInMinutes</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
-				<maml:name>ClusterName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
-				<maml:name>HostName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="10">
-				<maml:name>FailoverNetwork</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="11">
-				<maml:name>TestNetwork</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
-				<maml:name>DatastoreName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
-				<maml:name>DatastoreclusterName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="14">
-				<maml:name>JournalDatastoreName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="15">
-				<maml:name>JournalHistoryInHours</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="16">
-				<maml:name>JournalHardLimitMB</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="17">
-				<maml:name>JournalWarningThresholdMB</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="18">
-				<maml:name>vCenterFolder</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="19">
-				<maml:name>VmNamesAndIPAddresses</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="true">VMIPAddress[]</command:parameterValue>
-			</command:parameter>
-		</command:syntaxItem>
-	</command:syntax>
-	<command:parameters>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
-			<maml:name>ZertoServer</maml:name>
-			<maml:description>
-				<maml:para>Zerto RestAPI URL server name </maml:para>
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
-			<maml:name>ZertoPort</maml:name>
-			<maml:description>
-				<maml:para>Zerto RestAPI URL Port</maml:para>
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue>9669</dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
-			<maml:name>ZertoToken</maml:name>
-			<maml:description>
-				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
-			<dev:type>
-				<maml:name>Hashtable</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
-			<maml:name>VPGName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-			<maml:name>Priority</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">ZertoVPGPriority</command:parameterValue>
-			<dev:type>
-				<maml:name>ZertoVPGPriority</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-			<maml:name>RecoverySiteName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
-			<maml:name>RPOAlertInSeconds</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			<dev:type>
-				<maml:name>Int32</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
-			<maml:name>TestIntervalInMinutes</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			<dev:type>
-				<maml:name>Int32</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
-			<maml:name>ClusterName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
-			<maml:name>HostName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="10">
-			<maml:name>FailoverNetwork</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="11">
-			<maml:name>TestNetwork</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
-			<maml:name>DatastoreName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
-			<maml:name>DatastoreclusterName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="14">
-			<maml:name>JournalDatastoreName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="15">
-			<maml:name>JournalHistoryInHours</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			<dev:type>
-				<maml:name>Int32</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="16">
-			<maml:name>JournalHardLimitMB</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			<dev:type>
-				<maml:name>Int32</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="17">
-			<maml:name>JournalWarningThresholdMB</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
-			<dev:type>
-				<maml:name>Int32</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="18">
-			<maml:name>vCenterFolder</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="false" position="19">
-			<maml:name>VmNamesAndIPAddresses</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="true">VMIPAddress[]</command:parameterValue>
-			<dev:type>
-				<maml:name>VMIPAddress[]</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-	</command:parameters>
-	<command:inputTypes>
-		<command:inputType>
-			<dev:type>
-				<maml:name></maml:name>
-				<maml:uri></maml:uri>
-				<maml:description/>
-			</dev:type>
-			<maml:description>
-<maml:para />
-			</maml:description>
-		</command:inputType>
-	</command:inputTypes>
-	<command:returnValues>
-		<command:returnValue>
-			<dev:type>
-				<maml:name></maml:name>
-				<maml:uri></maml:uri>
-				<maml:description/>
-			</dev:type>
-			<maml:description>
-<maml:para />
-			</maml:description>
-		</command:returnValue>
-	</command:returnValues>
-	<command:terminatingErrors></command:terminatingErrors>
-	<command:nonTerminatingErrors></command:nonTerminatingErrors>
-	<maml:alertSet>
-		<maml:title></maml:title>
-		<maml:alert>
-			<maml:para />
-		</maml:alert>
-	</maml:alertSet>
-	<command:examples>
-	</command:examples>
-	<maml:relatedLinks>
-	</maml:relatedLinks>
-</command:command>
-<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
-<!--Generated by PS Cmdlet Help Editor-->
-	<command:details>
 		<command:name>Convert-ZertoVPGToVPGSetting</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Converts an active Zerto VPG to a VPG Settings object</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -15207,7 +14992,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Converts an active Zerto VPG to a VPG Settings object for modification</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -15334,7 +15119,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Get-ZertoVPGCheckpointID</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Returns a Zerto VPG Checkpoint ID</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -15344,7 +15129,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Returns a Zerto VPG Checkpoints for a given VPG ID and Checkpoint Tag</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -15380,7 +15165,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoVpgCheckpointTag</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto VPG Checkpoint Tag</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -15438,7 +15223,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoVpgCheckpointTag</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Zerto VPG Checkpoint Tag</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -15490,7 +15275,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Get-ZertoVPGCheckpointLastID</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Returns the latest Zerto VPG Checkpoint ID</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -15500,7 +15285,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Returns the latest Zerto VPG Checkpoint IDf or a given VPG ID</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -15627,7 +15412,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Get-ZertoVPGCheckpoints</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Returns all Zerto VPG Checkpoints</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -15637,7 +15422,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Returns all Zerto VPG Checkpoints for a given Zerto VPG ID</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -15802,7 +15587,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Get-ZertoVPGCheckpointSummary</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Returns a Zerto VPG Checkpoint summary </maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -15812,7 +15597,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Returns a Zerto VPG Checkpoint summary for a given Zerto VPG ID</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -16213,7 +15998,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Invoke-ZertoVPGFailoverCommit</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Commits a a Zerto VPG failover</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -16223,7 +16008,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Commits a a Zerto VPG failover given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -16350,7 +16135,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Invoke-ZertoVPGFailoverRollback</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Rollback a a Zerto VPG failover</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -16360,7 +16145,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Rollback a a Zerto VPG failover given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -16487,7 +16272,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Invoke-ZertoVPGForceSync</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Force synchronizes a Zerto VPG</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -16497,7 +16282,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Force synchronizes a Zerto VPG given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -16573,314 +16358,6 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			<maml:name>ZertoVpgIdentifier</maml:name>
 			<maml:description>
 				<maml:para>Zerto VPG Identifier</maml:para>
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-	</command:parameters>
-	<command:inputTypes>
-		<command:inputType>
-			<dev:type>
-				<maml:name></maml:name>
-				<maml:uri></maml:uri>
-				<maml:description/>
-			</dev:type>
-			<maml:description>
-<maml:para />
-			</maml:description>
-		</command:inputType>
-	</command:inputTypes>
-	<command:returnValues>
-		<command:returnValue>
-			<dev:type>
-				<maml:name></maml:name>
-				<maml:uri></maml:uri>
-				<maml:description/>
-			</dev:type>
-			<maml:description>
-<maml:para />
-			</maml:description>
-		</command:returnValue>
-	</command:returnValues>
-	<command:terminatingErrors></command:terminatingErrors>
-	<command:nonTerminatingErrors></command:nonTerminatingErrors>
-	<maml:alertSet>
-		<maml:title></maml:title>
-		<maml:alert>
-			<maml:para />
-		</maml:alert>
-	</maml:alertSet>
-	<command:examples>
-	</command:examples>
-	<maml:relatedLinks>
-	</maml:relatedLinks>
-</command:command>
-<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
-<!--Generated by PS Cmdlet Help Editor-->
-	<command:details>
-		<command:name>New-ZertoIPAddress</command:name>
-		<maml:description>
-			<maml:para />
-		</maml:description>
-		<maml:copyright>
-			<maml:para />
-		</maml:copyright>
-		<command:verb>New</command:verb>
-		<command:noun>ZertoIPAddress</command:noun>
-		<dev:version />
-	</command:details>
-	<maml:description>
-		<maml:para />
-	</maml:description>
-	<command:syntax>
-		<command:syntaxItem>
-			<maml:name>New-ZertoIPAddress</maml:name>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
-				<maml:name>VMName</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1">
-				<maml:name>IPAddress</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="2">
-				<maml:name>SubnetMask</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
-				<maml:name>Gateway</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-				<maml:name>DNS1</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-				<maml:name>DNS2</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
-				<maml:name>DNSSuffix</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
-				<maml:name>TestIPAddress</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
-				<maml:name>TestSubnetMask</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
-				<maml:name>TestGateway</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="10">
-				<maml:name>TestDNS1</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="11">
-				<maml:name>TestDNS2</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
-				<maml:name>TestDNSSuffix</maml:name>
-				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-		</command:syntaxItem>
-	</command:syntax>
-	<command:parameters>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
-			<maml:name>VMName</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1">
-			<maml:name>IPAddress</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="2">
-			<maml:name>SubnetMask</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
-			<maml:name>Gateway</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-			<maml:name>DNS1</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-			<maml:name>DNS2</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
-			<maml:name>DNSSuffix</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
-			<maml:name>TestIPAddress</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
-			<maml:name>TestSubnetMask</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
-			<maml:name>TestGateway</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="10">
-			<maml:name>TestDNS1</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="11">
-			<maml:name>TestDNS2</maml:name>
-			<maml:description>
-				<maml:para />
-			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			<dev:type>
-				<maml:name>String</maml:name>
-				<maml:uri/>
-			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
-		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
-			<maml:name>TestDNSSuffix</maml:name>
-			<maml:description>
-				<maml:para />
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -17663,7 +17140,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Remove-ZertoVPG</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Removes a Zerto VPG</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -17673,7 +17150,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Removes a Zerto VPG given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -17709,14 +17186,14 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
 				<maml:name>Force</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Force the removal of the VPG</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
 				<maml:name>KeepRecoveryVolumes</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Keeps the Recovery Volumes on the remote site</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
@@ -17774,7 +17251,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
 			<maml:name>Force</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Force the removal of the VPG</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			<dev:type>
@@ -17786,14 +17263,14 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
 			<maml:name>KeepRecoveryVolumes</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Keeps the Recovery Volumes on the remote site</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			<dev:type>
 				<maml:name>Boolean</maml:name>
 				<maml:uri/>
 			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
+			<dev:defaultValue>$false</dev:defaultValue>
 		</command:parameter>
 	</command:parameters>
 	<command:inputTypes>
@@ -17994,7 +17471,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Start-ZertoVPGClone</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Starts a clone of a Zerto VPG</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -18004,7 +17481,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Starts a clone of a Zerto VPG given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -18150,7 +17627,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Start-ZertoVPGFailover</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Starts a Zerto VPG failover</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -18160,7 +17637,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Starts a Zerto VPG failover given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -18193,31 +17670,55 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-				<maml:name>commitPolicy</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+				<maml:name>ZertoVpgCheckpointIdentifier</maml:name>
 				<maml:description>
-					<maml:para />
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">ZertoCommitPolicy</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-				<maml:name>commitValue</maml:name>
-				<maml:description>
-					<maml:para />
+					<maml:para>The identifier of the checkpoint to use for the failover. A checkpoint must be specified. (default is latest)</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
+				<maml:name>CommitPolicy</maml:name>
+				<maml:description>
+					<maml:para>The policy to use after the failover enters a Before Commit state. Possible values are (Json/XML):
+rollback – After the seconds specified in the commitValue setting have elapsed, the failover is rolled
+back.
+commit – After the seconds specified in the commitValue setting have elapsed, the failover continue,
+committing the virtual machines in the recovery site.
+none – The virtual machines in the VPG being failed over remain in the Before Commit state until
+either they are committed with Commit a failover, or rolled back with Roll back a failover</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">ZertoCommitPolicy</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
+				<maml:name>CommitInSeconds</maml:name>
+				<maml:description>
+					<maml:para>Number of seconds after failover to commit.</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
 				<maml:name>ShutdownPolicy</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>The shutdown policy to apply to the virtual machines on the protected site that are being failed over
+Possible values are (Json/XML):
+None – The protected virtual machines are not touched before starting the failover. This assumes
+that you do not have access to the protected virtual machines.
+shutdown – If the protected virtual machines have VMware Tools or Microsoft Integration Services
+available, the virtual machines are gracefully shut down, otherwise the failover operation fails. This is
+similar to performing a Move operation to a specified checkpoint.
+forceshutdown – The protected virtual machines are forcibly shut down before starting the failover. If
+the protected virtual machines have VMware Tools or Microsoft Integration Services available, the
+procedure waits five minutes for the virtual machines to be gracefully shut down before forcibly
+powering them off. This is similar to performing a Move operation to a specified checkpoint.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">ZertoShutdownPolicy</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="7">
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="8">
 				<maml:name>TimeToWaitBeforeShutdownInSec</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>The amount of time in seconds the failover waits in a Before Commit state to enable checking that
+the failover is as required before performing the commitPolicy setting.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -18272,22 +17773,51 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
-			<maml:name>commitPolicy</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
+			<maml:name>CommitPolicy</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>The policy to use after the failover enters a Before Commit state. Possible values are (Json/XML):
+rollback – After the seconds specified in the commitValue setting have elapsed, the failover is rolled
+back.
+commit – After the seconds specified in the commitValue setting have elapsed, the failover continue,
+committing the virtual machines in the recovery site.
+none – The virtual machines in the VPG being failed over remain in the Before Commit state until
+either they are committed with Commit a failover, or rolled back with Roll back a failover</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">ZertoCommitPolicy</command:parameterValue>
 			<dev:type>
 				<maml:name>ZertoCommitPolicy</maml:name>
 				<maml:uri/>
 			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
+			<dev:defaultValue>Commit</dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
-			<maml:name>commitValue</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="7">
+			<maml:name>ShutdownPolicy</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>The shutdown policy to apply to the virtual machines on the protected site that are being failed over
+Possible values are (Json/XML):
+None – The protected virtual machines are not touched before starting the failover. This assumes
+that you do not have access to the protected virtual machines.
+shutdown – If the protected virtual machines have VMware Tools or Microsoft Integration Services
+available, the virtual machines are gracefully shut down, otherwise the failover operation fails. This is
+similar to performing a Move operation to a specified checkpoint.
+forceshutdown – The protected virtual machines are forcibly shut down before starting the failover. If
+the protected virtual machines have VMware Tools or Microsoft Integration Services available, the
+procedure waits five minutes for the virtual machines to be gracefully shut down before forcibly
+powering them off. This is similar to performing a Move operation to a specified checkpoint.</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">ZertoShutdownPolicy</command:parameterValue>
+			<dev:type>
+				<maml:name>ZertoShutdownPolicy</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>Shutdown</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="8">
+			<maml:name>TimeToWaitBeforeShutdownInSec</maml:name>
+			<maml:description>
+				<maml:para>The amount of time in seconds the failover waits in a Before Commit state to enable checking that
+the failover is as required before performing the commitPolicy setting.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -18296,22 +17826,22 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
-			<maml:name>ShutdownPolicy</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<maml:name>ZertoVpgCheckpointIdentifier</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>The identifier of the checkpoint to use for the failover. A checkpoint must be specified. (default is latest)</maml:para>
 			</maml:description>
-			<command:parameterValue required="true" variableLength="false">ZertoShutdownPolicy</command:parameterValue>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
-				<maml:name>ZertoShutdownPolicy</maml:name>
+				<maml:name>String</maml:name>
 				<maml:uri/>
 			</dev:type>
-			<dev:defaultValue></dev:defaultValue>
+			<dev:defaultValue>(default is latest)</dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="7">
-			<maml:name>TimeToWaitBeforeShutdownInSec</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="6">
+			<maml:name>CommitInSeconds</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Number of seconds after failover to commit.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -18363,7 +17893,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 	<command:details>
 		<command:name>Stop-ZertoVPGClone</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Stops a clone of a Zerto VPG</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -18373,7 +17903,7 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Stops a clone of a Zerto VPG given a VPG Identifier</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -18590,6 +18120,1174 @@ ZORG An organization set up in the Zerto Cloud</maml:para>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
 				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>Invoke-ZertoVPGPause</command:name>
+		<maml:description>
+			<maml:para>Pauses a Zerto VPG</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>Invoke</command:verb>
+		<command:noun>ZertoVPGPause</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Pauses a Zerto VPG given a VPG Identifier</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>Invoke-ZertoVPGPause</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>ZertoVpgIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VPG Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>ZertoServer</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL server name </maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ZertoPort</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL Port</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>9669</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<maml:name>ZertoToken</maml:name>
+			<maml:description>
+				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			<dev:type>
+				<maml:name>Hashtable</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>ZertoVpgIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VPG Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>Invoke-ZertoVPGResume</command:name>
+		<maml:description>
+			<maml:para>Resumes a paused Zerto VPG</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>Invoke</command:verb>
+		<command:noun>ZertoVPGResume</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Resumes a paused Zerto VPG given a VPG Identifier</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>Invoke-ZertoVPGResume</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>ZertoVpgIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VPG Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>ZertoServer</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL server name </maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ZertoPort</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL Port</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>9669</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<maml:name>ZertoToken</maml:name>
+			<maml:description>
+				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			<dev:type>
+				<maml:name>Hashtable</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>ZertoVpgIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VPG Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>Remove-ZertoVRA</command:name>
+		<maml:description>
+			<maml:para>Removes a Zerto VRA</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>Remove</command:verb>
+		<command:noun>ZertoVRA</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Removes a Zerto VRA given a Zerto VRA Identifier</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>Remove-ZertoVRA</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>ZertoVraIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VRA Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>ZertoServer</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL server name </maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ZertoPort</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL Port</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>9669</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<maml:name>ZertoToken</maml:name>
+			<maml:description>
+				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			<dev:type>
+				<maml:name>Hashtable</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>ZertoVraIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VRA Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>Start-ZertoVPGFailoverTest</command:name>
+		<maml:description>
+			<maml:para>Starts a Zerto Failover Test</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>Start</command:verb>
+		<command:noun>ZertoVPGFailoverTest</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Starts a Zerto Failover Test given a Zerto VPG Identifier</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>Start-ZertoVPGFailoverTest</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>ZertoVpgIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VPG Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+				<maml:name>ZertoVpgCheckpointIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VPG Checkpoint Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>ZertoServer</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL server name </maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ZertoPort</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL Port</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>9669</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<maml:name>ZertoToken</maml:name>
+			<maml:description>
+				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			<dev:type>
+				<maml:name>Hashtable</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>ZertoVpgIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VPG Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<maml:name>ZertoVpgCheckpointIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VPG Checkpoint Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>Stop-ZertoVPGFailoverTest</command:name>
+		<maml:description>
+			<maml:para>Stops a Zerto Failover Test</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>Stop</command:verb>
+		<command:noun>ZertoVPGFailoverTest</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Stops a Zerto Failover Test given a Zerto VPG Identifier</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>Stop-ZertoVPGFailoverTest</maml:name>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>ZertoServer</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL server name </maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ZertoPort</maml:name>
+				<maml:description>
+					<maml:para>Zerto RestAPI URL Port</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+				<maml:name>ZertoToken</maml:name>
+				<maml:description>
+					<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>ZertoVpgIdentifier</maml:name>
+				<maml:description>
+					<maml:para>Zerto VPG Identifier</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+				<maml:name>FailoverTestSuccess</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
+				<maml:name>FailoverTestSummary</maml:name>
+				<maml:description>
+					<maml:para />
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>ZertoServer</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL server name </maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>il1zerto.nuveen.com</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ZertoPort</maml:name>
+			<maml:description>
+				<maml:para>Zerto RestAPI URL Port</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue>9669</dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="2">
+			<maml:name>ZertoToken</maml:name>
+			<maml:description>
+				<maml:para>Zerto token from Get-ZertoAuthToken</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
+			<dev:type>
+				<maml:name>Hashtable</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>ZertoVpgIdentifier</maml:name>
+			<maml:description>
+				<maml:para>Zerto VPG Identifier</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<maml:name>FailoverTestSuccess</maml:name>
+			<maml:description>
+				<maml:para />
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
+			<maml:name>FailoverTestSummary</maml:name>
+			<maml:description>
+				<maml:para />
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>New-ZertoFailoverIPAddress</command:name>
+		<maml:description>
+			<maml:para>Creats a new Zerto Failover IP Address for a VPG</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>New</command:verb>
+		<command:noun>ZertoFailoverIPAddress</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Creats a new Zerto Failover IP Address for a VPG</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>New-ZertoFailoverIPAddress</maml:name>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>NICName</maml:name>
+				<maml:description>
+					<maml:para>NIC Name</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+				<maml:name>ReplaceMAC</maml:name>
+				<maml:description>
+					<maml:para>Replace the MAC address on failover</maml:para>
+				</maml:description>
+				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="2">
+				<maml:name>IPAddress</maml:name>
+				<maml:description>
+					<maml:para>Failover IP Address</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+				<maml:name>SubnetMask</maml:name>
+				<maml:description>
+					<maml:para>Failover Subnet Mask</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
+				<maml:name>Gateway</maml:name>
+				<maml:description>
+					<maml:para>Failover IP Gateway</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
+				<maml:name>DNS1</maml:name>
+				<maml:description>
+					<maml:para>Failover DNS Server 1</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
+				<maml:name>DNS2</maml:name>
+				<maml:description>
+					<maml:para>Failover DNS Server 1</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="7">
+				<maml:name>DNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
+				<maml:name>TestIPAddress</maml:name>
+				<maml:description>
+					<maml:para>Failover Test IP Address</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
+				<maml:name>TestSubnetMask</maml:name>
+				<maml:description>
+					<maml:para>Failover Subnet MaskSubnet Mask</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="10">
+				<maml:name>TestGateway</maml:name>
+				<maml:description>
+					<maml:para>Failover Test Gateway</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="11">
+				<maml:name>TestDNS1</maml:name>
+				<maml:description>
+					<maml:para>Failover Test DNS Server 1</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
+				<maml:name>TestDNS2</maml:name>
+				<maml:description>
+					<maml:para>Failover Test DNS Server 2</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
+				<maml:name>TestDNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover Test DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>NICName</maml:name>
+			<maml:description>
+				<maml:para>NIC Name</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1">
+			<maml:name>ReplaceMAC</maml:name>
+			<maml:description>
+				<maml:para>Replace the MAC address on failover</maml:para>
+			</maml:description>
+			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
+			<dev:type>
+				<maml:name>Boolean</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="2">
+			<maml:name>IPAddress</maml:name>
+			<maml:description>
+				<maml:para>Failover IP Address</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="3">
+			<maml:name>SubnetMask</maml:name>
+			<maml:description>
+				<maml:para>Failover Subnet Mask</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<maml:name>Gateway</maml:name>
+			<maml:description>
+				<maml:para>Failover IP Gateway</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="5">
+			<maml:name>DNS1</maml:name>
+			<maml:description>
+				<maml:para>Failover DNS Server 1</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="6">
+			<maml:name>DNS2</maml:name>
+			<maml:description>
+				<maml:para>Failover DNS Server 1</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="7">
+			<maml:name>DNSSuffix</maml:name>
+			<maml:description>
+				<maml:para>Failover DNS Suffix</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="8">
+			<maml:name>TestIPAddress</maml:name>
+			<maml:description>
+				<maml:para>Failover Test IP Address</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="9">
+			<maml:name>TestSubnetMask</maml:name>
+			<maml:description>
+				<maml:para>Failover Subnet MaskSubnet Mask</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="10">
+			<maml:name>TestGateway</maml:name>
+			<maml:description>
+				<maml:para>Failover Test Gateway</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="11">
+			<maml:name>TestDNS1</maml:name>
+			<maml:description>
+				<maml:para>Failover Test DNS Server 1</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="12">
+			<maml:name>TestDNS2</maml:name>
+			<maml:description>
+				<maml:para>Failover Test DNS Server 2</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="13">
+			<maml:name>TestDNSSuffix</maml:name>
+			<maml:description>
+				<maml:para>Failover Test DNS Suffix</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+	</command:parameters>
+	<command:inputTypes>
+		<command:inputType>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:inputType>
+	</command:inputTypes>
+	<command:returnValues>
+		<command:returnValue>
+			<dev:type>
+				<maml:name></maml:name>
+				<maml:uri></maml:uri>
+				<maml:description/>
+			</dev:type>
+			<maml:description>
+<maml:para />
+			</maml:description>
+		</command:returnValue>
+	</command:returnValues>
+	<command:terminatingErrors></command:terminatingErrors>
+	<command:nonTerminatingErrors></command:nonTerminatingErrors>
+	<maml:alertSet>
+		<maml:title></maml:title>
+		<maml:alert>
+			<maml:para />
+		</maml:alert>
+	</maml:alertSet>
+	<command:examples>
+	</command:examples>
+	<maml:relatedLinks>
+	</maml:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<!--Generated by PS Cmdlet Help Editor-->
+	<command:details>
+		<command:name>New-ZertoVPGVirtualMachine</command:name>
+		<maml:description>
+			<maml:para>Creates a new Zerto VPG Virtual Machine object</maml:para>
+		</maml:description>
+		<maml:copyright>
+			<maml:para />
+		</maml:copyright>
+		<command:verb>New</command:verb>
+		<command:noun>ZertoVPGVirtualMachine</command:noun>
+		<dev:version />
+	</command:details>
+	<maml:description>
+		<maml:para>Creates a new Zerto VPG Virtual Machine object for creating a new VPG</maml:para>
+	</maml:description>
+	<command:syntax>
+		<command:syntaxItem>
+			<maml:name>New-ZertoVPGVirtualMachine</maml:name>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
+				<maml:name>VMName</maml:name>
+				<maml:description>
+					<maml:para>VM Name</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="false" position="1">
+				<maml:name>FailoverIPAddress</maml:name>
+				<maml:description>
+					<maml:para>Array of Failover IP Address objects</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="true">FailoverIPAddress[]</command:parameterValue>
+			</command:parameter>
+		</command:syntaxItem>
+	</command:syntax>
+	<command:parameters>
+		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0">
+			<maml:name>VMName</maml:name>
+			<maml:description>
+				<maml:para>VM Name</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<dev:type>
+				<maml:name>String</maml:name>
+				<maml:uri/>
+			</dev:type>
+			<dev:defaultValue></dev:defaultValue>
+		</command:parameter>
+		<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="false" position="1">
+			<maml:name>FailoverIPAddress</maml:name>
+			<maml:description>
+				<maml:para>Array of Failover IP Address objects</maml:para>
+			</maml:description>
+			<command:parameterValue required="true" variableLength="true">FailoverIPAddress[]</command:parameterValue>
+			<dev:type>
+				<maml:name>FailoverIPAddress[]</maml:name>
 				<maml:uri/>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>

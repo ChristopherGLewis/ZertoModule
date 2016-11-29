@@ -1,6 +1,12 @@
 ﻿#Requires -Version 5.0
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#NOTE that the ExternalHelp tag requires a BLANK LINE before it 
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 #region Zerto Enums
+
+
     enum ZertoVPGStatus {
         Initializing          = 0
         MeetingSLA            = 1
@@ -327,14 +333,63 @@
         ForceShutdown = 2
     }
 
-
     enum ZertoVRAIPConfigType {
         Dhcp = 0
         Static = 1
     }
+
+    enum ZertoTaskTypes {
+        CreateProtectionGroup = 0  
+        RemoveProtectionGroup = 1  
+        FailOver = 2  
+        FailOverTest = 3  
+        StopFailOverTest = 4  
+        Move = 5  
+        GetCheckpointList = 6  
+        ProtectVM = 7  
+        UnprotectVM = 8  
+        AddVMToProtectionGroup = 9  
+        RemoveVMFromProtectionGroup = 10 
+        InstallVra = 11 
+        UninstallVra = 12 
+        GetVMSettings = 13 
+        UpdateProtectionGroup = 14 
+        InsertTaggedCP = 15 
+        WaitForCP = 16 
+        HandleMirrorPromotion = 17 
+        ActivateAllMirrors = 18 
+        LogCollection = 19 
+        ClearCheckpoints = 20 
+        ForceReconfigurationOfNewVM = 21 
+        ClearSite = 22 
+        ForceRemoveProtectionGroup = 23 
+        ForceUpdateProtectionGroup = 24 
+        ForceKillProtectionGroup = 25 
+        PrePostScript = 26 
+        InitFullSync = 27 
+        Pair = 28 
+        Unpair = 29 
+        AddPeerVraInfo = 30 
+        RemovePeerVraInfo = 31 
+        InstallCloudConnector = 32 
+        UninstallCloudConnector = 33 
+        HandleFirstSyncDone = 34 
+        Clone = 35 
+        MoveBeforeCommit = 36 
+        MoveRollback = 37 
+        MoveCommit = 38 
+        UpgradeVRA = 39 
+        MaintainHost = 40 
+        NotSupportedInThisVersion = 41 
+        MoveProtectionGroupToManualOperationNeeded = 42 
+        FailoverBeforeCommit = 43 
+        FailoverCommit = 44 
+
+    }
 #endregion
 
 #region Zerto Classes
+
     class FailoverIPAddress {
         [string] $NICName;
         [bool]   $ReplaceMAC;
@@ -525,21 +580,21 @@
         Return $NewZertoVM    
     }
 
-    class VRAIPAddress {
-         [String] $IPAddress;
-         [String] $SubnetMask;
-         [String] $Gateway;
-         [ZertoVRAIPConfigType] $VRAIPType;
+    class VRAIPAddressConfig {
+            [String] $IPAddress;
+            [String] $SubnetMask;
+            [String] $Gateway;
+            [ZertoVRAIPConfigType] $VRAIPType;
 
         #region base CTOR
-        VRAIPAddress ([String] $IPAddress, [String] $SubnetMask, [String] $Gateway, [ZertoVRAIPConfigType] $VRAIPType) {
+        VRAIPAddressConfig ([String] $IPAddress, [String] $SubnetMask, [String] $Gateway, [ZertoVRAIPConfigType] $VRAIPType) {
             $this.IPAddress = $IPAddress;
             $this.SubnetMask = $SubnetMask;
             $this.Gateway = $Gateway;
             $this.VRAIPType = $VRAIPType;
         }
         #endregion         
-    
+
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -763,7 +818,7 @@ Add-Type @"
 
     Function Get-QueryStringFromHashTable {
         param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Query String Hash Table')] [Hashtable] $QueryStringHash
+            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Query String Hash Table')] [Hashtable] $QueryStringHash
         )
         
         $out = ""
@@ -782,7 +837,7 @@ Add-Type @"
 
     Function Parse-ZertoDate {
         param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto Date in the form YYYY-MM-DD or YYYY-MM-DDThh:mm:ss')] [String] $ZertoDate
+            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto Date in the form YYYY-MM-DD or YYYY-MM-DDThh:mm:ss')] [String] $ZertoDate
         )
         
         try {
@@ -795,7 +850,7 @@ Add-Type @"
 
     Function Test-RESTError {
         param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Error')] [System.Management.Automation.ErrorRecord] $err
+            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Error')] [System.Management.Automation.ErrorRecord] $err
         )
         
         If ($err.Exception -is [System.Net.WebException]) {
@@ -823,7 +878,7 @@ Add-Type @"
 
 #region Zerto Authentication
 
-    # .ExternalHelp ZertoModule.psm1-help.xml
+    #.ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAuthToken  {
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
@@ -903,6 +958,8 @@ Add-Type @"
 #endregion
 
 #region Zerto Rest API
+
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoRESTAPIs {
         param(
@@ -926,6 +983,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Alerts
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlerts {
         param(
@@ -950,16 +1008,16 @@ Add-Type @"
         }
 
         $FullURL = $baseURL + "alerts" 
-        if ($StartDate -or $EndDate -or $VPGIdentifier -or $ZORGIdentifier -or $SiteIdentifier -or $Level -or $Entity -or $HelpIdentifier) {
+        if ($StartDate -or $EndDate -or $VPGIdentifier -or $ZORGIdentifier -or $SiteIdentifier -or $Level -ne $null  -or $Entity -ne $null -or $HelpIdentifier -ne $null) {
             $qs = [ordered] @{}
-            if ($StartDate)      { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
-            if ($EndDate)        { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
-            if ($VPGIdentifier)  { $qs.Add("VPGIdentifier", $VPGIdentifier) }
-            if ($ZORGIdentifier) { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
-            if ($SiteIdentifier) { $qs.Add("SiteIdentifier", $SiteIdentifier) }
-            if ($Level)          { $qs.Add("Level", $Level) }
-            if ($Entity)         { $qs.Add("Entity", $Entity) }
-            if ($HelpIdentifier) { $qs.Add("HelpIdentifier", $HelpIdentifier) }
+            if ($StartDate)        { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
+            if ($EndDate)          { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
+            if ($VPGIdentifier)    { $qs.Add("VPGIdentifier", $VPGIdentifier) }
+            if ($ZORGIdentifier)   { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
+            if ($SiteIdentifier)   { $qs.Add("SiteIdentifier", $SiteIdentifier) }
+            if ($Level -ne $null)     { $qs.Add("Level", $Level) }
+            if ($Entity -ne $null)     { $qs.Add("Entity", $Entity) }
+            if ($HelpIdentifier -ne $null) { $qs.Add("HelpIdentifier", $HelpIdentifier) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -1287,6 +1345,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Events
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEvents {
         param(
@@ -1314,20 +1373,20 @@ Add-Type @"
         }
 
         $FullURL = $baseURL + "events" 
-        if ($StartDate -or $EndDate -or $VPGIdentifier -or $EventType -or $SiteName -or $SiteIdentifier -or $ZORGIdentifier -or $Entity `
-            -or $UserName -or $EventCategory -or $ZertoAlertIdentifier) {
+        if ($StartDate -or $EndDate -or $VPGIdentifier -or $EventType -ne $null -or $SiteName -or $SiteIdentifier -or $ZORGIdentifier `
+            -or $EntityType  -ne $null -or $UserName -or $EventCategory -ne $null -or $ZertoAlertIdentifier) {
             $qs = [ordered] @{}
-            if ($StartDate)            { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
-            if ($EndDate)              { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
-            if ($VPGIdentifier)        { $qs.Add("VPGIdentifier", $VPGIdentifier) }
-            if ($EventType)            { $qs.Add("EventType", $EventType) }
-            if ($SiteName)             { $qs.Add("SiteName", $SiteName) }
-            if ($SiteIdentifier)       { $qs.Add("SiteIdentifier", $SiteIdentifier) }
-            if ($EntityType)           { $qs.Add("EntityType", $EntityType) }
-            if ($ZORGIdentifier)       { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
-            if ($UserName)             { $qs.Add("UserName", $UserName) }
-            if ($EventCategory)        { $qs.Add("EventCategory", $EventCategory) }
-            if ($ZertoAlertIdentifier) { $qs.Add("ZertoAlertIdentifier", $ZertoAlertIdentifier) }
+            if ($StartDate)                { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
+            if ($EndDate)                  { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
+            if ($VPGIdentifier)            { $qs.Add("VPGIdentifier", $VPGIdentifier) }
+            if ($EventType -ne $null)      { $qs.Add("EventType", $EventType) }
+            if ($SiteName)                 { $qs.Add("SiteName", $SiteName) }
+            if ($SiteIdentifier)           { $qs.Add("SiteIdentifier", $SiteIdentifier) }
+            if ($EntityType -ne $null)     { $qs.Add("EntityType", $EntityType) }
+            if ($ZORGIdentifier)           { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
+            if ($UserName)                 { $qs.Add("UserName", $UserName) }
+            if ($EventCategory -ne $null)  { $qs.Add("EventCategory", $EventCategory) }
+            if ($ZertoAlertIdentifier)     { $qs.Add("ZertoAlertIdentifier", $ZertoAlertIdentifier) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -1450,6 +1509,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Local Site
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoLocalSite {
         param(
@@ -1475,6 +1535,7 @@ Add-Type @"
         return $Result
     }
 
+    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoLocalSiteID {
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
@@ -1516,6 +1577,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Peer Sites
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoPeerSites {
         param(
@@ -1537,13 +1599,13 @@ Add-Type @"
         }
 
         $FullURL = $baseURL + "peersites"
-        if ($PeerName -or $ParingStatus -or $Location -or $HostName -or $Port) {
+        if ($PeerName -or $ParingStatus -ne $null -or $Location -or $HostName -or $Port) {
             $qs = [ordered] @{}
-            if ($PeerName) { $qs.Add("peerName", $PeerName) }
-            if ($ParingStatus) { $qs.Add("paringStatus", $ParingStatus) }
-            if ($Location) { $qs.Add("location", $Location) }
-            if ($HostName) { $qs.Add("hostName", $HostName) }
-            if ($Port) { $qs.Add("port", $Port) }
+            if ($PeerName)               { $qs.Add("peerName", $PeerName) }
+            if ($ParingStatus -ne $null) { $qs.Add("paringStatus", $ParingStatus) }
+            if ($Location)               { $qs.Add("location", $Location) }
+            if ($HostName)               { $qs.Add("hostName", $HostName) }
+            if ($Port)                   { $qs.Add("port", $Port) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -1613,7 +1675,7 @@ Add-Type @"
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
             [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1626,7 +1688,7 @@ Add-Type @"
         $FullURL = $baseURL + "serviceprofiles"
         if ($Site) {
             $qs = [ordered] @{}
-            if ($SiteIdentifier) { $qs.Add("Site", $SiteIdentifier) }
+            if ($SiteIdentifier) { $qs.Add("Site", $ZertoSiteIdentifier) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -1691,6 +1753,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Virtualization Sites
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSites {
         param(
@@ -1803,6 +1866,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Site Secondarys
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteDatastoreClusters {
         param(
@@ -2311,6 +2375,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Tasks
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoTasks {
         param(
@@ -2321,7 +2386,7 @@ Add-Type @"
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Started After Date')] [string] $StartedAfterDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Completed Before Date (YYYY-MM-DD)')] [string] $CompletedBeforeDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Completed After Date')] [string] $CompletedAfterDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Type')] [string] $Type, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Type')] [ZertoTaskTypes] $TaskType, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Status')] [string] $Status
         )
 
@@ -2333,14 +2398,14 @@ Add-Type @"
         }
 
         $FullURL = $baseURL + "tasks"
-        if ($StartedBeforeDate -or $StartedAfterDate -or $CompletedBeforeDate -or $CompletedAfterDate -or $Type -or $Status) {
+        if ($StartedBeforeDate -or $StartedAfterDate -or $CompletedBeforeDate -or $CompletedAfterDate -or $TaskType -ne $null -or $Status) {
             $qs = [ordered] @{}
             if ($StartedBeforeDate)   { if (Parse-ZertoDate($StartedBeforeDate))    { $qs.Add("startedBeforeDate",   $StartedBeforeDate)   } else { throw "Invalid StartedBeforeDate: '$StartedBeforeDate'" } }
             if ($StartedAfterDate)    { if (Parse-ZertoDate($StartedAfterDate))     { $qs.Add("startedAfterDate",    $StartedAfterDate)    } else { throw "Invalid StartedAfterDate: '$StartedAfterDate'" } }
             if ($CompletedBeforeDate) { if (Parse-ZertoDate($CompletedBeforeDate))  { $qs.Add("completedBeforeDate", $CompletedBeforeDate) } else { throw "Invalid CompletedBeforeDate: '$CompletedBeforeDate'" } }
             if ($CompletedAfterDate)  { if (Parse-ZertoDate($CompletedAfterDate))   { $qs.Add("completedAfterDate",  $CompletedAfterDate)  } else { throw "Invalid CompletedAfterDate: '$CompletedAfterDate'" } }
-            if ($Type) { $qs.Add("type", $Type) }
-            if ($Status) { $qs.Add("status", $Status) }
+            if ($TaskType -ne $null)  { $qs.Add("type", $TaskType) }
+            if ($Status)              { $qs.Add("status", $Status) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -2413,6 +2478,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Virtual Machines
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVMs {
         param(
@@ -2422,7 +2488,7 @@ Add-Type @"
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG name')] [string] $VPGName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM name')] [string] $VMName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Status')] [ZertoVPGStatus] $Status, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Substatus')] [ZertoVPGSubstatus] $Substatus, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Substatus')] [ZertoVPGSubstatus] $SubStatus, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Source Type')] [ZertoSourceType] $SourceType, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Target Type')] [ZertoTargetType] $TargetType, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Source Site')] [string] $SourceSite, 
@@ -2438,18 +2504,20 @@ Add-Type @"
             throw "Missing Zerto Authentication Token"
         }
         $FullURL = $baseURL + "vms"
-        if ($VPGName -or $VMName -or $Status -or $SourceType -or $TargetType -or $SourceSite -or $TargetSite -or $OrganizationName -or $Priority) {
+        if ($VPGName -or $VMName -or $Status -ne $null -or $Substatus -ne $null -or `
+                $SourceType -ne $null -or $TargetType -ne $null -or $SourceSite -or $TargetSite -or $OrganizationName `
+                -or $Priority -ne $null) {
             $qs = [ordered] @{}
-            if ($VPGName) { $qs.Add("vpgName", $VPGName) }
-            if ($VMName) { $qs.Add("vmName", $VMName) }
-            if ($Status) { $qs.Add("status", $Status) }
-            if ($Substatus) { $qs.Add("substatus", $Substatus) }
-            if ($SourceType) { $qs.Add("sourceType", $SourceType) }
-            if ($TargetType) { $qs.Add("targetType", $TargetType) }
-            if ($SourceSite) { $qs.Add("sourceSite", $SourceSite) }
-            if ($TargetSite) { $qs.Add("targetSite", $TargetSite) }
-            if ($OrganizationName) { $qs.Add("organizationName", $OrganizationName) }
-            if ($Priority) { $qs.Add("priority", $Priority) }
+            if ($VPGName)              { $qs.Add("vpgName", $VPGName) }
+            if ($VMName)               { $qs.Add("vmName", $VMName) }
+            if ($Status -ne $null)     { $qs.Add("status", $Status) }
+            if ($Substatus -ne $null)  { $qs.Add("substatus", $Substatus) }
+            if ($SourceType -ne $null) { $qs.Add("sourceType", $SourceType) }
+            if ($TargetType -ne $null) { $qs.Add("targetType", $TargetType) }
+            if ($SourceSite)           { $qs.Add("sourceSite", $SourceSite) }
+            if ($TargetSite)           { $qs.Add("targetSite", $TargetSite) }
+            if ($OrganizationName)     { $qs.Add("organizationName", $OrganizationName) }
+            if ($Priority -ne $null)   { $qs.Add("priority", $Priority) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -2513,6 +2581,7 @@ Add-Type @"
 #endregion
 
 #region Zerto VRAs
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRAs {
         param(
@@ -2538,10 +2607,11 @@ Add-Type @"
         }
 
         $FullURL = $baseURL + "vras" 
-        if ($VRAName -or $Status -or $VRAVersion -or $HostVersion -or $IPAddress -or $VRAGroup -or $DatastoreName -or $DatastoreClusterName -or $NetworkName ) {
+        if ($VRAName -or $VRAStatus -ne $null -or $VRAVersion -or $HostVersion -or $IPAddress `
+                -or $VRAGroup -or $DatastoreName -or $DatastoreClusterName -or $NetworkName ) {
             $qs = [ordered] @{}
             if ($VRAName)              { $qs.Add("VRAName", $VRAName) }
-            if ($VRAStatus)            { $qs.Add("Status", $VRAStatus) }
+            if ($VRAStatus -ne $null)  { $qs.Add("Status", $VRAStatus) }
             if ($VRAVersion)           { $qs.Add("VRAVersion", $VRAVersion) }
             if ($HostVersion)          { $qs.Add("HostVersion", $HostVersion) }
             if ($IPAddress)            { $qs.Add("IPAddress", $IPAddress) }
@@ -2729,9 +2799,9 @@ Add-Type @"
             [Parameter(Mandatory=$False, HelpMessage = 'Zerto VRA Group Name (optional)')] [string] $VRAGroupName,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Host Name')] [string] $HostName,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Network Name')] [string] $NetworkName,
-            [Parameter(Mandatory=$true, HelpMessage = 'Memory in GB for new VRA')] [string] $MemoryInGB,
+            [Parameter(Mandatory=$false, HelpMessage = 'Memory in GB for new VRA (1-16, defaults to 16)')] [string] $MemoryInGB = 16,
             [Parameter(Mandatory=$true, ParameterSetName="Password", HelpMessage = 'Zerto Host Root Password')] [string] $HostRootPassword,
-            [Parameter(Mandatory=$true, ParameterSetName="PublicKey", HelpMessage = 'Use vCenter PublicKey instead of Password')] [string] $UseVCenterPublicKey = $true,
+            [Parameter(Mandatory=$true, ParameterSetName="PublicKey", HelpMessage = 'Use vCenter PublicKey instead of Password')] [bool] $UseVCenterPublicKey = $true,
             [Parameter(Mandatory=$true, HelpMessage = 'VRA IP Configuration')] [VRAIPAddressConfig] $VRAIPConfiguration
 
             ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
@@ -2747,6 +2817,10 @@ Add-Type @"
         if ($UseVCenterPublicKey -and $HostRootPassword) {
             throw "Cannot specify both HostRootPassword and Use vCenter Public Key"
         }
+        if ($MemoryInGB -lt 1 -or $MemoryInGB -gt 16) {
+            throw "Invalid MemoryInGB - must be from 1 to 16"
+        }  
+
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoToken $ztoken
@@ -2808,6 +2882,7 @@ Add-Type @"
 #endregion
 
 #region Zerto VPGs
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGs {
         param(
@@ -2840,26 +2915,28 @@ Add-Type @"
         }
         
         $FullURL = $baseURL + "vpgs"
-        if ($VPGName -or $Status -or $SubStatus -or $ProtectedSiteType -or $RecoverySiteType -or $ProtectedSiteIdentifier -or `
-                $RecoverySiteIdentifier -or $SourceSite -or $TargetSite -or $SourceType -or $TargetType -or $ZOrganizationName -or `
-                $ZOrgIdentifier -or $priority -or $serviceProfileIdentifier -or $backupEnabled ) {
+        if ($VPGName -or $Status -ne $null -or $SubStatus -ne $null -or $ProtectedSiteType -ne $null `
+                -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or `
+                $RecoverySiteIdentifier -or $SourceSite -or $TargetSite -or $SourceType -ne $null `
+                -or $TargetType -ne $null -or $ZOrganizationName -or $ZOrgIdentifier `
+                -or $priority -ne $null -or $serviceProfileIdentifier -or $backupEnabled ) {
             $qs = [ordered] @{}
-            if ($VPGName)                   { $qs.Add("Name", $VPGName) }
-            if ($Status)                    { $qs.Add("Status", $Status) }
-            if ($SubStatus)                 { $qs.Add("SubStatus", $SubStatus) }
-            if ($ProtectedSiteType)         { $qs.Add("ProtectedSiteType", $ProtectedSiteType) }
-            if ($RecoverySiteType)          { $qs.Add("RecoverySiteType", $RecoverySiteType) }
-            if ($ProtectedSiteIdentifier)   { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
-            if ($RecoverySiteIdentifier)    { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
-            if ($SourceSite)                { $qs.Add("SourceSite", $SourceSite) }
-            if ($TargetSite)                { $qs.Add("TargetSite", $TargetSite) }
-            if ($SourceType)                { $qs.Add("SourceType", $SourceType) }
-            if ($TargetType)                { $qs.Add("TargetType", $TargetType) }
-            if ($ZOrganizationName)         { $qs.Add("ZOrganizationName", $ZOrganizationName) }
-            if ($ZOrgIdentifier)            { $qs.Add("ZOrgIdentifier", $ZOrgIdentifier) }
-            if ($Priority)                  { $qs.Add("priority", $Priority) }
-            if ($ServiceProfileIdentifier)  { $qs.Add("ServiceProfileIdentifier", $ServiceProfileIdentifier) }
-            if ($BackupEnabled)             { $qs.Add("BackupEnabled", $BackupEnabled) }
+            if ($VPGName)                     { $qs.Add("Name", $VPGName) }
+            if ($Status -ne $null)            { $qs.Add("Status", $Status) }
+            if ($SubStatus -ne $null)         { $qs.Add("SubStatus", $SubStatus) }
+            if ($ProtectedSiteType -ne $null) { $qs.Add("ProtectedSiteType", $ProtectedSiteType) }
+            if ($RecoverySiteType -ne $null)  { $qs.Add("RecoverySiteType", $RecoverySiteType) }
+            if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
+            if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
+            if ($SourceSite)                  { $qs.Add("SourceSite", $SourceSite) }
+            if ($TargetSite)                  { $qs.Add("TargetSite", $TargetSite) }
+            if ($SourceType -ne $null)        { $qs.Add("SourceType", $SourceType) }
+            if ($TargetType -ne $null)        { $qs.Add("TargetType", $TargetType) }
+            if ($ZOrganizationName)           { $qs.Add("ZOrganizationName", $ZOrganizationName) }
+            if ($ZOrgIdentifier)              { $qs.Add("ZOrgIdentifier", $ZOrgIdentifier) }
+            if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
+            if ($ServiceProfileIdentifier)    { $qs.Add("ServiceProfileIdentifier", $ServiceProfileIdentifier) }
+            if ($BackupEnabled)               { $qs.Add("BackupEnabled", $BackupEnabled) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -3943,6 +4020,7 @@ Add-Type @"
 #endregion
 
 #region Zerto VPG Settings
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettings {
         param(
@@ -4647,6 +4725,7 @@ Add-Type @"
 #endregion
 
 #region Zerto ZOrgs
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoZOrgs {
         param(
@@ -4704,6 +4783,7 @@ Add-Type @"
 #endregion
 
 #region Zerto Resoure Report
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoResoureReport {
         param(
@@ -4713,7 +4793,7 @@ Add-Type @"
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report From Time (YYYY-MM-DD HH:MM:SS)')] [string] $FromTime, 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report To Time (YYYY-MM-DD HH:MM:SS)')] [string] $ToTime, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Report Start Index ')] [string] $StartIndex, 
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report Records to Retrieve 1 to 500')] [string] $Count
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Report Records to retrieve 1 to 500')] [string] $Count = 500
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/ZvmService/ResourceReport/"
@@ -4722,6 +4802,10 @@ Add-Type @"
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
+
+        if ($Count -lt 1 -or $Count -gt 500) {
+            throw "Invalid Count - must be from 1 to 500"
+        }  
 
         $FullURL = $baseURL + "getSamples"
         if ($FromTime -or $ToTime -or $StartIndex -or $Count ) {
@@ -4783,130 +4867,137 @@ Add-Type @"
     }
 #endregion
 
-# ( "Export-ModuleMember -function " + (Get-Content .\ZertoModule\ZertoModule.psm1 | Where-Object { $_ -imatch "^Function *" } | Where-Object { $_ -inotmatch "SSLCertByPass" -and $_ -inotmatch "QueryStringFromHashTable"  -and $_ -inotmatch "Parse-ZertoDate" } | ForEach-Object { "```n" + ($_ -split "\s",3)[1] + "," })).TrimEnd( ',```n' ) 
-# Get-Content .\ZertoModule\ZertoModule.psm1 | Where-Object { $_ -imatch "^Function *" } | Where-Object { $_ -inotmatch "SSLCertByPass" -and $_ -inotmatch "QueryStringFromHashTable"  -and $_ -inotmatch "Parse-ZertoDate" } | ForEach-Object {  ($_ -split "\s",3)[1] + ",``" }
+# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', 'Test-RESTError' )
+# ( "Export-ModuleMember -function " + ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
+#                                         Where-Object { $_ -imatch "^Function *" } | ForEach-Object {  ($_ -split "\s",3)[1] } | `
+#                                         Where-Object {$_ -notin $PrivateFunctions} | ForEach-Object { "```n`t`t`t" + $_ + "," })).TrimEnd( ',```n' )
 
-Export-ModuleMember -function   New-ZertoFailoverIPAddress,`
-                                New-ZertoVPGVirtualMachine, `
-                                New-ZertoVPGSettingBasic,`
-                                New-ZertoVPGSettingBootgroup,`
-                                New-ZertoVPGSettingJournalLimitation,`
-                                New-ZertoVPGSettingJournal,`
-                                Get-ZertoAuthToken,`
-                                Remove-ZertoAuthToken,`
-                                Get-ZertoRESTAPIs,`
-                                Get-ZertoAlerts,`
-                                Get-ZertoAlert,`
-                                Get-ZertoAlertHelpIdentifierDescription,`
-                                Invoke-ZertoAlertDismiss,`
-                                Invoke-ZertoAlertUndismiss,`
-                                Get-ZertoAlertEntities,`
-                                Get-ZertoAlertHelpIdentifiers,`
-                                Get-ZertoAlertLevels,`
-                                Get-ZertoEvents,`
-                                Get-ZertoEvent,`
-                                Get-ZertoEventCategories,`
-                                Get-ZertoEventEntities,`
-                                Get-ZertoEventTypes,`
-                                Get-ZertoLocalSite,`
-                                Get-ZertoLocalSiteID,`
-                                Get-ZertoLocalSitePairingStatuses,`
-                                Get-ZertoPeerSites,`
-                                Get-ZertoPeerSite,`
-                                Get-ZertoPeerSiteID,`
-                                Get-ZertoServiceProfiles,`
-                                Get-ZertoServiceProfile,`
-                                Get-ZertoServiceProfileID,`
-                                Get-ZertoSites,`
-                                Get-ZertoSite,`
-                                Get-ZertoSiteID,`
-                                Get-ZertoVirtualizationSites,`
-                                Get-ZertoVirtualizationSite,`
-                                Get-ZertoVirtualizationSiteID,`
-                                Get-ZertoSiteDatastoreClusters,`
-                                Get-ZertoSiteDatastoreClusterID,`
-                                Get-ZertoSiteDatastores,`
-                                Get-ZertoSiteDatastoreID,`
-                                Get-ZertoSiteFolders,`
-                                Get-ZertoSiteFolderID,`
-                                Get-ZertoSiteHostClusters,`
-                                Get-ZertoSiteHostClusterID,`
-                                Get-ZertoSiteHosts,`
-                                Get-ZertoSiteHost,`
-                                Get-ZertoSiteHostID,`
-                                Get-ZertoSiteNetworks,`
-                                Get-ZertoSiteNetworkID,`
-                                Get-ZertoSiteOrgVCDs,`
-                                Get-ZertoSiteResourcePools,`
-                                Get-ZertoSiteVApps,`
-                                Get-ZertoSiteVcdVapps,`
-                                Get-ZertoSiteVMs,`
-                                Get-ZertoSiteVMID,`
-                                Get-ZertoTasks,`
-                                Get-ZertoTask,`
-                                Get-ZertoTasksTypes,`
-                                Get-ZertoVMs,`
-                                Get-ZertoVM,`
-                                Get-ZertoVMID,`
-                                Get-ZertoVPGs,`
-                                Get-ZertoVPG,`
-                                Convert-ZertoVPGToVPGSetting,`
-                                Get-ZertoVPGID,`
-                                Get-ZertoVPGCheckpoints,`
-                                Get-ZertoVPGCheckpointID,`
-                                Get-ZertoVPGCheckpointLastID,`
-                                Get-ZertoVPGCheckpointSummary,`
-                                Get-ZertoVPGEntityTypes,`
-                                Get-ZertoVPGFailoverCommitPolicies,`
-                                Get-ZertoVPGFailoverShutdownPolicies,`
-                                Get-ZertoVPGPriorities,`
-                                Get-ZertoVPGRetentionPolicies,`
-                                Get-ZertoVPGStatuses,`
-                                Get-ZertoVPGSubstatuses,`
-                                Add-ZertoVPG,`
-                                Remove-ZertoVPG,`
-                                Invoke-ZertoVPGForceSync,`
-                                Start-ZertoVPGClone,`
-                                Stop-ZertoVPGClone,`
-                                Start-ZertoVPGFailover,`
-                                Invoke-ZertoVPGFailoverCommit,`
-                                Invoke-ZertoVPGFailoverRollback,`
-                                Stop-ZertoVPGFailover,`
-                                Start-ZertoVPGFailoverTest,`
-                                Stop-ZertoVPGFailoverTest,`
-                                Invoke-ZertoVPGPause,`
-                                Invoke-ZertoVPGResume,`
-                                Get-ZertoVPGSettings,`
-                                Get-ZertoVPGSetting,`
-                                Get-ZertoVPGSettingID,`
-                                Commit-ZertoVPGSetting,`
-                                Remove-ZertoVPGSetting,`
-                                Get-ZertoVPGSettingBackup,`
-                                Get-ZertoVPGSettingBackupDayOfWeek,`
-                                Get-ZertoVPGSettingBackupRetentionPeriod,`
-                                Get-ZertoVPGSettingBackupSchedulerPeriod,`
-                                Get-ZertoVPGSettingBasic,`
-                                Set-ZertoVPGSettingBasic,`
-                                Get-ZertoVPGSettingBootGroup,`
-                                Get-ZertoVPGSettingJournal,`
-                                Get-ZertoVPGSettingNetworks,`
-                                Get-ZertoVPGSettingPriority,`
-                                Get-ZertoVPGSettingRecovery,`
-                                Get-ZertoVPGSettingScripting,`
-                                Get-ZertoVPGSettingVMs,`
-                                Get-ZertoVPGSettingVM,`
-                                Get-ZertoVPGSettingVMNICs,`
-                                Get-ZertoVPGSettingVMNIC,`
-                                Get-ZertoVPGSettingVMVolumes,`
-                                Get-ZertoVPGSettingVMVolume,`
-                                Get-ZertoVRAs,`
-                                Get-ZertoVRA,`
-                                Get-ZertoVRAID,`
-                                Get-ZertoVRAIPConfigurationTypes,`
-                                Get-ZertoVRAStatuses,`
-                                Remove-ZertoVRA,`
-                                Invoke-ZertoVRAUpgrade,`
-                                Get-ZertoZOrgs,`
-                                Get-ZertoZOrg,`
-                                Get-ZertoResoureReport,`
+
+# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', 'Test-RESTError' )
+# Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} |  Where-Object { $_ -imatch "^Function *" } | ForEach-Object {  ($_ -split "\s",3)[1] } | Where-Object {$_ -notin $PrivateFunctions} | ForEach-Object {$_ + ", "}
+
+Export-ModuleMember -function   New-ZertoFailoverIPAddress, 
+                                New-ZertoVPGVirtualMachine, 
+                                New-ZertoVRAIPAddressConfig, 
+                                New-ZertoVPGSettingBasic, 
+                                New-ZertoVPGSettingBootgroup, 
+                                New-ZertoVPGSettingJournalLimitation, 
+                                New-ZertoVPGSettingJournal, 
+                                Get-ZertoAuthToken, 
+                                Remove-ZertoAuthToken, 
+                                Get-ZertoRESTAPIs, 
+                                Get-ZertoAlerts, 
+                                Get-ZertoAlert, 
+                                Get-ZertoAlertHelpIdentifierDescription, 
+                                Invoke-ZertoAlertDismiss, 
+                                Invoke-ZertoAlertUndismiss, 
+                                Get-ZertoAlertEntities, 
+                                Get-ZertoAlertHelpIdentifiers, 
+                                Get-ZertoAlertLevels, 
+                                Get-ZertoEvents, 
+                                Get-ZertoEvent, 
+                                Get-ZertoEventCategories, 
+                                Get-ZertoEventEntities, 
+                                Get-ZertoEventTypes, 
+                                Get-ZertoLocalSite, 
+                                Get-ZertoLocalSiteID, 
+                                Get-ZertoLocalSitePairingStatuses, 
+                                Get-ZertoPeerSites, 
+                                Get-ZertoPeerSite, 
+                                Get-ZertoPeerSiteID, 
+                                Get-ZertoServiceProfiles, 
+                                Get-ZertoServiceProfile, 
+                                Get-ZertoServiceProfileID, 
+                                Get-ZertoSites, 
+                                Get-ZertoSite, 
+                                Get-ZertoSiteID, 
+                                Get-ZertoVirtualizationSites, 
+                                Get-ZertoVirtualizationSite, 
+                                Get-ZertoVirtualizationSiteID, 
+                                Get-ZertoSiteDatastoreClusters, 
+                                Get-ZertoSiteDatastoreClusterID, 
+                                Get-ZertoSiteDatastores, 
+                                Get-ZertoSiteDatastoreID, 
+                                Get-ZertoSiteFolders, 
+                                Get-ZertoSiteFolderID, 
+                                Get-ZertoSiteHostClusters, 
+                                Get-ZertoSiteHostClusterID, 
+                                Get-ZertoSiteHosts, 
+                                Get-ZertoSiteHost, 
+                                Get-ZertoSiteHostID, 
+                                Get-ZertoSiteNetworks, 
+                                Get-ZertoSiteNetworkID, 
+                                Get-ZertoSiteOrgVCDs, 
+                                Get-ZertoSiteResourcePools, 
+                                Get-ZertoSiteVApps, 
+                                Get-ZertoSiteVcdVapps, 
+                                Get-ZertoSiteVMs, 
+                                Get-ZertoSiteVMID, 
+                                Get-ZertoTasks, 
+                                Get-ZertoTask, 
+                                Get-ZertoTasksTypes, 
+                                Get-ZertoVMs, 
+                                Get-ZertoVM, 
+                                Get-ZertoVMID, 
+                                Get-ZertoVRAs, 
+                                Get-ZertoVRA, 
+                                Get-ZertoVRAID, 
+                                Get-ZertoVRAIPConfigurationTypes, 
+                                Get-ZertoVRAStatuses, 
+                                Remove-ZertoVRA, 
+                                Invoke-ZertoVRAUpgrade, 
+                                Add-ZertoVRA, 
+                                Get-ZertoVPGs, 
+                                Get-ZertoVPG, 
+                                Convert-ZertoVPGToVPGSetting, 
+                                Get-ZertoVPGID, 
+                                Get-ZertoVPGCheckpoints, 
+                                Get-ZertoVPGCheckpointID, 
+                                Get-ZertoVPGCheckpointLastID, 
+                                Get-ZertoVPGCheckpointSummary, 
+                                Get-ZertoVPGEntityTypes, 
+                                Get-ZertoVPGFailoverCommitPolicies, 
+                                Get-ZertoVPGFailoverShutdownPolicies, 
+                                Get-ZertoVPGPriorities, 
+                                Get-ZertoVPGRetentionPolicies, 
+                                Get-ZertoVPGStatuses, 
+                                Get-ZertoVPGSubstatuses, 
+                                Add-ZertoVPG, 
+                                Remove-ZertoVPG, 
+                                Invoke-ZertoVPGForceSync, 
+                                Start-ZertoVPGClone, 
+                                Stop-ZertoVPGClone, 
+                                Start-ZertoVPGFailover, 
+                                Invoke-ZertoVPGFailoverCommit, 
+                                Invoke-ZertoVPGFailoverRollback, 
+                                Start-ZertoVPGFailoverTest, 
+                                Stop-ZertoVPGFailoverTest, 
+                                Invoke-ZertoVPGPause, 
+                                Invoke-ZertoVPGResume, 
+                                Get-ZertoVPGSettings, 
+                                Get-ZertoVPGSetting, 
+                                Get-ZertoVPGSettingID, 
+                                Commit-ZertoVPGSetting, 
+                                Remove-ZertoVPGSetting, 
+                                Get-ZertoVPGSettingBackup, 
+                                Get-ZertoVPGSettingBackupDayOfWeek, 
+                                Get-ZertoVPGSettingBackupRetentionPeriod, 
+                                Get-ZertoVPGSettingBackupSchedulerPeriod, 
+                                Get-ZertoVPGSettingBasic, 
+                                Set-ZertoVPGSettingBasic, 
+                                Get-ZertoVPGSettingBootGroup, 
+                                Get-ZertoVPGSettingJournal, 
+                                Get-ZertoVPGSettingNetworks, 
+                                Get-ZertoVPGSettingPriority, 
+                                Get-ZertoVPGSettingRecovery, 
+                                Get-ZertoVPGSettingScripting, 
+                                Get-ZertoVPGSettingVMs, 
+                                Get-ZertoVPGSettingVM, 
+                                Get-ZertoVPGSettingVMNICs, 
+                                Get-ZertoVPGSettingVMNIC, 
+                                Get-ZertoVPGSettingVMVolumes, 
+                                Get-ZertoVPGSettingVMVolume, 
+                                Get-ZertoZOrgs, 
+                                Get-ZertoZOrg, 
+                                Get-ZertoResoureReport, 
                                 Get-ZertoResoureReportAdvFilter

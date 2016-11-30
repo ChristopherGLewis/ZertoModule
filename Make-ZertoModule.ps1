@@ -8,5 +8,8 @@
         -FileList 'ZertoModule.psm1-help.xml' `
         -FunctionsToExport '*'  `
         -PowerShellVersion 5.0 `
-        -VariablesToExport '*' 
+        -VariablesToExport '*' `
+        -ProjectUri https://github.com/ChristopherGLewis/ZertoModule `
+        -LicenseUri  https://github.com/ChristopherGLewis/ZertoModule/blob/master/LICENSE `
+        -ReleaseNotes https://github.com/ChristopherGLewis/ZertoModule/blob/master/README.md
 #        -ScriptsToProcess @('ZertoModule.psm1') `

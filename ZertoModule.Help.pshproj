@@ -9272,7 +9272,7 @@ PS C:\Scripts\Zerto&gt; $Env:ZertoToken
 
 PS C:\Scripts\Zerto&gt; Get-ZertoLocalSite
 
-ContactEmail               : noc@nuveen.com
+ContactEmail               : noc@test.com
 ContactName                : NOC
 ContactPhone               : 847-555-1212
 IpAddress                  : 10.77.199.10

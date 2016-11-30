@@ -796,27 +796,32 @@
 #endregion
 
 #region Utility Functions
-    Function Set-SSLCertByPass  () {
-    ################################################
-    # Setting certificate exception to prevent authentication issues to the ZVM
-    ################################################
-    try {
-Add-Type @"
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    public class TrustAllCertsPolicy : ICertificatePolicy {
-        public bool CheckValidationResult( ServicePoint srvPoint, X509Certificate certificate, WebRequest request, int certificateProblem) {
-            return true;
+
+    Function Set-SSLCertByPass () {
+        ################################################
+        # Setting certificate exception to prevent authentication issues to the ZVM
+        ################################################
+        try {
+            $type = "using System.Net;" + [Environment]::NewLine 
+            $type +="using System.Security.Cryptography.X509Certificates;" +  [Environment]::NewLine  
+            $type +="public class TrustAllCertsPolicy : ICertificatePolicy {" +  [Environment]::NewLine  
+            $type +="  public bool CheckValidationResult( ServicePoint srvPoint, X509Certificate certificate, WebRequest request, int certificateProblem) {" +  [Environment]::NewLine  
+            $type +="    return true;" +  [Environment]::NewLine  
+            $type +="  }" +  [Environment]::NewLine  
+            $type +="}" +  [Environment]::NewLine  
+            
+            Add-Type -TypeDefinition $type -ErrorAction SilentlyContinue
+
+        } catch {
+            If ($Error[0].Exception -ne "Cannot add type. The type name 'TrustAllCertsPolicy' already exists.") {
+                Write-Debug $Error[0]
+            } 
         }
-    }
-"@ -ErrorAction SilentlyContinue
-    } catch {
-        Write-Debug $Error[0].Exception.Message 
-    }
-    [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     }
 
     Function Get-QueryStringFromHashTable {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Query String Hash Table')] [Hashtable] $QueryStringHash
         )
@@ -849,6 +854,7 @@ Add-Type @"
     }
 
     Function Test-RESTError {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Error')] [System.Management.Automation.ErrorRecord] $err
         )
@@ -874,26 +880,86 @@ Add-Type @"
         }
 
     }
+
+    Function Convert-ZertoTokenHash {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto Token')] [System.Object] $ZertoToken
+        )
+
+        #Saving the token to the ENV as json has to be converted back to hashtable 
+        if ($ZertoToken -is [String]) {
+            try { 
+                $ZertoToken = $ZertoToken | ConvertFrom-Json
+            } catch {
+                Throw "Invalid Zerto Token - '$ZertoToken'"
+            }
+        }
+
+        #Round tripping the ZertoToken Hashtable to JSON returns it as a PSCustomObject
+        #This converts it back to a hash table from either JSON or string  
+        if ($ZertoToken -is [PSCustomObject]) {
+            $NewHash = @{}
+            $ZertoToken.PSObject.Properties | ForEach-Object {
+                $NewHash.Add($_.Name, $_.Value)
+            }
+            Return $NewHash
+        } 
+        
+        #Already a hash table
+        if ($ZertoToken -is [HashTable]) {
+            Return $ZertoToken
+        }
+
+        Throw "Invalid Zerto Token - '$ZertoToken'"
+    } 
+
+    Function Get-EnvZertoServer {
+        If ( (get-item Env:\ZertoServer -ErrorAction SilentlyContinue) ) {
+             return (get-item Env:\ZertoServer).Value 
+        } 
+    }
+
+    Function Get-EnvZertoPort {
+        If ((get-item Env:\ZertoPort -ErrorAction SilentlyContinue) ) { 
+            Return (get-item Env:\ZertoPort).Value 
+        } else { 
+            Return '9669' 
+        } 
+    }
+
+    Function Get-EnvZertoToken {
+        If ((get-item Env:\ZertoToken -ErrorAction SilentlyContinue) ) { 
+            Return Convert-ZertoTokenHash -ZertoToken  (get-item Env:\ZertoToken).Value 
+        } 
+    }
+    
+
 #endregion
 
 #region Zerto Authentication
 
     #.ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAuthToken  {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer ) ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser
         )
         
         Set-SSLCertByPass
 
+        if ( [String]::IsNullOrEmpty($ZertoServer) ) {
+            throw "Missing Zerto Server"
+        }
+
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $xZertoSessionURL = $baseURL + "session/add"
+        $FullURL = $baseURL + "session/add"
         $TypeJSON = "application/json"
+        Write-Verbose $FullURL
 
-
-        if (  [String]::IsNullOrEmpty($ZertoUser) ) {
+        if ( [String]::IsNullOrEmpty($ZertoUser) ) {
             $cred = Get-Credential -Message "Enter your Zerto credentials"
         } else {
             $cred = Get-Credential -Message "Enter your Zerto credentials" -UserName $ZertoUser
@@ -909,7 +975,7 @@ Add-Type @"
 
             #Need to check our Response.
             try { 
-                $xZertoSessionResponse = Invoke-WebRequest -Uri $xZertoSessionURL -Headers $headers -Method POST -Body $sessionBody -ContentType $TypeJSON             
+                $xZertoSessionResponse = Invoke-WebRequest -Uri $FullURL -Headers $headers -Method POST -Body $sessionBody -ContentType $TypeJSON             
             } catch {
                 $xZertoSessionResponse = $_.Exception.Response
             }
@@ -929,12 +995,25 @@ Add-Type @"
         }
     }
 
+    #.ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoAuthToken  {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer ) ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser 
+        )
+        
+        Set-Item ENV:ZertoToken ( (Get-ZertoAuthToken -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoUser $ZertoUser) | ConvertTo-Json -Compress) 
+    }
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Remove-ZertoAuthToken  {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )  
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -962,9 +1041,10 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoRESTAPIs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -986,10 +1066,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlerts {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
@@ -1033,10 +1114,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlert {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
         )
         
@@ -1209,10 +1291,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoAlertDismiss {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
         )
         
@@ -1238,10 +1321,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoAlertUndismiss {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
         )
         
@@ -1267,10 +1351,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlertEntities {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1293,10 +1378,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlertHelpIdentifiers {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1319,10 +1405,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlertLevels {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1348,10 +1435,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEvents {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Event Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Event End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
@@ -1402,10 +1490,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEvent {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
         )
         
@@ -1431,10 +1520,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEventCategories {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1457,10 +1547,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEventEntities {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1483,10 +1574,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEventTypes {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1512,10 +1604,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoLocalSite {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1537,10 +1630,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoLocalSiteID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $ID = Get-ZertoLocalSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
@@ -1551,10 +1645,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoLocalSitePairingStatuses {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1580,10 +1675,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoPeerSites {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site name')] [string] $PeerName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site pairing status')] [ZertoPairingStatus] $ParingStatus, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site location')] [string] $Location, 
@@ -1621,10 +1717,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoPeerSite {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -1651,10 +1748,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoPeerSiteID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto PeerSite Name')] [string] $ZertoPeerSiteName
         )
         
@@ -1671,10 +1769,11 @@ Add-Type @"
 #region Zerto Service Profiles
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoServiceProfiles {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -1704,10 +1803,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoServiceProfile {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Service Profile Identifier')] [string] $ZertoServiceProfile
         )
 
@@ -1734,10 +1834,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoServiceProfileID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Service Profile Name')] [string] $ZertoServiceProfileName
         )
@@ -1756,10 +1857,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSites {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
         
         Return Get-ZertoVirtualizationSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
@@ -1767,10 +1869,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSite {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
         
@@ -1779,10 +1882,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Name')] [string] $ZertoSiteName
         )
 
@@ -1791,10 +1895,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVirtualizationSites {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -1817,10 +1922,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVirtualizationSite {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -1847,10 +1953,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVirtualizationSiteID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Name')] [string] $ZertoSiteName
         )
         
@@ -1869,10 +1976,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteDatastoreClusters {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -1900,10 +2008,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteDatastoreClusterID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Datastore Cluster Name')] [string] $DatastoreClusterName
         )
@@ -1919,10 +2028,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteDatastores {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -1950,10 +2060,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteDatastoreID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Datastore Name')] [string] $DatastoreName
         )
@@ -1969,10 +2080,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteFolders {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2000,10 +2112,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteFolderID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto vCenter Folder Name')] [string] $FolderName
         )
@@ -2019,10 +2132,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHostClusters {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2050,10 +2164,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHostClusterID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Host Cluster Name')] [string] $HostClusterName
         )
@@ -2069,10 +2184,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHosts {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2100,10 +2216,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHost {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Host Identifier')] [string] $ZertoHostIdentifier
         )
@@ -2135,10 +2252,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHostID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Host Name')] [string] $HostName
         )
@@ -2154,10 +2272,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteNetworks {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2185,10 +2304,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteNetworkID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Network Name')] [string] $NetworkName
         )
@@ -2204,10 +2324,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteOrgVCDs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2235,10 +2356,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteResourcePools {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2265,10 +2387,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteVApps {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2295,10 +2418,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteVcdVapps {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2325,10 +2449,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteVMs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
@@ -2355,10 +2480,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteVMID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Virtual Machine Name')] [string] $VMName
         )
@@ -2378,10 +2504,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoTasks {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Started Before Date (YYYY-MM-DD)')] [string] $StartedBeforeDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Started After Date')] [string] $StartedAfterDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Completed Before Date (YYYY-MM-DD)')] [string] $CompletedBeforeDate, 
@@ -2421,10 +2548,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoTask {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Task Identifier')] [string] $ZertoTaskIdentifier
         )
 
@@ -2451,10 +2579,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoTasksTypes {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2481,10 +2610,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVMs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG name')] [string] $VPGName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM name')] [string] $VMName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Status')] [ZertoVPGStatus] $Status, 
@@ -2533,10 +2663,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVM {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVMIdentifier
         )
 
@@ -2563,10 +2694,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVMID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')] [string] $VmName
         )
         
@@ -2584,10 +2716,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRAs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Name')] [string] $VRAName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Status')] [ZertoVRAStatus] $VRAStatus,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Version')] [string] $VRAVersion, 
@@ -2634,10 +2767,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRA {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier
         )
 
@@ -2663,10 +2797,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRAID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Name')] [string] $VraName
         )
 
@@ -2681,10 +2816,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRAIPConfigurationTypes {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2707,10 +2843,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRAStatuses {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2733,10 +2870,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Remove-ZertoVRA {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier
         )
 
@@ -2762,10 +2900,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVRAUpgrade {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier
         )
         
@@ -2791,10 +2930,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Add-ZertoVRA {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Datastore Name')] [string] $DatastoreName,
             [Parameter(Mandatory=$False, HelpMessage = 'Zerto VRA Group Name (optional)')] [string] $VRAGroupName,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Host Name')] [string] $HostName,
@@ -2885,10 +3025,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Name')] [string] $VPGName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGStatus] $Status,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGSubStatus] $SubStatus,
@@ -2952,10 +3093,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPG {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -2982,10 +3124,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Convert-ZertoVPGToVPGSetting {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3017,10 +3160,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Name')] [string] $VpgName
         )
 
@@ -3035,10 +3179,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpoints {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Checkpoint Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Checkpoint End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate
@@ -3074,10 +3219,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpointID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             #[Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Checkpoint ID')] [string] $ZertoVpgCheckpointIdentifier,
             [Parameter(Mandatory=$true, ParameterSetName="Tag", HelpMessage = 'Zerto Checkpoint Tag')] [string] $ZertoVpgCheckpointTag
@@ -3100,10 +3246,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpointLastID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
         
@@ -3115,10 +3262,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpointSummary {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3145,10 +3293,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGEntityTypes {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3170,10 +3319,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGFailoverCommitPolicies {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3195,10 +3345,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGFailoverShutdownPolicies {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3220,10 +3371,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGPriorities {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3245,10 +3397,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGRetentionPolicies {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3270,10 +3423,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGStatuses {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3295,10 +3449,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSubstatuses {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3320,10 +3475,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Add-ZertoVPG {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Name')] [string] $VPGName, 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Priority')] [ZertoVPGPriority] $Priority, 
@@ -3637,10 +3793,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Remove-ZertoVPG {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Force Remove')] [Bool] $Force = $false,
             [Parameter(Mandatory=$false, HelpMessage = 'Keep Recovery Volumes')] [Bool] $KeepRecoveryVolumes = $false
@@ -3676,10 +3833,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVPGForceSync {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3706,10 +3864,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Start-ZertoVPGClone {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Checkpoint Identifier (default is latest)')] [string] $ZertoVpgCheckpointIdentifier
         )
@@ -3744,10 +3903,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Stop-ZertoVPGClone {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3774,10 +3934,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Start-ZertoVPGFailover {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Checkpoint Identifier (default is latest)')] [string] $ZertoVpgCheckpointIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Commit Policy')] [ZertoCommitPolicy] $CommitPolicy = "Commit",
@@ -3822,10 +3983,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVPGFailoverCommit {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG  Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3852,10 +4014,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVPGFailoverRollback {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG  Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3882,10 +4045,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Start-ZertoVPGFailoverTest {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Checkpoint Identifier')] [string] $ZertoVpgCheckpointIdentifier
         )
@@ -3920,10 +4084,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Stop-ZertoVPGFailoverTest {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Failover Test success status')] [string] $FailoverTestSuccess = $true,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Failover Test result summary')] [string] $FailoverTestSummary
@@ -3960,10 +4125,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVPGPause {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG  Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -3990,10 +4156,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Invoke-ZertoVPGResume {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG  Identifier')] [string] $ZertoVpgIdentifier
         )
 
@@ -4023,10 +4190,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettings {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4048,10 +4216,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSetting {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4078,10 +4247,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingID {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Setting Name')] [string] $VpgSettingName
         )
 
@@ -4096,10 +4266,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Commit-ZertoVPGSetting {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4126,10 +4297,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Remove-ZertoVPGSetting {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4156,10 +4328,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBackup {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4186,10 +4359,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBackupDayOfWeek {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4216,10 +4390,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBackupRetentionPeriod {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4246,10 +4421,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBackupSchedulerPeriod {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4276,10 +4452,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBasic {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4306,10 +4483,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Set-ZertoVPGSettingBasic {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Basic block')] [ZertoVPGSettingBasic] $ZertoVpgSettingBasic
         )
@@ -4339,10 +4517,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBootGroup {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4369,10 +4548,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingJournal {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4399,10 +4579,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingNetworks {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4429,10 +4610,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingPriority {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4459,10 +4641,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingRecovery {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4489,10 +4672,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingScripting {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4519,10 +4703,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVMs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
@@ -4549,10 +4734,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVM {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVmIdentifier
         )
@@ -4583,10 +4769,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVMNICs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVmIdentifier
         )
@@ -4617,10 +4804,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVMNIC {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVmIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoNicIdentifier
@@ -4654,10 +4842,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVMVolumes {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVmIdentifier
         )
@@ -4688,10 +4877,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingVMVolume {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVmIdentifier,
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVolumeIdentifier
@@ -4728,10 +4918,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoZOrgs {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4753,10 +4944,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoZOrg {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoOrgIdentifier
         )
 
@@ -4786,10 +4978,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoResoureReport {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report From Time (YYYY-MM-DD HH:MM:SS)')] [string] $FromTime, 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report To Time (YYYY-MM-DD HH:MM:SS)')] [string] $ToTime, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Report Start Index ')] [string] $StartIndex, 
@@ -4828,10 +5021,11 @@ Add-Type @"
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoResoureReportAdvFilter {
+        [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server')] [string] $ZertoServer = "il1zerto.nuveen.com",
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = 9669,
-            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken')] [Hashtable] $ZertoToken,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report From Time (YYYY-MM-DD HH:MM:SS)')] [string] $FromTime, 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report To Time (YYYY-MM-DD HH:MM:SS)')] [string] $ToTime, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Report Start Index ')] [string] $StartIndex, 
@@ -4996,6 +5190,7 @@ Export-ModuleMember -function   Add-ZertoVPG,
                                 Remove-ZertoVPGSetting, 
                                 Remove-ZertoVRA, 
                                 Set-ZertoVPGSettingBasic, 
+                                Set-ZertoAuthToken,
                                 Start-ZertoVPGClone, 
                                 Start-ZertoVPGFailover, 
                                 Start-ZertoVPGFailoverTest, 

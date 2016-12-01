@@ -1,6 +1,9 @@
-﻿New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
+﻿$ModuleVersion = '0.8.4' 
+$ReleaseNotes = 'Updated to remove some company information'
+
+New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `
-                -ModuleVersion '0.8.3' `
+                -ModuleVersion $ModuleVersion `
                 -Author 'Chris Lewis' `
                 -CompanyName 'Nuveen' `
                 -Description 'Zerto REST API Powershell Wrapping module' `
@@ -11,7 +14,7 @@
                 -VariablesToExport '*' `
                 -ProjectUri https://github.com/ChristopherGLewis/ZertoModule `
                 -LicenseUri  https://github.com/ChristopherGLewis/ZertoModule/blob/master/LICENSE `
-                -ReleaseNotes https://github.com/ChristopherGLewis/ZertoModule/blob/master/README.md
+                -ReleaseNotes $ReleaseNotes
         #        -ScriptsToProcess @('ZertoModule.psm1') `
 
 $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `

@@ -9722,7 +9722,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
     <CmdletObject verb="Stop" noun="ZertoVPGFailoverTest">
       <Name>Stop-ZertoVPGFailoverTest</Name>
       <Syntax>
-        <string>Stop-ZertoVPGFailoverTest [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-ZertoVpgIdentifier] &lt;String&gt; [[-FailoverTestSuccess] &lt;String&gt;] [[-FailoverTestSummary] &lt;String&gt;]</string>
+        <string>Stop-ZertoVPGFailoverTest [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-ZertoVpgIdentifier] &lt;String&gt; [[-FailoverTestSuccess] &lt;Boolean&gt;] [[-FailoverTestSummary] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Stops a Zerto Failover Test</Synopsis>
@@ -9779,8 +9779,8 @@ the failover is as required before performing the commitPolicy setting.</Descrip
           <Description>Zerto VPG Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
-          <Name>FailoverTestSuccess</Name>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
+          <Name>FailoverTestSummary</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
@@ -9789,8 +9789,8 @@ the failover is as required before performing the commitPolicy setting.</Descrip
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
-          <Name>FailoverTestSummary</Name>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+          <Name>FailoverTestSuccess</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>

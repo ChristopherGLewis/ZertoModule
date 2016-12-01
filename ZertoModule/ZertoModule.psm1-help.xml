@@ -20076,7 +20076,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 				<maml:description>
 					<maml:para />
 				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
 				<maml:name>FailoverTestSummary</maml:name>
@@ -20136,8 +20136,8 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
-			<maml:name>FailoverTestSuccess</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
+			<maml:name>FailoverTestSummary</maml:name>
 			<maml:description>
 				<maml:para />
 			</maml:description>
@@ -20148,14 +20148,14 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
-			<maml:name>FailoverTestSummary</maml:name>
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
+			<maml:name>FailoverTestSuccess</maml:name>
 			<maml:description>
 				<maml:para />
 			</maml:description>
-			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			<dev:type>
-				<maml:name>String</maml:name>
+				<maml:name>Boolean</maml:name>
 				<maml:uri/>
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>

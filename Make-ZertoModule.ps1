@@ -14,6 +14,7 @@ New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -VariablesToExport '*' `
                 -ProjectUri https://github.com/ChristopherGLewis/ZertoModule `
                 -LicenseUri  https://github.com/ChristopherGLewis/ZertoModule/blob/master/LICENSE `
+                -Tags 'PSModule','Zerto'  `
                 -ReleaseNotes $ReleaseNotes
         #        -ScriptsToProcess @('ZertoModule.psm1') `
 

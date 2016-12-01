@@ -3,7 +3,6 @@
   <Name>ZertoModule</Name>
   <Version>1.0</Version>
   <Description>Zerto REST API Powershell Wrapping module</Description>
-  <ModulePath>C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1</ModulePath>
   <HasManifest>false</HasManifest>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
@@ -269,7 +268,7 @@
       <Examples>
         <Example>
           <Name>Simple VPG</Name>
-          <Cmd>$ztoken = Get-ZertoAuthToken -ZertoUser nuveen\ep_lewish
+          <Cmd>$ztoken = Get-ZertoAuthToken -ZertoUser test\Account
 
 Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
                 -VPGName "NewVPG" `
@@ -293,7 +292,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
                             -Gateway '10.199.199.1' `
                             -DNS1 '10.77.182.137' `
                             -DNS2 '10.77.182.163' `
-                            -DNSSuffix 'nuveen.com'
+                            -DNSSuffix 'test.com'
 
 $VM1 = New-ZertoVPGVirtualMachine -VMName 'IL1ZTest01' -FailoverIPAddress $IP1
 
@@ -1070,14 +1069,14 @@ $ZertoAuth = Get-ZertoAuthToken </Cmd>
         <Example>
           <Name>Auth with User Name</Name>
           <Cmd># Auth with User Name
-$ZertoAuth = Get-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</Cmd>
+$ZertoAuth = Get-ZertoAuthToken -ZertoUser test\account</Cmd>
           <Description>Authentication with passed User name</Description>
           <Output />
         </Example>
         <Example>
           <Name>Checking Authentication</Name>
           <Cmd># Checking Authentication
-$ZertoAuth = Get-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ
+$ZertoAuth = Get-ZertoAuthToken -ZertoUser test\account
 if ($ZertoAuth -ne $null) {
    Write-Host "Successfully Authenticated!"
 }</Cmd>
@@ -3331,13 +3330,13 @@ Filter Description
           <Name>Simple</Name>
           <Cmd>Get-ZertoLocalSite -ZertoToken (Get-ZertoAuthToken)</Cmd>
           <Description>Retrieves the local Zerto site information</Description>
-          <Output>ContactEmail               : noc@nuveen.com
+          <Output>ContactEmail               : noc@test.com
 ContactName                : NOC
-ContactPhone               : 847-288-8110
+ContactPhone               : 847-555-1212
 IpAddress                  : 10.77.199.10
 IsReplicationToSelfEnabled : True
 Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
-Location                   : Franklin Park, IL
+Location                   : Chicago, IL
 SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
 SiteName                   : Zerto-IL1
 SiteType                   : VCenter
@@ -9255,17 +9254,17 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <Example>
           <Name>Auth with User Name </Name>
           <Cmd># Auth with User Name
-Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</Cmd>
+Set-ZertoAuthToken -ZertoUser test\Account</Cmd>
           <Description>Zerto Authentication with a passed in username.</Description>
           <Output />
         </Example>
         <Example>
           <Name>Sample Commands</Name>
-          <Cmd>PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoServer "il1zerto.nuveen.com" 
+          <Cmd>PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoServer "il1zerto.test.com" 
 PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoPort "9669" 
 
 # Auth with User Name
-PS C:\Scripts\Zerto&gt;Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ
+PS C:\Scripts\Zerto&gt;Set-ZertoAuthToken -ZertoUser test\Account
 
 PS C:\Scripts\Zerto&gt; $Env:ZertoToken
 {"x-zerto-session":"527ffdec-4cb0-eb4c-2067-5488cba47134"}
@@ -9278,7 +9277,7 @@ ContactPhone               : 847-555-1212
 IpAddress                  : 10.77.199.10
 IsReplicationToSelfEnabled : True
 Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
-Location                   : Franklin Park, IL
+Location                   : Chicago, IL
 SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
 SiteName                   : Zerto-IL1
 SiteType                   : VCenter
@@ -9786,7 +9785,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Failover test results summary</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
@@ -9796,7 +9795,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Did the Failover test succeed?</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>

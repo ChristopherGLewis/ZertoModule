@@ -35,7 +35,7 @@ Zerto's REST API uses a Zerto session header for the REST calls.  You can establ
 Or 
 
     # Auth with User Name
-    PS C:\Scripts\Zerto> Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ
+    PS C:\Scripts\Zerto> Set-ZertoAuthToken -ZertoUser Test\Account
 
     PS C:\Scripts\Zerto> $Env:ZertoToken
     {"x-zerto-session":"527ffdec-4cb0-eb4c-2067-5488cba47134"}
@@ -53,7 +53,7 @@ Once you've authenticated, any call can be made using the ENV vars.
     IpAddress                  : 10.77.199.10
     IsReplicationToSelfEnabled : True
     Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
-    Location                   : Franklin Park, IL
+    Location                   : Chicago, IL
     SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
     SiteName                   : Zerto-IL1
     SiteType                   : VCenter

@@ -1,4 +1,4 @@
-﻿$ModuleVersion = '0.8.4' 
+﻿$ModuleVersion = '0.8.5' 
 $ReleaseNotes = 'Updated to remove some company information'
 
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `

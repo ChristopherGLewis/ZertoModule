@@ -648,7 +648,7 @@
 			<maml:introduction>
 				<maml:paragraph>PS C:\&gt;</maml:paragraph>
 			</maml:introduction>
-			<dev:code>$ztoken = Get-ZertoAuthToken -ZertoUser nuveen\ep_lewish
+			<dev:code>$ztoken = Get-ZertoAuthToken -ZertoUser test\Account
 
 Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
                 -VPGName &quot;NewVPG&quot; `
@@ -686,7 +686,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
                             -Gateway &apos;10.199.199.1&apos; `
                             -DNS1 &apos;10.77.182.137&apos; `
                             -DNS2 &apos;10.77.182.163&apos; `
-                            -DNSSuffix &apos;nuveen.com&apos;
+                            -DNSSuffix &apos;test.com&apos;
 
 $VM1 = New-ZertoVPGVirtualMachine -VMName &apos;IL1ZTest01&apos; -FailoverIPAddress $IP1
 
@@ -2346,7 +2346,7 @@ $ZertoAuth = Get-ZertoAuthToken </dev:code>
 				<maml:paragraph>PS C:\&gt;</maml:paragraph>
 			</maml:introduction>
 			<dev:code># Auth with User Name
-$ZertoAuth = Get-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</dev:code>
+$ZertoAuth = Get-ZertoAuthToken -ZertoUser test\account</dev:code>
 			<dev:remarks>
 				<maml:para>Authentication with passed User name</maml:para>
 				<maml:para />
@@ -2367,7 +2367,7 @@ $ZertoAuth = Get-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</dev:code>
 				<maml:paragraph>PS C:\&gt;</maml:paragraph>
 			</maml:introduction>
 			<dev:code># Checking Authentication
-$ZertoAuth = Get-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ
+$ZertoAuth = Get-ZertoAuthToken -ZertoUser test\account
 if ($ZertoAuth -ne $null) {
    Write-Host &quot;Successfully Authenticated!&quot;
 }</dev:code>
@@ -6933,13 +6933,13 @@ ZORG An organization set up in the Zerto Cloud.</maml:para>
 				<maml:para>Retrieves the local Zerto site information</maml:para>
 				<maml:para />
 				<maml:para />
-				<maml:para>ContactEmail               : noc@nuveen.com
+				<maml:para>ContactEmail               : noc@test.com
 ContactName                : NOC
-ContactPhone               : 847-288-8110
+ContactPhone               : 847-555-1212
 IpAddress                  : 10.77.199.10
 IsReplicationToSelfEnabled : True
 Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
-Location                   : Franklin Park, IL
+Location                   : Chicago, IL
 SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
 SiteName                   : Zerto-IL1
 SiteType                   : VCenter
@@ -19091,7 +19091,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<maml:paragraph>PS C:\&gt;</maml:paragraph>
 			</maml:introduction>
 			<dev:code># Auth with User Name
-Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</dev:code>
+Set-ZertoAuthToken -ZertoUser test\Account</dev:code>
 			<dev:remarks>
 				<maml:para>Zerto Authentication with a passed in username.</maml:para>
 				<maml:para />
@@ -19111,11 +19111,11 @@ Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ</dev:code>
 			<maml:introduction>
 				<maml:paragraph>PS C:\&gt;</maml:paragraph>
 			</maml:introduction>
-			<dev:code>PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoServer &quot;il1zerto.nuveen.com&quot; 
+			<dev:code>PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoServer &quot;il1zerto.test.com&quot; 
 PS C:\Scripts\Zerto&gt;Set-Item ENV:ZertoPort &quot;9669&quot; 
 
 # Auth with User Name
-PS C:\Scripts\Zerto&gt;Set-ZertoAuthToken -ZertoUser Nuveen\EP_smithJ
+PS C:\Scripts\Zerto&gt;Set-ZertoAuthToken -ZertoUser test\Account
 
 PS C:\Scripts\Zerto&gt; $Env:ZertoToken
 {&quot;x-zerto-session&quot;:&quot;527ffdec-4cb0-eb4c-2067-5488cba47134&quot;}
@@ -19128,7 +19128,7 @@ ContactPhone               : 847-555-1212
 IpAddress                  : 10.77.199.10
 IsReplicationToSelfEnabled : True
 Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
-Location                   : Franklin Park, IL
+Location                   : Chicago, IL
 SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
 SiteName                   : Zerto-IL1
 SiteType                   : VCenter
@@ -20074,14 +20074,14 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
 				<maml:name>FailoverTestSuccess</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Did the Failover test succeed?</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
 				<maml:name>FailoverTestSummary</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Failover test results summary</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -20139,7 +20139,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="5">
 			<maml:name>FailoverTestSummary</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Failover test results summary</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20151,7 +20151,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="4">
 			<maml:name>FailoverTestSuccess</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Did the Failover test succeed?</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			<dev:type>

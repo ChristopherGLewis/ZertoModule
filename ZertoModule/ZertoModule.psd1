@@ -12,7 +12,7 @@
 RootModule = 'ZertoModule.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.8.4'
+ModuleVersion = '0.8.5'
 
 # ID used to uniquely identify this module
 GUID = 'a7c23e30-0879-42f4-9e1c-bffbe723b02b'
@@ -142,8 +142,7 @@ AliasesToExport = @()
 # ModuleList = @()
 
 # List of all files packaged with this module
-FileList = 
-               'C:\Scripts\Zerto\ZertoModule\ZertoModule\ZertoModule.psm1-help.xml'
+FileList = 'ZertoModule\ZertoModule.psm1-help.xml'
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
@@ -151,7 +150,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = 'PSModule','Zerto'
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/ChristopherGLewis/ZertoModule/blob/master/LICENSE'
@@ -163,7 +162,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'https://github.com/ChristopherGLewis/ZertoModule/blob/master/README.md'
+        ReleaseNotes = 'Updated to remove some company information'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

@@ -4090,7 +4090,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Failover Test success status')] [string] $FailoverTestSuccess = $true,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Failover Test success status')] [bool] $FailoverTestSuccess = $true,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Failover Test result summary')] [string] $FailoverTestSummary
         )
 
@@ -4107,13 +4107,11 @@
         $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/FailoverTestStop"
         Write-Verbose $FullURL
         
-        if ($ZertoVpgCheckpointIdentifier) {
-            $BodyHash = [ordered] @{}
-            $BodyHash.Add("FailoverTestSuccess", $FailoverTestSuccess)
-            $BodyHash.Add("FailoverTestSummary", $FailoverTestSummary)
-            $Body = $BodyHash | ConvertTo-Json
-            Write-Verbose $Body
-        }
+        $BodyHash = [ordered] @{}
+        $BodyHash.Add("FailoverTestSuccess", $FailoverTestSuccess)
+        $BodyHash.Add("FailoverTestSummary", $FailoverTestSummary)
+        $Body = $BodyHash | ConvertTo-Json
+        Write-Verbose $Body
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $Body
@@ -5061,13 +5059,16 @@
     }
 #endregion
 
-# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', 'Test-RESTError' )
+# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `
+#                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
+
 # ( "Export-ModuleMember -function " + ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
 #                                         Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | `
 #                                         Where-Object {$_ -notin $PrivateFunctions} | ForEach-Object { "```n`t`t`t" + $_ + "," })).TrimEnd( ',```n' )
 
 
-# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', 'Test-RESTError' )
+# $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `
+#                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
 # Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} |  Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | Where-Object {$_ -notin $PrivateFunctions} | ForEach-Object {$_ + ", "}
 
 Export-ModuleMember -function   Add-ZertoVPG, 

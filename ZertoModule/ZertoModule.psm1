@@ -2961,16 +2961,15 @@
             throw "Invalid MemoryInGB - must be from 1 to 16"
         }  
 
-
         #Get Identifiers
-        $LocalSiteID = Get-ZertoLocalSiteID -ZertoToken $ztoken
+        $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
         if ( [string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
 
-        $HostID = Get-ZertoSiteHostID -ZertoToken $ztoken -ZertoSiteIdentifier $LocalSiteID -HostName $HostName
+        $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -HostName $HostName
  
-        $DatastoreID = Get-ZertoSiteDatastoreID -ZertoToken $ztoken -ZertoSiteIdentifier $LocalSiteID -DatastoreName $DatastoreName
+        $DatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -DatastoreName $DatastoreName
 
-        $NetworkID = Get-ZertoSiteNetworkID  -ZertoToken $ztoken -ZertoSiteIdentifier $LocalSiteID -NetworkName $NetworkName
+        $NetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -NetworkName $NetworkName
 
         #Validate IDs
         if ( [string]::IsNullOrEmpty($DatastoreID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
@@ -3525,51 +3524,51 @@
         if ( $VmNames.Count -lt 1 -and $VmNamesAndIPAddresses.Count -lt 1 ) { throw "Must specify at least one VM Name "}
 
         #Get Identifiers
-        $LocalSiteID = Get-ZertoLocalSiteID -ZertoToken $ztoken
+        $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
 
-        $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoToken $ztoken -ZertoSiteName $RecoverySiteName
+        $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteName $RecoverySiteName
 
-        $FailoverNetworkID = Get-ZertoSiteNetworkID  -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $FailoverNetwork
+        $FailoverNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $FailoverNetwork
 
-        $TestNetworkID = Get-ZertoSiteNetworkID  -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $TestNetwork
+        $TestNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $TestNetwork
 
         if ($ClusterName) {
-            $ClusterID = Get-ZertoSiteHostClusterID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -HostClusterName $ClusterName
+            $ClusterID = Get-ZertoSiteHostClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -HostClusterName $ClusterName
             $HostID = $null
         } elseif ($HostName) {
             $ClusterID = $null
-            $HostID = Get-ZertoSiteHostID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -HostName $HostName
+            $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -HostName $HostName
         }
 
         #BROKEN
-        #$ServiceProfileID = Get-ZertoServiceProfiles -ZertoToken $ztoken  | `
+        #$ServiceProfileID = Get-ZertoServiceProfiles -ZertoToken $ZertoToken  | `
         #                    Where-Object {$_.Description -match $ServiceProfile} | `
         #                    Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
         if ($DatastoreName) {
-            $DatastoreID = Get-ZertoSiteDatastoreID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName $DatastoreName
+            $DatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName $DatastoreName
             $DatastoreClusterID = $null
         } elseif ($DatastoreClusterName) {
             $DatastoreID = $null
-            $DatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
+            $DatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
         }
 
-        $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName 
+        $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName 
 
-        $FolderID = Get-ZertoSiteFolderID -ZertoToken $ztoken -ZertoSiteIdentifier $RecoverySiteID -FolderName $vCenterFolder
+        $FolderID = Get-ZertoSiteFolderID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -FolderName $vCenterFolder
 
         #Save our VMID in a VMName/ID Hash
         $VMNameAndIDHash = [ordered] @{}
         if ($VmNames) {
             $VmNames | ForEach-Object  {
                 #VM's are always from LocalSite
-                $VMID =  Get-ZertoSiteVMID -ZertoToken $ztoken -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
+                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
                 $VMNameAndIDHash.Add($_, $VMID)
         }
         } elseif ($VmNamesAndIPAddresses) {
             $VmNamesAndIPAddresses | ForEach-Object  {
                 #VM's are always from LocalSite
-                $VMID =  Get-ZertoSiteVMID -ZertoToken $ztoken -ZertoSiteIdentifier $LocalSiteID -VMName $_.VMName 
+                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_.VMName 
                 $VMNameAndIDHash.Add($_.VMName , $VMID)
             }
         } else {
@@ -4253,7 +4252,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Setting Name')] [string] $VpgSettingName
         )
 
-        $ID =  Get-ZertoVPGSettings -ZertoToken $ztoken | `
+        $ID =  Get-ZertoVPGSettings -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.Basic.Name -eq $VpgSettingName} | `
                             Select-Object VpgSettingsIdentifier -ExpandProperty VpgSettingsIdentifier
 

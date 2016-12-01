@@ -12,7 +12,7 @@
 RootModule = 'ZertoModule.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.8.5'
+ModuleVersion = '0.8.6'
 
 # ID used to uniquely identify this module
 GUID = 'a7c23e30-0879-42f4-9e1c-bffbe723b02b'
@@ -162,7 +162,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Updated to remove some company information'
+        ReleaseNotes = 'Fixed some isssues with passing ZertoServer/Port/Token to sub-calls'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

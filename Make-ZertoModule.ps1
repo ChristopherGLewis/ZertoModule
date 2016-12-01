@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.8.5' 
-$ReleaseNotes = 'Updated to remove some company information'
+﻿$ModuleVersion = '0.8.6' 
+$ReleaseNotes = 'Fixed some isssues with passing ZertoServer/Port/Token to sub-calls'
 
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

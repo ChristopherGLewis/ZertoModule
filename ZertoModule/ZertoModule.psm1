@@ -2976,25 +2976,30 @@
         if ( [string]::IsNullOrEmpty($HostID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
         if ( [string]::IsNullOrEmpty($NetworkID)  ) { throw "Could not find  Network ID for $NetworkName " }
 
-        $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier 
+        $FullURL = $baseURL + "vras"  
         Write-Verbose $FullURL
 
-        $NewVRAHash = @{}
+        $NewVRAHash = [ordered] @{}
         $NewVRAHash.Add("DatastoreIdentifier", $DatastoreID)
         $NewVRAHash.Add("GroupName", $VRAGroupName)
         $NewVRAHash.Add("HostIdentifier", $HostID)
-        $NewVRAHash.Add("MemoryInGB", $MemoryInGB)
-        $NewVRAHash.Add("NetworkIdentifier", $NetworkID)
         If ($HostRootPassword) {
             $NewVRAHash.Add("HostRootPassword", $HostRootPassword)
         } else {
             $NewVRAHash.Add("HostRootPassword", $null)
         }
-        $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKeyNetworkID)
-        $NewVRAIPInfo=  @{}
-            $NewVRAIPInfo.Add("DefaultGateway", $VRAIPConfiguration.DefaultGateway )
+
+        $NewVRAHash.Add("MemoryInGb", $MemoryInGB)
+        $NewVRAHash.Add("NetworkIdentifier", $NetworkID)
+        If ($HostRootPassword) {
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
+        } else {
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
+        }
+        $NewVRAIPInfo = [ordered] @{}
+            $NewVRAIPInfo.Add("DefaultGateway", $VRAIPConfiguration.Gateway )
             $NewVRAIPInfo.Add("SubnetMask", $VRAIPConfiguration.SubnetMask )
-            $NewVRAIPInfo.Add("VraIPAddress", $VRAIPConfiguration.VraIPAddress )
+            $NewVRAIPInfo.Add("VraIPAddress", $VRAIPConfiguration.IPAddress )
             $NewVRAIPInfo.Add("VraIPConfigurationTypeApi", $VRAIPConfiguration.VRAIPType.ToString() )
             $NewVRAHash.Add("VraNetworkDataApi", $NewVRAIPInfo)
 
@@ -3010,7 +3015,7 @@
         }
 
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $NewVRAJson
         } catch {
             Test-RESTError -err $_
         }

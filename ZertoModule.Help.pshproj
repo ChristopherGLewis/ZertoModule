@@ -3,6 +3,7 @@
   <Name>ZertoModule</Name>
   <Version>1.0</Version>
   <Description>Zerto REST API Powershell Wrapping module</Description>
+  <ModulePath>C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1</ModulePath>
   <HasManifest>false</HasManifest>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
@@ -8282,7 +8283,8 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="New" noun="ZertoFailoverIPAddress">
       <Name>New-ZertoFailoverIPAddress</Name>
       <Syntax>
-        <string>New-ZertoFailoverIPAddress [-NICName] &lt;String&gt; [[-ReplaceMAC] &lt;Boolean&gt;] [-IPAddress] &lt;String&gt; [-SubnetMask] &lt;String&gt; [-Gateway] &lt;String&gt; [-DNS1] &lt;String&gt; [-DNS2] &lt;String&gt; [-DNSSuffix] &lt;String&gt; [[-TestIPAddress] &lt;String&gt;] [[-TestSubnetMask] &lt;String&gt;] [[-TestGateway] &lt;String&gt;] [[-TestDNS1] &lt;String&gt;] [[-TestDNS2] &lt;String&gt;] [[-TestDNSSuffix] &lt;String&gt;]</string>
+        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -UseDHCP &lt;SwitchParameter&gt; [-TestUseDHCP]</string>
+        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -IPAddress &lt;String&gt; -SubnetMask &lt;String&gt; -Gateway &lt;String&gt; -DNS1 &lt;String&gt; -DNS2 &lt;String&gt; -DNSSuffix &lt;String&gt; [-TestIPAddress &lt;String&gt;] [-TestSubnetMask &lt;String&gt;] [-TestGateway &lt;String&gt;] [-TestDNS1 &lt;String&gt;] [-TestDNS2 &lt;String&gt;] [-TestDNSSuffix &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Creats a new Zerto Failover IP Address for a VPG</Synopsis>
@@ -8291,15 +8293,16 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <InputType />
         <InputUrl />
         <InputTypeDescription />
-        <ReturnType>FailoverIPAddress</ReturnType>
+        <ReturnType />
         <ReturnUrl />
         <ReturnTypeDescription />
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="NICName ReplaceMAC IPAddress SubnetMask Gateway DNS1 DNS2 DNSSuffix TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 TestDNSSuffix Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="DHCP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC UseDHCP TestUseDHCP Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="IP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC IPAddress SubnetMask Gateway DNS1 DNS2 DNSSuffix TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 TestDNSSuffix Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>NICName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8309,7 +8312,17 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>NIC Name</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>NetworkID</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto Nework Identifier</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ReplaceMAC</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8319,7 +8332,47 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Replace the MAC address on failover</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="2" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>TestNetworkID</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto Nework Identifier for Test Failover</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>TestReplaceMAC</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Replace the MAC address on failover</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="SwitchParameter" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>UseDHCP</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Use DHCP for failover IP Address</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>TestUseDHCP</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Use DHCP for failover test IP Address</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>IPAddress</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8329,7 +8382,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover IP Address</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>SubnetMask</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8339,7 +8392,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover Subnet Mask</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>Gateway</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8349,7 +8402,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover IP Gateway</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DNS1</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8359,17 +8412,17 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover DNS Server 1</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DNS2</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Failover DNS Server 1</Description>
+          <Description>Failover DNS Server 2</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DNSSuffix</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8379,37 +8432,37 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover DNS Suffix</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestIPAddress</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Failover Test IP Address</Description>
+          <Description>Failover Test IP Address </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestSubnetMask</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Failover Subnet MaskSubnet Mask</Description>
+          <Description>Failover Test Subnet Mask</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestGateway</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Failover Test Gateway</Description>
+          <Description>Failover Test IP Gateway</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestDNS1</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8419,7 +8472,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover Test DNS Server 1</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestDNS2</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -8429,7 +8482,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Failover Test DNS Server 2</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestDNSSuffix</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9796,6 +9849,124 @@ the failover is as required before performing the commitPolicy setting.</Descrip
           </Attributes>
           <Aliases />
           <Description>Did the Failover test succeed?</Description>
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="Update" noun="ZertoVRA">
+      <Name>Update-ZertoVRA</Name>
+      <Syntax>
+        <string>Update-ZertoVRA [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -ZertoVraIdentifier &lt;String&gt; [-VRAGroupName &lt;String&gt;] -HostRootPassword &lt;String&gt; -VRAIPConfiguration &lt;VRAIPAddressConfig&gt; [-DumpJson]</string>
+        <string>Update-ZertoVRA [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -ZertoVraIdentifier &lt;String&gt; [-VRAGroupName &lt;String&gt;] -UseVCenterPublicKey &lt;Boolean&gt; -VRAIPConfiguration &lt;VRAIPAddressConfig&gt; [-DumpJson]</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis />
+        <Description />
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Password" Params="ZertoServer ZertoPort ZertoToken ZertoVraIdentifier VRAGroupName HostRootPassword VRAIPConfiguration DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PublicKey" Params="ZertoServer ZertoPort ZertoToken ZertoVraIdentifier VRAGroupName UseVCenterPublicKey VRAIPConfiguration DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ZertoServer</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ZertoPort</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Hashtable" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ZertoToken</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ZertoVraIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VRAGroupName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>HostRootPassword</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="VRAIPAddressConfig" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VRAIPConfiguration</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DumpJson</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>UseVCenterPublicKey</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
           <DefaultValue />
         </ParameterDescription>
       </Parameters>

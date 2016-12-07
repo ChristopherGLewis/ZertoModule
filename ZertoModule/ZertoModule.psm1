@@ -6,7 +6,6 @@
 
 #region Zerto Enums
 
-
     enum ZertoVPGStatus {
         Initializing          = 0
         MeetingSLA            = 1
@@ -391,14 +390,20 @@
 #region Zerto Classes
 
     class FailoverIPAddress {
+        
         [string] $NICName;
+        [String] $NetworkID;
         [bool]   $ReplaceMAC;
+        [bool]   $UseDHCP;
         [String] $IPAddress;
         [String] $SubnetMask;
         [String] $Gateway;
         [String] $DNS1;
         [String] $DNS2;
         [String] $DNSSuffix;
+        [String] $TestNetworkID;
+        [bool]   $TestReplaceMAC;
+        [bool]   $TestUseDHCP;
         [String] $TestIPAddress;
         [String] $TestSubnetMask;
         [String] $TestGateway;
@@ -406,7 +411,48 @@
         [String] $TestDNS2;
         [String] $TestDNSSuffix;
 
-        #region Base CTOR
+
+        #CTOR for default + DHCP
+        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, `
+                             [String] $TestNetworkID, [bool] $TestReplaceMAC, [bool] $TestUseDHCP) {
+            $this.NICName        = $NICName;
+            $this.NetworkID      = $NetworkID;
+            $this.ReplaceMAC     = $ReplaceMAC;
+            $this.TestNetworkID  = $TestNetworkID;
+            $this.TestReplaceMAC = $TestReplaceMAC;
+            $this.UseDHCP        = $UseDHCP;
+            $this.TestUseDHCP    = $TestUseDHCP;
+        }
+
+
+        #CTOR for default + IP
+        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
+                            [String] $IPAddress, [String] $Subnetmask, [String] $Gateway, `
+                            [String] $DNS1, [String] $DNS2, [String] $DNSSuffix, `
+                            [String] $TestNetworkID, [bool] $TestReplaceMAC, `
+                            [String] $TestIPAddress, [String] $TestSubnetMask, [String] $TestGateway, `
+                            [String] $TestDNS1, [String] $TestDNS2, [String] $TestDNSSuffix ) {
+            $this.NICName        = $NICName;
+            $this.NetworkID      = $NetworkID;
+            $this.ReplaceMAC     = $ReplaceMAC;
+            $this.TestNetworkID  = $TestNetworkID;
+            $this.TestReplaceMAC = $TestReplaceMAC;
+            $this.UseDHCP        = $false;
+            $this.IPAddress      = $IPAddress;
+            $this.Subnetmask     = $Subnetmask;
+            $this.Gateway        = $Gateway;
+            $this.DNS1           = $DNS1;
+            $this.DNS2           = $DNS2;
+            $this.DNSSuffix      = $DNSSuffix;
+            $this.TestUseDHCP    = $false;
+            $this.TestIPAddress  = $TestIPAddress;
+            $this.TestSubnetMask = $TestSubnetMask;
+            $this.TestGateway    = $TestGateway;
+            $this.TestDNS1       = $TestDNS1;
+            $this.TestDNS2       = $TestDNS2;
+            $this.TestDNSSuffix =  $TestDNSSuffix;        }
+
+        #region Base CTOR  (7 strings)
         FailoverIPAddress( [String] $NICName, [String] $IPAddress, `
                     [String] $Subnetmask, [String] $Gateway, `
                     [String] $DNS1, [String] $DNS2, `
@@ -420,112 +466,53 @@
             $this.DNS2 =       $DNS2;
             $this.DNSSuffix =  $DNSSuffix;
             $this.ReplaceMAC = $false;
+            $this.UseDHCP    = $false;
         }
         #endregion
-
-        #region CTOR with ReplaceMAC
-        FailoverIPAddress( [String] $NICName, [bool] $ReplaceMAC,  `
-                    [String] $IPAddress, [String] $Subnetmask, `
-                    [String] $Gateway, [String] $DNS1, `
-                    [String] $DNS2, [String] $DNSSuffix) {
-            $this.NICName =     $NICName;
-            #Should add validation to IP/subnets
-            $this.IPAddress =  $IPAddress;
-            $this.Subnetmask = $Subnetmask;
-            $this.Gateway =    $Gateway;
-            $this.DNS1 =       $DNS1;
-            $this.DNS2 =       $DNS2;
-            $this.DNSSuffix =  $DNSSuffix;
-            $this.ReplaceMAC = $ReplaceMAC;
-        }
-        #endregion
-
-        #region CTOR with Test IPs
-        FailoverIPAddress(  [String] $NICName, [String] $IPAddress, `
-                    [String] $Subnetmask, [String] $Gateway, `
-                    [String] $DNS1, [String] $DNS2, `
-                    [String] $DNSSuffix, [String] $TestIPAddress, `
-                    [String] $TestSubnetMask, [String] $TestGateway, `
-                    [String] $TestDNS1, [String] $TestDNS2, `
-                    [String] $TestDNSSuffix ) {
-            $this.NICName =     $NICName;
-            #Should add validation to IP/subnets
-            $this.IPAddress =  $IPAddress;
-            $this.Subnetmask = $Subnetmask;
-            $this.Gateway =    $Gateway;
-            $this.DNS1 =       $DNS1;
-            $this.DNS2 =       $DNS2;
-            $this.DNSSuffix =  $DNSSuffix;
-            $this.ReplaceMAC = $false;
-            $this.TestIPAddress =  $TestIPAddress;
-            $this.TestSubnetMask = $TestSubnetMask;
-            $this.TestGateway =    $TestGateway;
-            $this.TestDNS1 =       $TestDNS1;
-            $this.TestDNS2 =       $TestDNS2;
-            $this.TestDNSSuffix =  $TestDNSSuffix;
-        }
-        #endregion
-
-        #region CTOR with Test IPs & ReplaceMAC
-        FailoverIPAddress(  [String] $NICName, [bool] $ReplaceMAC, [String] $IPAddress, `
-                    [String] $Subnetmask, [String] $Gateway, `
-                    [String] $DNS1, [String] $DNS2, `
-                    [String] $DNSSuffix, [String] $TestIPAddress, `
-                    [String] $TestSubnetMask, [String] $TestGateway, `
-                    [String] $TestDNS1, [String] $TestDNS2, `
-                    [String] $TestDNSSuffix ) {
-            $this.NICName =     $NICName;
-            #Should add validation to IP/subnets
-            $this.IPAddress =      $IPAddress;
-            $this.Subnetmask =     $Subnetmask;
-            $this.Gateway =        $Gateway;
-            $this.DNS1 =           $DNS1;
-            $this.DNS2 =           $DNS2;
-            $this.DNSSuffix =      $DNSSuffix;
-            $this.ReplaceMAC =     $ReplaceMAC;
-            $this.TestIPAddress =  $TestIPAddress;
-            $this.TestSubnetMask = $TestSubnetMask;
-            $this.TestGateway =    $TestGateway;
-            $this.TestDNS1 =       $TestDNS1;
-            $this.TestDNS2 =       $TestDNS2;
-            $this.TestDNSSuffix =  $TestDNSSuffix;
-        }
-        #endregion
+        
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoFailoverIPAddress {
+        #Parameter Sets
+        # Default NICName Req, NetworkID,  ReplaceMAC, TestNetworkID TestReplaceMAC Optional
+        #  1) DHCP req, FailDHCP optional
+        #  3) IPaddress, Submet, Gateway, DNS1, DN2, DNSSUfix req, Test versions opt
+        [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto NIC Name')]        [String] $NICName,
-            [Parameter(Mandatory=$false, HelpMessage = 'Replace MAC Address')] [Bool]   $ReplaceMAC = $false,
-            [Parameter(Mandatory=$true, HelpMessage = 'IP Address')]           [String] $IPAddress,
-            [Parameter(Mandatory=$true, HelpMessage = 'Subnet Mask')]          [String] $SubnetMask,
-            [Parameter(Mandatory=$true, HelpMessage = 'Gateway')]              [String] $Gateway,
-            [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 1')]         [String] $DNS1,
-            [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 2')]         [String] $DNS2,
-            [Parameter(Mandatory=$true, HelpMessage = 'DNS Domain Suffix')]    [String] $DNSSuffix,
+            [Parameter(Mandatory=$true, HelpMessage = 'vCenter NIC Name')]          [String] $NICName,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Network ID')]         [String] $NetworkID,
+            [Parameter(Mandatory=$false, HelpMessage = 'Replace MAC Address')]      [Bool]   $ReplaceMAC = $false,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Zerto Network ID')]    [String] $TestNetworkID,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Replace MAC Address')] [Bool]   $TestReplaceMAC = $false,
 
-            [Parameter(Mandatory=$false, HelpMessage = 'Test IP Address')]        [String] $TestIPAddress,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test Subnet Mask')]       [String] $TestSubnetMask,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test Gateway')]           [String] $TestGateway,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 1')]      [String] $TestDNS1,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 2')]      [String] $TestDNS2,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Domain Suffix')] [String] $TestDNSSuffix
+            [Parameter(Mandatory=$true, HelpMessage = 'Use DHCP', ParameterSetName = 'DHCP')] [switch]           $UseDHCP,
+            [Parameter(Mandatory=$false, HelpMessage = 'Use DHCP for test', ParameterSetName = 'DHCP')] [switch] $TestUseDHCP,
+
+            [Parameter(Mandatory=$true, HelpMessage = 'IP Address', ParameterSetName = 'IP')]           [String] $IPAddress,
+            [Parameter(Mandatory=$true, HelpMessage = 'Subnet Mask', ParameterSetName = 'IP')]          [String] $SubnetMask,
+            [Parameter(Mandatory=$true, HelpMessage = 'Gateway', ParameterSetName = 'IP')]              [String] $Gateway,
+            [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 1', ParameterSetName = 'IP')]         [String] $DNS1,
+            [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 2', ParameterSetName = 'IP')]         [String] $DNS2,
+            [Parameter(Mandatory=$true, HelpMessage = 'DNS Domain Suffix', ParameterSetName = 'IP')]    [String] $DNSSuffix,
+
+ 
+            [Parameter(Mandatory=$false, HelpMessage = 'Test IP Address', ParameterSetName = 'IP')]        [String] $TestIPAddress,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Subnet Mask', ParameterSetName = 'IP')]       [String] $TestSubnetMask,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Gateway', ParameterSetName = 'IP')]           [String] $TestGateway,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 1', ParameterSetName = 'IP')]      [String] $TestDNS1,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 2', ParameterSetName = 'IP')]      [String] $TestDNS2,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Domain Suffix', ParameterSetName = 'IP')] [String] $TestDNSSuffix
         )
         
-        [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $ReplaceMAC, $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix);
+        Write-Verbose $PSCmdlet.ParameterSetName
+        If ($PSCmdlet.ParameterSetName -eq 'DHCP') {
+            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $TestNetworkID, $TestReplaceMAC, $TestUseDHCP);
+        } else {
+            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $TestNetworkID, $TestReplaceMAC, `
+                                                                    $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, `
+                                                                    $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
 
-        if ($TestIPAddress -or $TestSubnetMask -or $TestGateway -or $TestDNS1 -or $TestDNS2 -or $TestDNSSuffix) {
-            if (-not $TestIPAddress -or -not $TestSubnetMask -or -not $TestGateway  `
-                -or -not $TestDNS1 -or -not $TestDNS1 -or -not $TestDNS2 -or -not $TestDNSSuffix)  {
-                throw "All Test IP settings must be specified if one test setting is specified"
-            }
-            $NewZertoIP.TestIPAddress = $TestIPAddress
-            $NewZertoIP.TestSubnetMask = $TestSubnetMask
-            $NewZertoIP.TestGateway = $TestGateway
-            $NewZertoIP.TestDNS1 = $TestDNS1
-            $NewZertoIP.TestDNS2 = $TestDNS2
-            $NewZertoIP.TestDNSSuffix = $TestDNSSuffix
         }
         Return $NewZertoIP    
     }
@@ -564,6 +551,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGVirtualMachine {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')]     [String] $VMName,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto IPAddresses')]  [FailoverIPAddress[]] $FailoverIPAddress
@@ -599,6 +587,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVRAIPAddressConfig {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, HelpMessage = 'IP Address')]           [String] $IPAddress,
             [Parameter(Mandatory=$true, HelpMessage = 'Subnet Mask')]          [String] $SubnetMask,
@@ -651,6 +640,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingBasic {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Journal in Hrs')] [int] $JournalHistoryInHours, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Name')] [string] $Name, 
@@ -698,6 +688,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingBootgroup {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootDelayInSeconds')] [int] $BootDelayInSeconds, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Identifier')] [string] $BootGroupIdentifier, 
@@ -756,6 +747,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingJournalLimitation {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInMB')] [int] $HardLimitInMB, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInPercent')] [int] $HardLimitInPercent, 
@@ -776,6 +768,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingJournal {
+        [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInMB')] [int] $HardLimitInMB, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInPercent')] [int] $HardLimitInPercent, 
@@ -2985,17 +2978,14 @@
         $NewVRAHash.Add("HostIdentifier", $HostID)
         If ($HostRootPassword) {
             $NewVRAHash.Add("HostRootPassword", $HostRootPassword)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
         } else {
             $NewVRAHash.Add("HostRootPassword", $null)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
         }
 
         $NewVRAHash.Add("MemoryInGb", $MemoryInGB)
         $NewVRAHash.Add("NetworkIdentifier", $NetworkID)
-        If ($HostRootPassword) {
-            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
-        } else {
-            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
-        }
         $NewVRAIPInfo = [ordered] @{}
             $NewVRAIPInfo.Add("DefaultGateway", $VRAIPConfiguration.Gateway )
             $NewVRAIPInfo.Add("SubnetMask", $VRAIPConfiguration.SubnetMask )
@@ -3020,6 +3010,78 @@
             Test-RESTError -err $_
         }
         return $Result
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Update-ZertoVRA {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier,
+            [Parameter(Mandatory=$False, HelpMessage = 'Zerto VRA Group Name (optional)')] [string] $VRAGroupName,
+            [Parameter(Mandatory=$true, ParameterSetName="Password", HelpMessage = 'Zerto Host Root Password')] [string] $HostRootPassword,
+            [Parameter(Mandatory=$true, ParameterSetName="PublicKey", HelpMessage = 'Use vCenter PublicKey instead of Password')] [bool] $UseVCenterPublicKey = $true,
+            [Parameter(Mandatory=$true, HelpMessage = 'VRA IP Configuration')] [VRAIPAddressConfig] $VRAIPConfiguration
+
+            ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
+        )
+        
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+
+        #Validate
+        if ($UseVCenterPublicKey -and $HostRootPassword) {
+            throw "Cannot specify both HostRootPassword and Use vCenter Public Key"
+        }
+
+        #Get Identifiers
+        $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
+        if ( [string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
+
+        $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier
+        Write-Verbose $FullURL
+
+        $NewVRAHash = [ordered] @{}
+
+        $NewVRAHash.Add("GroupName", $VRAGroupName)
+        If ($HostRootPassword) {
+            $NewVRAHash.Add("HostRootPassword", $HostRootPassword)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
+        } else {
+            $NewVRAHash.Add("HostRootPassword", $null)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
+        }
+
+        $NewVRAIPInfo = [ordered] @{}
+            $NewVRAIPInfo.Add("DefaultGateway", $VRAIPConfiguration.Gateway )
+            $NewVRAIPInfo.Add("SubnetMask", $VRAIPConfiguration.SubnetMask )
+            $NewVRAIPInfo.Add("VraIPAddress", $VRAIPConfiguration.IPAddress )
+            $NewVRAIPInfo.Add("VraIPConfigurationTypeApi", $VRAIPConfiguration.VRAIPType.ToString() )
+            $NewVRAHash.Add("VraNetworkDataApi", $NewVRAIPInfo)        
+
+        #Convert VPG Hash to JSON - Remember DEPTH!!!
+        $NewVRAJson = $NewVRAHash | ConvertTo-Json -Depth 20
+
+        Write-Verbose $NewVRAJson
+
+        if ($DumpJson ) {
+            #Display JSON, and exit
+            Write-host $NewVRAJson
+            return
+        }
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $NewVRAJson
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result
+
     }
 
 
@@ -3718,12 +3780,21 @@
                                     $NicFailHyper = [ordered] @{}
                                         $NicFailHyper.Add("DnsSuffix", $_.DnsSuffix)
                                             $NicFailHyperIP = [ordered] @{}
-                                            $NicFailHyperIP.Add("Gateway", $_.Gateway)
-                                            $NicFailHyperIP.Add("IsDhcp", $false)
-                                            $NicFailHyperIP.Add("PrimaryDns", $_.Dns1)
-                                            $NicFailHyperIP.Add("SecondaryDns", $_.Dns2)
-                                            $NicFailHyperIP.Add("StaticIp", $_.IPAddress)
-                                            $NicFailHyperIP.Add("SubnetMask", $_.SubnetMask)
+                                            if ($_.TestUseDHCP) {
+                                                $NicTestHyperIP.Add("IsDhcp", $true)
+                                                $NicTestHyperIP.Add("Gateway", "")
+                                                $NicTestHyperIP.Add("PrimaryDns", "")
+                                                $NicTestHyperIP.Add("SecondaryDns", "")
+                                                $NicTestHyperIP.Add("StaticIp", "")
+                                                $NicTestHyperIP.Add("SubnetMask", "")
+                                            } else {
+                                                $NicTestHyperIP.Add("IsDhcp", $false)
+                                                $NicTestHyperIP.Add("StaticIp", $_.IPAddress)
+                                                $NicTestHyperIP.Add("SubnetMask", $_.SubnetMask)
+                                                $NicTestHyperIP.Add("Gateway", $_.Gateway)
+                                                $NicTestHyperIP.Add("PrimaryDns", $_.Dns1)
+                                                $NicTestHyperIP.Add("SecondaryDns", $_.Dns2)
+                                            }
                                         $NicFailHyper.Add("IpConfig", $NicFailHyperIP)
                                         $NicFailHyper.Add( "ShouldReplaceMacAddress" , $_.ReplaceMAC)
                                     $NicFail.Add( "Hypervisor", $NicFailHyper)
@@ -3734,12 +3805,21 @@
                                     $NicTestHyper = [ordered] @{}
                                         $NicTestHyper.Add("DnsSuffix", $_.TestDnsSuffix)
                                             $NicTestHyperIP = [ordered] @{}
-                                            $NicTestHyperIP.Add("Gateway", $_.TestGateway)
-                                            $NicTestHyperIP.Add("IsDhcp", $false)
-                                            $NicTestHyperIP.Add("PrimaryDns", $_.TestDns1)
-                                            $NicTestHyperIP.Add("SecondaryDns", $_.TestDns2)
-                                            $NicTestHyperIP.Add("StaticIp", $_.TestIPAddress)
-                                            $NicTestHyperIP.Add("SubnetMask", $_.TestSubnetMask)
+                                            if ($_.TestUseDHCP) {
+                                                $NicTestHyperIP.Add("IsDhcp", $true)
+                                                $NicTestHyperIP.Add("StaticIp", "")
+                                                $NicTestHyperIP.Add("SubnetMask", "")
+                                                $NicTestHyperIP.Add("Gateway", "")
+                                                $NicTestHyperIP.Add("PrimaryDns", "")
+                                                $NicTestHyperIP.Add("SecondaryDns", "")
+                                            } else {
+                                                $NicTestHyperIP.Add("IsDhcp", $false)
+                                                $NicTestHyperIP.Add("StaticIp", $_.TestIPAddress)
+                                                $NicTestHyperIP.Add("SubnetMask", $_.TestSubnetMask)
+                                                $NicTestHyperIP.Add("Gateway", $_.TestGateway)
+                                                $NicTestHyperIP.Add("PrimaryDns", $_.TestDns1)
+                                                $NicTestHyperIP.Add("SecondaryDns", $_.TestDns2)
+                                            }
                                         $NicTestHyper.Add("IpConfig", $NicTestHyperIP)
                                         #$NicTestHyper.Add( "NetworkIdentifier" , '00000000-0000-0000-0000-000000000000')
                                         $NicTestHyper.Add( "ShouldReplaceMacAddress" , $_.ReplaceMAC)
@@ -5200,4 +5280,5 @@ Export-ModuleMember -function   Add-ZertoVPG,
                                 Start-ZertoVPGFailover, 
                                 Start-ZertoVPGFailoverTest, 
                                 Stop-ZertoVPGClone, 
-                                Stop-ZertoVPGFailoverTest
+                                Stop-ZertoVPGFailoverTest,
+                                Update-ZertoVRA

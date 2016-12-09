@@ -269,7 +269,9 @@
       <Examples>
         <Example>
           <Name>Simple VPG</Name>
-          <Cmd>$ztoken = Get-ZertoAuthToken -ZertoUser test\Account
+          <Cmd>Set-Item ENV:ZertoServer "il1zerto.test.com" 
+Set-Item ENV:ZertoPort "9669" 
+Set-ZertoAuthToken -ZertoUser test\Account
 
 Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
                 -VPGName "NewVPG" `
@@ -287,7 +289,11 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
         </Example>
         <Example>
           <Name>VPG with VM with Failover IP Address</Name>
-          <Cmd>$IP1 = New-ZertoFailoverIPAddress -NICName 'Network Adapter 1' `
+          <Cmd>Set-Item ENV:ZertoServer "il1zerto.test.com" 
+Set-Item ENV:ZertoPort "9669" 
+Set-ZertoAuthToken -ZertoUser test\Account
+
+$IP1 = New-ZertoFailoverIPAddress -NICName 'Network Adapter 1' `
                             -IPAddress '10.199.199.123' `
                             -SubnetMask  '255.255.0.0' `
                             -Gateway '10.199.199.1' `
@@ -308,7 +314,93 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
             -vCenterFolder 'Zerto-VM-Recovery'  `
             -VmNamesAndIPAddresses $Vm1
 </Cmd>
-          <Description>This example creates a new FailoverIPAddress object, adds it to a new VPGVirtualMachine object, then creates a single VPG with that VM.</Description>
+          <Description>This example creates a new FailoverIPAddress object, adds it to a new VPGVirtualMachine object, then creates a VPG with that VM.</Description>
+          <Output />
+        </Example>
+        <Example>
+          <Name>VPG with VM with DHCP IP Address</Name>
+          <Cmd>Set-Item ENV:ZertoServer "il1zerto.test.com" 
+Set-Item ENV:ZertoPort "9669" 
+Set-ZertoAuthToken -ZertoUser test\Account
+
+$IP1 = New-ZertoFailoverIPAddress -NICName 'Network adapter 1'  -UseDHCP
+
+$VM1 = New-ZertoVPGVirtualMachine -VMName 'IL1ZTest01' -FailoverIPAddress $IP1
+
+Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
+            -VPGName "ChrisLewis" `
+            -RecoverySiteName 'Zerto-IL1' `
+            -ClusterName  'dus01' `
+            -FailoverNetwork 'priv001hb'  `
+            -TestNetwork 'priv001hb' `
+            -DatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -JournalDatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -vCenterFolder 'Zerto-VM-Recovery'  `
+            -VmNamesAndIPAddresses $Vm1
+</Cmd>
+          <Description>This example creates a new FailoverIPAddress object that uses DHCP, adds it to a new VPGVirtualMachine object, then creates a VPG with that VM.</Description>
+          <Output />
+        </Example>
+        <Example>
+          <Name>VPG with VM with Failover and Test IP Address and Network IDs</Name>
+          <Cmd>Set-Item ENV:ZertoServer "il1zerto.test.com" 
+Set-Item ENV:ZertoPort "9669" 
+Set-ZertoAuthToken -ZertoUser test\Account
+
+$IP1 = New-ZertoFailoverIPAddress -NICName 'Network adapter 1' `
+                            -IPAddress '10.199.199.123' `
+                            -SubnetMask  '255.255.0.0' `
+                            -Gateway '10.199.199.1' `
+                            -DNS1 '10.77.182.137' `
+                            -DNS2 '10.77.182.163' `
+                            -DNSSuffix 'test.com' `
+                            -NetworkID (Get-ZertoSiteNetworkID -ZertoSiteIdentifier (Get-ZertoSiteID -ZertoSiteName 'Zerto-IL1' ) -NetworkName 'vlan99rpl') `
+                            -TestIPAddress '1.1.1.123' `
+                            -TestSubnetMask  '255.255.0.0' `
+                            -TestGateway '1.1.1.1' `
+                            -TestDNS1 '1.7.182.137' `
+                            -TestDNS2 '1.7.182.163' `
+                            -TestDNSSuffix 'TestNuveen.com' `
+                            -TestNetworkID (Get-ZertoSiteNetworkID -ZertoSiteIdentifier (Get-ZertoSiteID -ZertoSiteName 'Zerto-IL1' ) -NetworkName 'vlan60reg') 
+
+Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
+            -VPGName "ChrisLewis" `
+            -RecoverySiteName 'Zerto-IL1' `
+            -ClusterName  'dus01' `
+            -FailoverNetwork 'priv001hb'  `
+            -TestNetwork 'priv001hb' `
+            -DatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -JournalDatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -vCenterFolder 'Zerto-VM-Recovery'  `
+            -VmNamesAndIPAddresses $Vm1
+</Cmd>
+          <Description>This example creates a new FailoverIPAddress object with both Failover and TestFailover IPs, adds it to a new VPGVirtualMachine object, then creates a VPG with that VM.</Description>
+          <Output />
+        </Example>
+        <Example>
+          <Name>VPG with Multiple VMs with DHCP IP Address</Name>
+          <Cmd>Set-Item ENV:ZertoServer "il1zerto.test.com" 
+Set-Item ENV:ZertoPort "9669" 
+Set-ZertoAuthToken -ZertoUser test\Account
+
+$IP1 = New-ZertoFailoverIPAddress -NICName 'Network adapter 1'  -UseDHCP
+$VM1 = New-ZertoVPGVirtualMachine -VMName 'IL1ZTest01' -FailoverIPAddress $IP1
+
+$IP2 = New-ZertoFailoverIPAddress -NICName 'Network adapter 1'  -UseDHCP
+$VM2 = New-ZertoVPGVirtualMachine -VMName 'IL1ZTest02' -FailoverIPAddress $IP1
+
+Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
+            -VPGName "ChrisLewis" `
+            -RecoverySiteName 'Zerto-IL1' `
+            -ClusterName  'dus01' `
+            -FailoverNetwork 'priv001hb'  `
+            -TestNetwork 'priv001hb' `
+            -DatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -JournalDatastoreName 'IL1VSP1_ZTO_LD104F_CP2_P1-6' `
+            -vCenterFolder 'Zerto-VM-Recovery'  `
+            -VmNamesAndIPAddresses @($Vm1, $Vm2)
+</Cmd>
+          <Description>This example creates two VPGVirtualMachine objects each with a DHCP FailoverIPAddress object, then creates a VPG with those two VMs.</Description>
           <Output />
         </Example>
       </Examples>

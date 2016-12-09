@@ -73,14 +73,24 @@ to use an expired session looks like this:
         + FullyQualifiedErrorId : Exception occured in API : Invalid session
   
 
-
 ## Supported Zerto Versions
 
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 
 ## Release Notes
+**0.9.1** - Updated help for 0.9.0, fixed TestNetworkID for Add-ZertoVPG
+
+**0.9.0** - Added ability to specify Failover/Test network ID to Add-ZertoVPG.  Note that this
+updated the Failover IP class, so check your New-ZertoFailoverIPAddress calls
+
+**0.8.7** - Fixed some issues with Add-ZertoVRA
+
+**0.8.6** - Fixed some isssues with passing ZertoServer/Port/Token to sub-calls'
+
+**0.8.5** - Updated to remove some company information'
 
 **0.8.0** - Initital release to Powershell Gallery.  Note that some functionality, 
 specifically around editing VPG settings, has not been implemented.
+
 

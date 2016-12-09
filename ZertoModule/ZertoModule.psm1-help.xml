@@ -169,7 +169,7 @@
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -326,7 +326,7 @@
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -588,7 +588,7 @@
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DumpJson</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			<dev:type>
@@ -812,7 +812,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -892,7 +892,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -1022,7 +1022,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DumpJson</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			<dev:type>
@@ -17146,6 +17146,20 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>TestDNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover Test DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>UseDHCP</maml:name>
 				<maml:description>
 					<maml:para>Use DHCP for failover IP Address</maml:para>
@@ -17198,6 +17212,20 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>DNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
+				<maml:name>TestDNSSuffix</maml:name>
+				<maml:description>
+					<maml:para>Failover Test DNS Suffix</maml:para>
+				</maml:description>
+				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+			</command:parameter>
+			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>IPAddress</maml:name>
 				<maml:description>
 					<maml:para>Failover IP Address</maml:para>
@@ -17229,13 +17257,6 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<maml:name>DNS2</maml:name>
 				<maml:description>
 					<maml:para>Failover DNS Server 2</maml:para>
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
-				<maml:name>DNSSuffix</maml:name>
-				<maml:description>
-					<maml:para>Failover DNS Suffix</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -17271,13 +17292,6 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<maml:name>TestDNS2</maml:name>
 				<maml:description>
 					<maml:para>Failover Test DNS Server 2</maml:para>
-				</maml:description>
-				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-			</command:parameter>
-			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
-				<maml:name>TestDNSSuffix</maml:name>
-				<maml:description>
-					<maml:para>Failover Test DNS Suffix</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
@@ -20336,7 +20350,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 	<command:details>
 		<command:name>Update-ZertoVRA</command:name>
 		<maml:description>
-			<maml:para />
+			<maml:para>Updates a Zerto VRA.</maml:para>
 		</maml:description>
 		<maml:copyright>
 			<maml:para />
@@ -20346,7 +20360,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<dev:version />
 	</command:details>
 	<maml:description>
-		<maml:para />
+		<maml:para>Updates a Zerto VRA with a new GroupName or IPAddress</maml:para>
 	</maml:description>
 	<command:syntax>
 		<command:syntaxItem>
@@ -20354,56 +20368,56 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoServer</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoPort</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
 				<maml:name>ZertoToken</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoVraIdentifier</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto VRA Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VRAGroupName</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>New VRA GroupName</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>HostRootPassword</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>ESX Host root password</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VRAIPConfiguration</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>An VRAIPConfig object created with New-ZertoVRAIPAddressConfig</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">VRAIPAddressConfig</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -20413,56 +20427,56 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoServer</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoPort</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
 				<maml:name>ZertoToken</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ZertoVraIdentifier</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Zerto VRA Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VRAGroupName</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>New VRA GroupName</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>UseVCenterPublicKey</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Use the vCenter Public Key instead of the Host Root Password</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>VRAIPConfiguration</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>An VRAIPConfig object created with New-ZertoVRAIPAddressConfig</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">VRAIPAddressConfig</command:parameterValue>
 			</command:parameter>
 			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DumpJson</maml:name>
 				<maml:description>
-					<maml:para />
+					<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 				</maml:description>
 				<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			</command:parameter>
@@ -20472,7 +20486,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoServer</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20484,7 +20498,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoPort</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20496,7 +20510,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="true (ByValue)" position="named">
 			<maml:name>ZertoToken</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">Hashtable</command:parameterValue>
 			<dev:type>
@@ -20508,7 +20522,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ZertoVraIdentifier</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Zerto VRA Identifier</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20520,7 +20534,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>VRAGroupName</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>New VRA GroupName</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20532,7 +20546,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>HostRootPassword</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>ESX Host root password</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			<dev:type>
@@ -20544,7 +20558,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>VRAIPConfiguration</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>An VRAIPConfig object created with New-ZertoVRAIPAddressConfig</maml:para>
 			</maml:description>
 			<command:parameterValue required="true" variableLength="false">VRAIPAddressConfig</command:parameterValue>
 			<dev:type>
@@ -20556,7 +20570,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DumpJson</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Outputs the REST API json without posting.  Used for diagnostics</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
 			<dev:type>
@@ -20568,7 +20582,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>UseVCenterPublicKey</maml:name>
 			<maml:description>
-				<maml:para />
+				<maml:para>Use the vCenter Public Key instead of the Host Root Password</maml:para>
 			</maml:description>
 			<command:parameterValue required="false" variableLength="false">Boolean</command:parameterValue>
 			<dev:type>

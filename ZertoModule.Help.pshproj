@@ -252,7 +252,7 @@
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Outputs the REST API json without posting.  Used for diagnostics</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="VPGVirtualMachine[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -445,7 +445,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Outputs the REST API json without posting.  Used for diagnostics</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -8283,8 +8283,8 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="New" noun="ZertoFailoverIPAddress">
       <Name>New-ZertoFailoverIPAddress</Name>
       <Syntax>
-        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -UseDHCP &lt;SwitchParameter&gt; [-TestUseDHCP]</string>
-        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -IPAddress &lt;String&gt; -SubnetMask &lt;String&gt; -Gateway &lt;String&gt; -DNS1 &lt;String&gt; -DNS2 &lt;String&gt; -DNSSuffix &lt;String&gt; [-TestIPAddress &lt;String&gt;] [-TestSubnetMask &lt;String&gt;] [-TestGateway &lt;String&gt;] [-TestDNS1 &lt;String&gt;] [-TestDNS2 &lt;String&gt;] [-TestDNSSuffix &lt;String&gt;]</string>
+        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -DNSSuffix &lt;String&gt; [-TestDNSSuffix &lt;String&gt;] -UseDHCP &lt;SwitchParameter&gt; [-TestUseDHCP]</string>
+        <string>New-ZertoFailoverIPAddress -NICName &lt;String&gt; [-NetworkID &lt;String&gt;] [-ReplaceMAC &lt;Boolean&gt;] [-TestNetworkID &lt;String&gt;] [-TestReplaceMAC &lt;Boolean&gt;] -DNSSuffix &lt;String&gt; [-TestDNSSuffix &lt;String&gt;] -IPAddress &lt;String&gt; -SubnetMask &lt;String&gt; -Gateway &lt;String&gt; -DNS1 &lt;String&gt; -DNS2 &lt;String&gt; [-TestIPAddress &lt;String&gt;] [-TestSubnetMask &lt;String&gt;] [-TestGateway &lt;String&gt;] [-TestDNS1 &lt;String&gt;] [-TestDNS2 &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Creats a new Zerto Failover IP Address for a VPG</Synopsis>
@@ -8298,8 +8298,8 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <ReturnTypeDescription />
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="DHCP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC UseDHCP TestUseDHCP Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
-        <CommandParameterSetInfo2 Name="IP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC IPAddress SubnetMask Gateway DNS1 DNS2 DNSSuffix TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 TestDNSSuffix Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="DHCP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC DNSSuffix TestDNSSuffix UseDHCP TestUseDHCP Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="IP" Params="NICName NetworkID ReplaceMAC TestNetworkID TestReplaceMAC DNSSuffix TestDNSSuffix IPAddress SubnetMask Gateway DNS1 DNS2 TestIPAddress TestSubnetMask TestGateway TestDNS1 TestDNS2 Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9864,8 +9864,8 @@ the failover is as required before performing the commitPolicy setting.</Descrip
         <string>Update-ZertoVRA [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -ZertoVraIdentifier &lt;String&gt; [-VRAGroupName &lt;String&gt;] -UseVCenterPublicKey &lt;Boolean&gt; -VRAIPConfiguration &lt;VRAIPAddressConfig&gt; [-DumpJson]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Updates a Zerto VRA.</Synopsis>
+        <Description>Updates a Zerto VRA with a new GroupName or IPAddress</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -9886,7 +9886,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9896,7 +9896,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="Hashtable" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9906,7 +9906,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9916,7 +9916,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Zerto VRA Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9926,7 +9926,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>New VRA GroupName</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9936,7 +9936,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>ESX Host root password</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="VRAIPAddressConfig" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9946,7 +9946,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>An VRAIPConfig object created with New-ZertoVRAIPAddressConfig</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="SwitchParameter" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9956,7 +9956,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Outputs the REST API json without posting.  Used for diagnostics</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
@@ -9966,7 +9966,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description />
+          <Description>Use the vCenter Public Key instead of the Host Root Password</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>

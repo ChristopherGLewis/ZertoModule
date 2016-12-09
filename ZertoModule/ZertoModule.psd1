@@ -12,7 +12,7 @@
 RootModule = 'ZertoModule.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.8.9'
+ModuleVersion = '0.9.0'
 
 # ID used to uniquely identify this module
 GUID = 'a7c23e30-0879-42f4-9e1c-bffbe723b02b'
@@ -162,7 +162,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Updated the Failover IP class'
+        ReleaseNotes = 'Added ability to specify Failover/Test network ID to Add-ZertoVPG'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

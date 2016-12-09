@@ -630,7 +630,7 @@
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Add-VPG task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>
@@ -1064,7 +1064,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Add-VRA task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>
@@ -1201,7 +1201,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Add-VPG task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>
@@ -18807,7 +18807,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Remove-VPG task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>
@@ -19081,7 +19081,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Remove-VRA task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>
@@ -20612,7 +20612,7 @@ the failover is as required before performing the commitPolicy setting.</maml:pa
 				<maml:description/>
 			</dev:type>
 			<maml:description>
-<maml:para />
+				<maml:para>Returns the TaskID of the Update-VRA task</maml:para>
 			</maml:description>
 		</command:returnValue>
 	</command:returnValues>

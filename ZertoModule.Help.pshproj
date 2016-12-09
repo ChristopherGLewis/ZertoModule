@@ -23,7 +23,7 @@
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Add-VPG task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="VMNames" Params="ZertoServer ZertoPort ZertoToken VPGName Priority RecoverySiteName RPOAlertInSeconds TestIntervalInMinutes ClusterName HostName FailoverNetwork TestNetwork DatastoreName DatastoreclusterName JournalDatastoreName JournalHistoryInHours JournalHardLimitMB JournalWarningThresholdMB vCenterFolder VmNames VPGCommit DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
@@ -331,7 +331,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Add-VRA task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="Password" Params="ZertoServer ZertoPort ZertoToken DatastoreName VRAGroupName HostName NetworkName MemoryInGB HostRootPassword VRAIPConfiguration DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
@@ -478,7 +478,7 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Add-VPG task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken ZertoVpgSettingsIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
@@ -9042,7 +9042,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Remove-VPG task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken ZertoVpgIdentifier Force KeepRecoveryVolumes Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
@@ -9194,7 +9194,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Remove-VRA task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken ZertoVraIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
@@ -9872,7 +9872,7 @@ the failover is as required before performing the commitPolicy setting.</Descrip
         <InputTypeDescription />
         <ReturnType />
         <ReturnUrl />
-        <ReturnTypeDescription />
+        <ReturnTypeDescription>Returns the TaskID of the Update-VRA task</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
         <CommandParameterSetInfo2 Name="Password" Params="ZertoServer ZertoPort ZertoToken ZertoVraIdentifier VRAGroupName HostRootPassword VRAIPConfiguration DumpJson Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />

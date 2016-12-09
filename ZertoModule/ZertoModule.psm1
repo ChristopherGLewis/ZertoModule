@@ -3785,7 +3785,7 @@
                                     $NicFail.Add( "Hypervisor", $NicFailHyper)
                                 #Add Failover to NIC
                                 $Nic.Add("Failover", $NicFail)
-                            If ($_.TestIPAddress) {
+                            If ($_.TestIPAddress -or $_.TestUseDHCP) {
                                 $NicTest = [ordered] @{}
                                     $NicTestHyper = [ordered] @{}
                                         $NicTestHyper.Add("DnsSuffix", $_.TestDnsSuffix)
@@ -3807,9 +3807,9 @@
                                             }
                                         $NicTestHyper.Add("IpConfig", $NicTestHyperIP)
                                         if ($_.TestNetworkID) {
-                                            $NicFailHyper.Add( "NetworkIdentifier" , $_.TestNetworkID)
+                                            $NicTestHyper.Add( "NetworkIdentifier" , $_.TestNetworkID)
                                         } else {
-                                            $NicFailHyper.Add( "NetworkIdentifier" , $null)
+                                            $NicTestHyper.Add( "NetworkIdentifier" , $null)
                                         }
                                         $NicTestHyper.Add( "ShouldReplaceMacAddress" , $_.TestReplaceMAC)
                                     $NicTest.Add("Hypervisor", $NicTestHyper)

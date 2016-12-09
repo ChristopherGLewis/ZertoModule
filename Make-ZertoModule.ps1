@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.8.9' 
-$ReleaseNotes = 'Updated the Failover IP class'
+﻿$ModuleVersion = '0.9.0' 
+$ReleaseNotes = 'Added ability to specify Failover/Test network ID to Add-ZertoVPG'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

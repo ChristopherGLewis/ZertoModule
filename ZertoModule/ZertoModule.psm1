@@ -390,7 +390,6 @@
 #region Zerto Classes
 
     class FailoverIPAddress {
-        
         [string] $NICName;
         [String] $NetworkID;
         [bool]   $ReplaceMAC;
@@ -413,17 +412,18 @@
 
 
         #CTOR for default + DHCP
-        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, `
-                             [String] $TestNetworkID, [bool] $TestReplaceMAC, [bool] $TestUseDHCP) {
+        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, [String] $DNSSuffix, `
+                             [String] $TestNetworkID, [bool] $TestReplaceMAC, [bool] $TestUseDHCP, [String] $TestDNSSuffix) {
             $this.NICName        = $NICName;
             $this.NetworkID      = $NetworkID;
             $this.ReplaceMAC     = $ReplaceMAC;
             $this.TestNetworkID  = $TestNetworkID;
             $this.TestReplaceMAC = $TestReplaceMAC;
             $this.UseDHCP        = $UseDHCP;
+            $this.DNSSuffix      = $DNSSuffix;
             $this.TestUseDHCP    = $TestUseDHCP;
+            $this.TestDNSSuffix  = $TestDNSSuffix;
         }
-
 
         #CTOR for default + IP
         FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
@@ -451,24 +451,6 @@
             $this.TestDNS1       = $TestDNS1;
             $this.TestDNS2       = $TestDNS2;
             $this.TestDNSSuffix =  $TestDNSSuffix;        }
-
-        #region Base CTOR  (7 strings)
-        FailoverIPAddress( [String] $NICName, [String] $IPAddress, `
-                    [String] $Subnetmask, [String] $Gateway, `
-                    [String] $DNS1, [String] $DNS2, `
-                    [String] $DNSSuffix) {
-            $this.NICName =     $NICName;
-            #Should add validation to IP/subnets
-            $this.IPAddress =  $IPAddress;
-            $this.Subnetmask = $Subnetmask;
-            $this.Gateway =    $Gateway;
-            $this.DNS1 =       $DNS1;
-            $this.DNS2 =       $DNS2;
-            $this.DNSSuffix =  $DNSSuffix;
-            $this.ReplaceMAC = $false;
-            $this.UseDHCP    = $false;
-        }
-        #endregion
         
     }
 
@@ -485,8 +467,10 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Replace MAC Address')]      [Bool]   $ReplaceMAC = $false,
             [Parameter(Mandatory=$false, HelpMessage = 'Test Zerto Network ID')]    [String] $TestNetworkID,
             [Parameter(Mandatory=$false, HelpMessage = 'Test Replace MAC Address')] [Bool]   $TestReplaceMAC = $false,
+            [Parameter(Mandatory=$true, HelpMessage = 'DNS Domain Suffix')]         [String] $DNSSuffix,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Domain Suffix')]   [String] $TestDNSSuffix,
 
-            [Parameter(Mandatory=$true, HelpMessage = 'Use DHCP', ParameterSetName = 'DHCP')] [switch]           $UseDHCP,
+            [Parameter(Mandatory=$true, HelpMessage = 'Use DHCP', ParameterSetName = 'DHCP')]           [switch] $UseDHCP,
             [Parameter(Mandatory=$false, HelpMessage = 'Use DHCP for test', ParameterSetName = 'DHCP')] [switch] $TestUseDHCP,
 
             [Parameter(Mandatory=$true, HelpMessage = 'IP Address', ParameterSetName = 'IP')]           [String] $IPAddress,
@@ -494,25 +478,22 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Gateway', ParameterSetName = 'IP')]              [String] $Gateway,
             [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 1', ParameterSetName = 'IP')]         [String] $DNS1,
             [Parameter(Mandatory=$true, HelpMessage = 'DNS Server 2', ParameterSetName = 'IP')]         [String] $DNS2,
-            [Parameter(Mandatory=$true, HelpMessage = 'DNS Domain Suffix', ParameterSetName = 'IP')]    [String] $DNSSuffix,
-
- 
-            [Parameter(Mandatory=$false, HelpMessage = 'Test IP Address', ParameterSetName = 'IP')]        [String] $TestIPAddress,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test Subnet Mask', ParameterSetName = 'IP')]       [String] $TestSubnetMask,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test Gateway', ParameterSetName = 'IP')]           [String] $TestGateway,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 1', ParameterSetName = 'IP')]      [String] $TestDNS1,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 2', ParameterSetName = 'IP')]      [String] $TestDNS2,
-            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Domain Suffix', ParameterSetName = 'IP')] [String] $TestDNSSuffix
+            [Parameter(Mandatory=$false, HelpMessage = 'Test IP Address', ParameterSetName = 'IP')]     [String] $TestIPAddress,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Subnet Mask', ParameterSetName = 'IP')]    [String] $TestSubnetMask,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test Gateway', ParameterSetName = 'IP')]        [String] $TestGateway,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 1', ParameterSetName = 'IP')]   [String] $TestDNS1,
+            [Parameter(Mandatory=$false, HelpMessage = 'Test DNS Server 2', ParameterSetName = 'IP')]   [String] $TestDNS2
         )
         
         Write-Verbose $PSCmdlet.ParameterSetName
         If ($PSCmdlet.ParameterSetName -eq 'DHCP') {
-            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $TestNetworkID, $TestReplaceMAC, $TestUseDHCP);
+            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $DNSSuffix, `
+                                                                        $TestNetworkID, $TestReplaceMAC, $TestUseDHCP, $TestDNSSuffix);
         } else {
-            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $TestNetworkID, $TestReplaceMAC, `
-                                                                    $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, `
-                                                                    $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
-
+            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, `
+                                                                        $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, `
+                                                                        $TestNetworkID, $TestReplaceMAC, `
+                                                                        $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
         }
         Return $NewZertoIP    
     }
@@ -3569,8 +3550,6 @@
 
             ,[Parameter(Mandatory=$false, HelpMessage = 'Commit this Zerto VPG')] [bool] $VPGCommit = $true
             ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson
-
-
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3588,7 +3567,7 @@
         if ($DatastoreName -and $DatastoreclusterName) {throw "Cannot specify both Datastore Name and Datastore Cluster Name"}
         if (-not $DatastoreName -and -not $DatastoreclusterName) {throw "Must specify either Datastore Name or Datastore Cluster Name"}
 
-        if ( $VmNames.Count -lt 1 -and $VmNamesAndIPAddresses.Count -lt 1 ) { throw "Must specify at least one VM Name "}
+        if ( $VmNames.Count -lt 1 -and $VPGVirtualMachines.Count -lt 1 ) { throw "Must specify at least one VmName or VPGVirtualMachine"}
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
@@ -3632,8 +3611,8 @@
                 $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
                 $VMNameAndIDHash.Add($_, $VMID)
         }
-        } elseif ($VmNamesAndIPAddresses) {
-            $VmNamesAndIPAddresses | ForEach-Object  {
+        } elseif ($VPGVirtualMachines) {
+            $VPGVirtualMachines | ForEach-Object  {
                 #VM's are always from LocalSite
                 $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_.VMName 
                 $VMNameAndIDHash.Add($_.VMName , $VMID)
@@ -3761,7 +3740,7 @@
             if ($VmNames) {
                 #This section is VM + ID only
                 if ($VMNameAndIDHash.Keys.Count -gt 0) { 
-                    $VMNameAndIDHash.Keys |  ForEach-Object {
+                    $VMNameAndIDHash.Keys | ForEach-Object {
                         $VMArray += @{ 'VmIdentifier' =  $VMNameAndIDHash[$_] }
                     }
                 }
@@ -3771,6 +3750,7 @@
                     $NewVmHash = [ordered] @{}
                         #Lookup ID from $VMNameAndIDHash
                         $NewVmHash.Add('VmIdentifier' , $VMNameAndIDHash[$_.VMName] )
+                        $NewVmHash.Add('BootGroupIdentifier', '00000000-0000-0000-0000-000000000000' )
                         #Loop through our NICs
                         $AllNics = @()
                         $_.FailoverIPAddresses | ForEach-Object {
@@ -3780,23 +3760,28 @@
                                     $NicFailHyper = [ordered] @{}
                                         $NicFailHyper.Add("DnsSuffix", $_.DnsSuffix)
                                             $NicFailHyperIP = [ordered] @{}
-                                            if ($_.TestUseDHCP) {
-                                                $NicTestHyperIP.Add("IsDhcp", $true)
-                                                $NicTestHyperIP.Add("Gateway", "")
-                                                $NicTestHyperIP.Add("PrimaryDns", "")
-                                                $NicTestHyperIP.Add("SecondaryDns", "")
-                                                $NicTestHyperIP.Add("StaticIp", "")
-                                                $NicTestHyperIP.Add("SubnetMask", "")
+                                            if ($_.UseDHCP) {
+                                                $NicFailHyperIP.Add("Gateway", "")
+                                                $NicFailHyperIP.Add("IsDhcp", $true)
+                                                $NicFailHyperIP.Add("PrimaryDns", "")
+                                                $NicFailHyperIP.Add("SecondaryDns", "")
+                                                $NicFailHyperIP.Add("StaticIp", "")
+                                                $NicFailHyperIP.Add("SubnetMask", "")
                                             } else {
-                                                $NicTestHyperIP.Add("IsDhcp", $false)
-                                                $NicTestHyperIP.Add("StaticIp", $_.IPAddress)
-                                                $NicTestHyperIP.Add("SubnetMask", $_.SubnetMask)
-                                                $NicTestHyperIP.Add("Gateway", $_.Gateway)
-                                                $NicTestHyperIP.Add("PrimaryDns", $_.Dns1)
-                                                $NicTestHyperIP.Add("SecondaryDns", $_.Dns2)
+                                                $NicFailHyperIP.Add("Gateway", $_.Gateway)
+                                                $NicFailHyperIP.Add("IsDhcp", $false)
+                                                $NicFailHyperIP.Add("PrimaryDns", $_.Dns1)
+                                                $NicFailHyperIP.Add("SecondaryDns", $_.Dns2)
+                                                $NicFailHyperIP.Add("StaticIp", $_.IPAddress)
+                                                $NicFailHyperIP.Add("SubnetMask", $_.SubnetMask)
                                             }
                                         $NicFailHyper.Add("IpConfig", $NicFailHyperIP)
-                                        $NicFailHyper.Add( "ShouldReplaceMacAddress" , $_.ReplaceMAC)
+                                        if ($_.NetworkID) {
+                                            $NicFailHyper.Add( "NetworkIdentifier" , $_.NetworkID)
+                                        } else {
+                                            $NicFailHyper.Add( "NetworkIdentifier" , $null)
+                                        }
+                                        $NicFailHyper.Add("ShouldReplaceMacAddress" , $_.ReplaceMAC)
                                     $NicFail.Add( "Hypervisor", $NicFailHyper)
                                 #Add Failover to NIC
                                 $Nic.Add("Failover", $NicFail)
@@ -3806,23 +3791,27 @@
                                         $NicTestHyper.Add("DnsSuffix", $_.TestDnsSuffix)
                                             $NicTestHyperIP = [ordered] @{}
                                             if ($_.TestUseDHCP) {
-                                                $NicTestHyperIP.Add("IsDhcp", $true)
-                                                $NicTestHyperIP.Add("StaticIp", "")
-                                                $NicTestHyperIP.Add("SubnetMask", "")
                                                 $NicTestHyperIP.Add("Gateway", "")
+                                                $NicTestHyperIP.Add("IsDhcp", $true)
                                                 $NicTestHyperIP.Add("PrimaryDns", "")
                                                 $NicTestHyperIP.Add("SecondaryDns", "")
+                                                $NicTestHyperIP.Add("StaticIp", "")
+                                                $NicTestHyperIP.Add("SubnetMask", "")
                                             } else {
-                                                $NicTestHyperIP.Add("IsDhcp", $false)
-                                                $NicTestHyperIP.Add("StaticIp", $_.TestIPAddress)
-                                                $NicTestHyperIP.Add("SubnetMask", $_.TestSubnetMask)
                                                 $NicTestHyperIP.Add("Gateway", $_.TestGateway)
+                                                $NicTestHyperIP.Add("IsDhcp", $false)
                                                 $NicTestHyperIP.Add("PrimaryDns", $_.TestDns1)
                                                 $NicTestHyperIP.Add("SecondaryDns", $_.TestDns2)
+                                                $NicTestHyperIP.Add("StaticIp", $_.TestIPAddress)
+                                                $NicTestHyperIP.Add("SubnetMask", $_.TestSubnetMask)
                                             }
                                         $NicTestHyper.Add("IpConfig", $NicTestHyperIP)
-                                        #$NicTestHyper.Add( "NetworkIdentifier" , '00000000-0000-0000-0000-000000000000')
-                                        $NicTestHyper.Add( "ShouldReplaceMacAddress" , $_.ReplaceMAC)
+                                        if ($_.TestNetworkID) {
+                                            $NicFailHyper.Add( "NetworkIdentifier" , $_.TestNetworkID)
+                                        } else {
+                                            $NicFailHyper.Add( "NetworkIdentifier" , $null)
+                                        }
+                                        $NicTestHyper.Add( "ShouldReplaceMacAddress" , $_.TestReplaceMAC)
                                     $NicTest.Add("Hypervisor", $NicTestHyper)
                                 #Add Failover Test to NIC
                                 $Nic.Add("FailoverTest", $NicTest)
@@ -3850,22 +3839,23 @@
         
         if ($DumpJson ) {
             #Display JSON, and exit
-        Write-host $NewVPGJson
-        return
+            Write-host $NewVPGJson
+            return
         }
 
         #This POST creates the settings
         $VPGSettingsID = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $NewVPGJson
-        Write-Verbose $VPGSettingsID
+        if ( $VPGSettingsID -eq $null ) { throw "Error creating VPG" }
+        Write-Verbose ("VPGSettingsID: " + $VPGSettingsID)
 
         $VPGSetting = Get-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgSettingsIdentifier $VPGSettingsID
-        if ( $VPGSetting -eq $null ) { throw "Error creating VPG" }
+        if ( $VPGSetting -eq $null ) { throw "Error retrieving VPGSettings for VPGSettingsID" }
 
         Write-Verbose  $VPGSetting
 
         if (-not $VPGCommit) {
             Write-Host "VPG Setting $VPGSettingsID created.  Commit with '" -NoNewline -ForegroundColor Red
-            write-host "Commit-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgSettingsIdentifier $VPGSettingsID" -ForegroundColor Cyan -NoNewline
+            write-host "Commit-ZertoVPGSetting -ZertoVpgSettingsIdentifier $VPGSettingsID" -ForegroundColor Cyan -NoNewline
             Write-Host "'" -ForegroundColor Red
             return $Result 
         }
@@ -4370,7 +4360,7 @@
         Write-Verbose $FullURL
 
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method POST
+                $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method POST
         } catch {
             Test-RESTError -err $_
         }

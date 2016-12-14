@@ -12,7 +12,7 @@
 RootModule = 'ZertoModule.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.9.2'
+ModuleVersion = '0.9.3'
 
 # ID used to uniquely identify this module
 GUID = 'a7c23e30-0879-42f4-9e1c-bffbe723b02b'
@@ -162,7 +162,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Updated help & ReadMe  for 0.9.0, fixed TestNetworkID for Add-ZertoVPG'
+        ReleaseNotes = 'Fixed issue with Get-ZertoSiteFolderID using -match vs -eq.'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

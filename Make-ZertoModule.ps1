@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.9.2' 
-$ReleaseNotes = 'Updated help & ReadMe  for 0.9.0, fixed TestNetworkID for Add-ZertoVPG'
+﻿$ModuleVersion = '0.9.3' 
+$ReleaseNotes = 'Fixed issue with Get-ZertoSiteFolderID using -match vs -eq.'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

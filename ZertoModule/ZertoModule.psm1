@@ -2096,10 +2096,10 @@
         )
         
         $ID = Get-ZertoSiteFolders -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
-                            Where-Object {$_.FolderName -match $FolderName } | `
+                            Where-Object {$_.FolderName -eq  $FolderName } | `
                             Select-Object FolderIdentifier -ExpandProperty FolderIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$FolderName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$FolderName' returned more than one ID"}
 
         Return $ID
     }
@@ -3538,8 +3538,9 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Failover Network')] [string] $FailoverNetwork, 
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Test Network')] [string] $TestNetwork, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Datastore Name')] [string] $DatastoreName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Datastore Cluster Name')] [string] $DatastoreclusterName, 
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Journal Datastore Name')] [string] $JournalDatastoreName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Datastore Cluster Name')] [string] $DatastoreClusterName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Datastore Name')] [string] $JournalDatastoreName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal History In Hours')] [ValidateRange(0,9999)] [int] $JournalHistoryInHours = 24, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Hard Limit in MB')] [ValidateRange(0,9999999)] [int] $JournalHardLimitMB = 153600, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Warning Threshold in MB')] [ValidateRange(0,9999999)] [int] $JournalWarningThresholdMB = 115200, 
@@ -3564,57 +3565,82 @@
         if ($HostName -and $ClusterName) {throw "Cannot specify both Host Name and Cluster Name"}
         if (-not $HostName -and -not $ClusterName) {throw "Must specify either Host Name or Cluster Name"}
 
-        if ($DatastoreName -and $DatastoreclusterName) {throw "Cannot specify both Datastore Name and Datastore Cluster Name"}
+        if ($DatastoreName -and $DatastoreClusterName) {throw "Cannot specify both Datastore Name and Datastore Cluster Name"}
         if (-not $DatastoreName -and -not $DatastoreclusterName) {throw "Must specify either Datastore Name or Datastore Cluster Name"}
+
+        if ($JournalDatastoreName -and $JournalDatastoreclusterName) {throw "Cannot specify both Journal Datastore Name and Journal Datastore Cluster Name"}
+        if (-not $JournalDatastoreName -and -not $JournalDatastoreclusterName) {throw "Must specify either Journal Datastore Name or Journal Datastore Cluster Name"}
+
+        ### Temp validation
+        If ($DatastoreClusterName)  {throw "Cannot DatastoreClusterName as a default value for the VPG (bug in zerto 5.0)"}
 
         if ( $VmNames.Count -lt 1 -and $VPGVirtualMachines.Count -lt 1 ) { throw "Must specify at least one VmName or VPGVirtualMachine"}
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
 
-        $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteName $RecoverySiteName
+        $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteName $RecoverySiteName
 
-        $FailoverNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $FailoverNetwork
+        $FailoverNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -NetworkName $FailoverNetwork
 
-        $TestNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -NetworkName $TestNetwork
+        $TestNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -NetworkName $TestNetwork
 
         if ($ClusterName) {
-            $ClusterID = Get-ZertoSiteHostClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -HostClusterName $ClusterName
+            $ClusterID = Get-ZertoSiteHostClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -HostClusterName $ClusterName
             $HostID = $null
         } elseif ($HostName) {
             $ClusterID = $null
-            $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -HostName $HostName
+            $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -HostName $HostName
         }
 
         #BROKEN
         #$ServiceProfileID = Get-ZertoServiceProfiles -ZertoToken $ZertoToken  | `
-        #                    Where-Object {$_.Description -match $ServiceProfile} | `
+        #                    Where-Object {$_.Description -eq  $ServiceProfile} | `
         #                    Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
         if ($DatastoreName) {
-            $DatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName $DatastoreName
+            $DatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                    -ZertoSiteIdentifier $RecoverySiteID -DatastoreName $DatastoreName
             $DatastoreClusterID = $null
         } elseif ($DatastoreClusterName) {
             $DatastoreID = $null
-            $DatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
+            $DatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                    -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
         }
 
-        $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName 
 
-        $FolderID = Get-ZertoSiteFolderID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $RecoverySiteID -FolderName $vCenterFolder
+        if ($JournalDatastoreName) {
+            $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName
+            $JournalDatastoreClusterID = $null
+        } elseif ($JournalDatastoreClusterName) {
+            $JournalDatastoreID = $null
+            $JournalDatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName  $JournalDatastoreClusterName
+        }
+
+        $FolderID = Get-ZertoSiteFolderID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $RecoverySiteID -FolderName $vCenterFolder
 
         #Save our VMID in a VMName/ID Hash
         $VMNameAndIDHash = [ordered] @{}
         if ($VmNames) {
             $VmNames | ForEach-Object  {
                 #VM's are always from LocalSite
-                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
+                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
                 $VMNameAndIDHash.Add($_, $VMID)
         }
         } elseif ($VPGVirtualMachines) {
             $VPGVirtualMachines | ForEach-Object  {
                 #VM's are always from LocalSite
-                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -VMName $_.VMName 
+                $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                     -ZertoSiteIdentifier $LocalSiteID -VMName $_.VMName 
                 $VMNameAndIDHash.Add($_.VMName , $VMID)
             }
         } else {
@@ -3639,7 +3665,13 @@
             if ( [string]::IsNullOrEmpty($DatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $DatastoreclusterName " }
         }
 
-        if ( [string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Journal Datastore ID for $JournalDatastoreName " }
+        if ($JournalDatastoreName) {
+            if ( [string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Datastore ID for $JournalDatastoreName " }
+        }
+        if ($JournalDatastoreClusterName) {
+            if ( [string]::IsNullOrEmpty($JournalDatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $JournalDatastoreclusterName " }
+        }
+        
         if ( [string]::IsNullOrEmpty($FolderID)  ) { throw "Could not find Folder ID for $vCenterFolder " }
 
         if ( $RecoverySiteID.Count -gt 1 ) { throw "More than one Recovery site has the name $RecoverySiteName " }
@@ -3656,7 +3688,13 @@
         } elseif ($DatastoreClusterName) {
             if ( $DatastoreClusterID.Count -gt 1 ) { throw "More than one Datastore Cluster ID has the name $DatastoreclusterName " }
         }
-        if ( $JournalDatastoreID.Count -gt 1 ) { throw "More than one Journal Datastore ID has the name $JournalDatastoreName " }
+
+        if ($JournalDatastoreName) {
+            if ( $JournalDatastoreID.Count -gt 1 ) { throw "More than one Datastore ID has the name $JournalDatastoreName " }
+        } elseif ($JournalDatastoreClusterName) {
+            if ( $JournalDatastoreClusterID.Count -gt 1 ) { throw "More than one Datastore Cluster ID has the name $JournalDatastoreclusterName " }
+        }
+
         if ( $FolderID.Count -gt 1 ) { throw "More than one Folder ID has the name $vCenterFolder " }
 
 
@@ -3684,19 +3722,18 @@
             $BootGroups= @{'BootGroups' = $BootGroupsArray }
             $NewVPGHash.Add('BootGroups' , $BootGroups )
         $Journal = [ordered] @{}
-            if ($DatastoreClusterID) {
-                $Journal.Add( 'DatastoreClusterIdentifier', $DatastoreClusterID)
+            if ($JournalDatastoreID) {
+                $Journal.Add( 'DatastoreClusterIdentifier', $null)
+                $Journal.Add( 'DatastoreIdentifier', $JournalDatastoreID)
+            } else {
+                $Journal.Add( 'DatastoreClusterIdentifier', $JournalDatastoreClusterID)
                 $Journal.Add( 'DatastoreIdentifier', $null)
             }
-            if ($DatastoreID) {
-                $Journal.Add( 'DatastoreClusterIdentifier', $null)
-                $Journal.Add( 'DatastoreIdentifier', $DatastoreID)
-            }
-                $JournalLimit = [ordered] @{}
-                $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
-                $JournalLimit.Add( 'HardLimitInPercent', $null )
-                $JournalLimit.Add( 'WarningThresholdInMB', $JournalWarningThresholdMB )
-                $JournalLimit.Add( 'WarningThresholdInPercent', $null )
+            $JournalLimit = [ordered] @{}
+            $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
+            $JournalLimit.Add( 'HardLimitInPercent', $null )
+            $JournalLimit.Add( 'WarningThresholdInMB', $JournalWarningThresholdMB )
+            $JournalLimit.Add( 'WarningThresholdInPercent', $null )
             $Journal.Add( 'Limitation', $JournalLimit)
             $NewVPGHash.Add('Journal' , $Journal )
         $Networks = [ordered] @{}
@@ -3712,7 +3749,14 @@
             $Networks.Add( 'FailoverTest', $FailoverTest)
             $NewVPGHash.Add('Networks' , $Networks )
         $Recovery = [ordered] @{}
-            $Recovery.Add( 'DefaultDatastoreIdentifier', $DatastoreID)
+            if ($DatastoreID) {
+                #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $null)
+                $Recovery.Add( 'DefaultDatastoreIdentifier', $DatastoreID)
+            } else {
+                #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $DatastoreClusterID)
+                #$Recovery.Add( 'DefaultDatastoreIdentifier', $null)
+                $Recovery.Add( 'DefaultDatastoreIdentifier', $DatastoreClusterID)
+            }
             $Recovery.Add( 'DefaultFolderIdentifier', $FolderID)
             if ($ClusterID) {
                 $Recovery.Add( 'DefaultHostClusterIdentifier', $ClusterID)

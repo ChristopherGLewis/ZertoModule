@@ -385,6 +385,30 @@
         FailoverCommit = 44 
 
     }
+
+    enum ZertoVPGSettingsBackupRetentionPeriod  {
+        OneWeek     = 0
+        OneMonth    = 1
+        ThreeMonths = 2
+        SixMonths   = 3
+        NineMonths  = 4
+        OneYear     = 5
+    }   
+
+    enum ZertoVPGSettingsBackupSchedulerDOW {
+        Sunday    = 0
+        Monday    = 1
+        Tuesday   = 2
+        Wednesday = 3
+        Thursday  = 4
+        Friday    = 5
+        Saturday  = 6
+    }   
+
+    enum ZertoVPGSettingsBackupSchedulerPeriod  {
+        Daily    = 0
+        Weekly   = 1
+    }    
 #endregion
 
 #region Zerto Classes
@@ -487,14 +511,26 @@
         
         Write-Verbose $PSCmdlet.ParameterSetName
         If ($PSCmdlet.ParameterSetName -eq 'DHCP') {
+            if (-not $UseDHCP) { throw "If UseDHCP is false, IP addresses must be specified" }
             [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $DNSSuffix, `
                                                                         $TestNetworkID, $TestReplaceMAC, $TestUseDHCP, $TestDNSSuffix);
         } else {
-            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, `
+            try { $TestIP = [IPAddress]$IPAddress  } catch {throw "Invalid IP Address '$IPAddress'"}
+            try { $TestIP = [IPAddress]$SubnetMask } catch {throw "Invalid Subnet Mask '$SubnetMask'"}
+            try { $TestIP = [IPAddress]$Gateway    } catch {throw "Invalid Gateway '$Gateway'"}
+            try { $TestIP = [IPAddress]$DNS1       } catch {throw "Invalid DNS1 '$DNS1'"}
+            try { $TestIP = [IPAddress]$DNS2       } catch {throw "Invalid DNS2 '$DNS2'"}
+            try { if ($TestIPAddress)  { $TestIP = [IPAddress]$TestIPAddress }  } catch {throw "Invalid Test IP Address '$TestPAddress'"}
+            try { if ($TestSubnetMask) { $TestIP = [IPAddress]$TestSubnetMask } } catch {throw "Invalid Test Subnet Mask '$TestSubnetMask'"}
+            try { if ($TestGateway)    { $TestIP = [IPAddress]$TestGateway }    } catch {throw "Invalid Test Gateway '$TestGateway'"}
+            try { if ($TestDNS1)       { $TestIP = [IPAddress]$TestDNS1 }       } catch {throw "Invalid Test DNS1 '$TestDNS1'"}
+            try { if ($TestDNS2)       { $TestIP = [IPAddress]$TestDNS2 }       } catch {throw "Invalid Test DNS2 '$TestDNS2'"}
+
+             [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, `
                                                                         $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, `
                                                                         $TestNetworkID, $TestReplaceMAC, `
                                                                         $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
-        }
+       }
         Return $NewZertoIP    
     }
 
@@ -580,10 +616,11 @@
         Return $NewVRAIPAddressConfig    
     }
 
+
     Class ZertoVPGSettingBasic {
         [int] $JournalHistoryInHours; 
         [string] $Name; 
-        [string] $Priority; 
+        [ZertoVPGPriority] $Priority; 
         [string] $ProtectedSiteIdentifier; 
         [string] $RecoverySiteIdentifier; 
         [int] $RpoInSeconds; 
@@ -605,7 +642,7 @@
             $this.UseWanCompression = $Value.UseWanCompression;    
             $this.ZorgIdentifier = $Value.ZorgIdentifier; 
         }    
-        ZertoVPGSettingBasic([int] $JournalHistoryInHours, [string] $Name, [string] $Priority, [string] $ProtectedSiteIdentifier, [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, [int] $TestIntervalInMinutes, [Boolean] $UseWanCompression, [string] $ZorgIdentifier) {
+        ZertoVPGSettingBasic([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, [int] $TestIntervalInMinutes, [Boolean] $UseWanCompression, [string] $ZorgIdentifier) {
             $this.JournalHistoryInHours = $JournalHistoryInHours; 
             $this.Name = $Name;
             $this.Priority = $Priority;
@@ -649,21 +686,22 @@
         
     }
 
+
     Class ZertoVPGSettingBootgroup {
         [int] $BootDelayInSeconds; 
         [string] $BootGroupIdentifier; 
-        [string] $Name;
+        [string] $BootGroupName;
 
         ZertoVPGSettingBootgroup([PSCustomObject] $Value) {
             #Validate object?
             $this.BootDelayInSeconds = $Value.BootDelayInSeconds;                                                
             $this.BootGroupIdentifier = $Value.BootGroupIdentifier;
-            $this.Name = $Value.Name;                   
+            $this.BootGroupName = $Value.BootGroupName;                   
         }    
-        ZertoVPGSettingBootgroup( [int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $Name ) {
+        ZertoVPGSettingBootgroup( [int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $BootGroupName ) {
             $this.BootDelayInSeconds = $BootDelayInSeconds;                                                
             $this.BootGroupIdentifier = $BootGroupIdentifier; 
-            $this.Name = $Name;                   
+            $this.BootGroupName = $BootGroupName;                   
         }                 
     }
 
@@ -673,12 +711,12 @@
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootDelayInSeconds')] [int] $BootDelayInSeconds, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Identifier')] [string] $BootGroupIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Name')] [string] $Name, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Name')] [string] $BootGroupName, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroup')] [PSCustomObject] $VPGSettingBootgroup
         )
         
-        if (-not $VPGSettingBasic) {
-            [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($BootDelayInSeconds, $BootGroupIdentifier, $Name );
+        if (-not $VPGSettingBootgroup) {
+            [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($BootDelayInSeconds, $BootGroupIdentifier, $BootGroupName );
         } else {
             [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($VPGSettingBootgroup)
         }
@@ -687,23 +725,6 @@
         
     }
 
-    Class ZertoVPGSettingJournal{
-        [int] $BootDelayInSeconds; 
-        [string] $BootGroupIdentifier; 
-        [string] $Name;
-
-        ZertoVPGSettingBootgroup([PSCustomObject] $Value) {
-            #Validate object?
-            $this.BootDelayInSeconds = $Value.BootDelayInSeconds;                                                
-            $this.BootGroupIdentifier = $Value.BootGroupIdentifier;
-            $this.Name = $Value.Name;                   
-        }    
-        ZertoVPGSettingBootgroup( [int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $Name ) {
-            $this.BootDelayInSeconds = $BootDelayInSeconds;                                                
-            $this.BootGroupIdentifier = $BootGroupIdentifier; 
-            $this.Name = $Name;                   
-        }                 
-    }
 
     Class ZertoVPGSettingJournalLimitation {
         [int] $HardLimitInMB; 
@@ -711,14 +732,14 @@
         [int] $WarningThresholdInMB;
         [int] $WarningThresholdInPercent;
 
-        ZertoVPGSettingBootgroup([PSCustomObject] $Value) {
+        ZertoVPGSettingJournalLimitation([PSCustomObject] $Value) {
             #Validate object?
             $this.HardLimitInMB = $Value.HardLimitInMB;                                                
             $this.HardLimitInPercent = $Value.HardLimitInPercent;                                                
             $this.WarningThresholdInMB = $Value.WarningThresholdInMB;                                                
             $this.WarningThresholdInPercent = $Value.WarningThresholdInPercent;                                                
         }    
-        ZertoVPGSettingBootgroup( [int] $HardLimitInMB, [int] $HardLimitInPercent, [int] $WarningThresholdInMB, [int] $WarningThresholdInPercent ) {
+        ZertoVPGSettingJournalLimitation( [int] $HardLimitInMB, [int] $HardLimitInPercent, [int] $WarningThresholdInMB, [int] $WarningThresholdInPercent ) {
             $this.HardLimitInMB = $HardLimitInMB;                                                
             $this.HardLimitInPercent = $HardLimitInPercent;                                                
             $this.WarningThresholdInMB = $WarningThresholdInMB;                                                
@@ -747,26 +768,173 @@
         
     }
 
+    Class ZertoVPGSettingJournal{
+        [string] $DatastoreClusterIdentifier; 
+        [string] $DatastoreIdentifier; 
+        [ZertoVPGSettingJournalLimitation] $Limitation;
+
+        ZertoVPGSettingJournal([PSCustomObject] $Value) {
+            #Validate object?
+            $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier;                                                
+            $this.DatastoreIdentifier = $Value.DatastoreIdentifier;
+            $this.Limitation = $Value.Limitation;                   
+        }    
+        ZertoVPGSettingJournal( [string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [ZertoVPGSettingJournalLimitation] $Limitation) {
+            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;                                                
+            $this.DatastoreIdentifier = $DatastoreIdentifier; 
+            $this.Limitation = $Limitation;                   
+        }                 
+    }
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingJournal {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInMB')] [int] $HardLimitInMB, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HardLimitInPercent')] [int] $HardLimitInPercent, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'WarningThresholdInMB')] [int] $WarningThresholdInMB, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'WarningThresholdInPercent')] [int] $WarningThresholdInPercent, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Journal Limitation')] [PSCustomObject] $VPGSettingJournalLimitation
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Limitation')] [ZertoVPGSettingJournalLimitation] $Limitation, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Journal ')] [PSCustomObject] $VPGSettingJournal
         )
         
-        if (-not $VPGSettingJournalLimitation) {
-            [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($HardLimitInMB, $HardLimitInPercent, $WarningThresholdInMB,  $WarningThresholdInPercent);
+        if (-not $VPGSettingJournal) {
+            [ZertoVPGSettingJournal] $NewObj = [ZertoVPGSettingJournal]::New($DatastoreClusterIdentifier, $DatastoreIdentifier, $Limitation);
         } else {
-            [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($VPGSettingJournalLimitation)
+            [ZertoVPGSettingJournal] $NewObj = [ZertoVPGSettingJournal]::New($VPGSettingJournal)
         }
 
         Return $NewObj
         
     }
+
+
+    class ZertoVPGSettingBackupRetry {
+        [int] $IntervalInMinutes; 
+        [int] $Number; 
+        [bool] $Retry;
+    
+        ZertoVPGSettingBackupRetry([PSCustomObject] $Value) {
+            #Validate object?
+            $this.IntervalInMinutes = $Value.IntervalInMinutes; 
+            $this.Number = $Value.Number;
+            $this.Retry = $Value.Retry;
+        }    
+        ZertoVPGSettingBackupRetry( [int] $IntervalInMinutes, [int] $Number, [bool] $Retry) {
+            $this.IntervalInMinutes = $IntervalInMinutes; 
+            $this.Number = $Number;
+            $this.Retry = $Retry;
+        }   
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingBackupRetry {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Number of minutes to wait on failure to retry backup')] [int] $IntervalInMinutes, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Number of retries')] [int] $Number, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retry the backup if it fails')] [bool] $Retry, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup Retry')] [PSCustomObject] $VPGSettingBackupRetry
+        )
+        
+        if (-not $VPGSettingBackupRetry) {
+            if ($Number -lt 1) { throw "Number of Retries must be more than 1" }
+            if ($IntervalInMinutes -lt 1) { throw "Retry Interval must be more than 1" }
+            [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($IntervalInMinutes, $Number, $Retry);
+        } else {
+            [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($VPGSettingBackupRetry)
+        }
+
+        Return $NewObj
+        
+    }
+    
+    
+    class ZertoVPGSettingBackupScheduler {
+        [string] $DayOfWeek; 
+        [string] $SchedulerPeriod; 
+        [string] $TimeOfDay;
+    
+        ZertoVPGSettingBackupScheduler([PSCustomObject] $Value) {
+            #Validate object?
+            $this.IntervalInMinutes = $Value.IntervalInMinutes; 
+            $this.Number = $Value.Number;
+            $this.Retry = $Value.Retry;
+        }    
+        ZertoVPGSettingBackupScheduler( [ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, [string] $TimeOfDay) {
+            $this.DayOfWeek = $DayOfWeek.ToString(); 
+            $this.SchedulerPeriod = $SchedulerPeriod.ToString();
+            $this.TimeOfDay = $TimeOfDay;
+        }   
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingBackupScheduler {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Day of week the backup will run')] [ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Scheduler Period (Daily|Weekly)')] [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Time of day (24 hour in form 23:59)')] [string] $TimeOfDay, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup Scheduler')] [PSCustomObject] $VPGSettingBackupScheduler
+        )
+        
+        if (-not $VPGSettingBackupScheduler) {
+            if (-not ($TimeOfDay -match "^\d\d:\d\d$") )  { throw "Time Of Day must be in the form '23:59'" }
+            if ( ($TimeOfDay.Split(':')[0] -lt 0 ) `
+                 -OR ($TimeOfDay.Split(':')[0] -gt 23 ) `
+                 -OR ($TimeOfDay.Split(':')[1] -lt 0 ) `
+                 -OR ($TimeOfDay.Split(':')[1] -gt 59 )  ) { throw "Time Of Day must be in the form '00:00' through '23:59'" }
+
+
+            [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($DayOfWeek, $SchedulerPeriod, $TimeOfDay);
+        } else {
+            [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($VPGSettingBackupScheduler)
+        }
+
+        Return $NewObj        
+    }
+
+    class ZertoVPGSettingBackup {
+        [string] $RepositoryIdentifier; 
+        [string] $RetentionPeriod; 
+        [ZertoVPGSettingBackupRetry] $Retry;
+        [ZertoVPGSettingBackupScheduler] $Scheduler;
+    
+        ZertoVPGSettingBackup([PSCustomObject] $Value) {
+            #Validate object?
+            $this.RepositoryIdentifier = $Value.RepositoryIdentifier; 
+            $this.RetentionPeriod = $Value.RetentionPeriod; 
+            $this.Retry = $Value.Retry; 
+            $this.Scheduler = $Value.Scheduler; 
+        }    
+        ZertoVPGSettingBackup( [string] $RepositoryIdentifier, [ZertoVPGSettingsBackupRetentionPeriod] $RetentionPeriod, [ZertoVPGSettingBackupRetry] $Retry, [ZertoVPGSettingBackupScheduler] $Scheduler ) {
+            $this.RepositoryIdentifier = $RepositoryIdentifier; 
+            $this.RetentionPeriod = $RetentionPeriod.ToString(); 
+            $this.Retry = $Retry; 
+            $this.Scheduler = $Scheduler; 
+        }   
+
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingBackup {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Backup Repository ID')] [string] $RepositoryIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retention Period')] [ZertoVPGSettingsBackupRetentionPeriod] $RetentionPeriod, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Retry')] [ZertoVPGSettingBackupRetry] $Retry, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Scheduler')] [ZertoVPGSettingBackupScheduler] $Scheduler, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Backup')] [PSCustomObject] $VPGSettingBackup
+        )
+        
+        if (-not $VPGSettingBackup) {
+            [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($RepositoryIdentifier, $RetentionPeriod, $Retry, $Scheduler);
+        } else {
+            [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($VPGSettingBackup)
+        }
+
+        Return $NewObj
+    }
+
+
 #endregion
 
 #region Utility Functions
@@ -4662,6 +4830,42 @@
         return $Result 
     }
 
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoVPGSettingBootGroup {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings BootGroup block')] [ZertoVpgSettingBootGroup] $ZertoVpgSettingBootGroup
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/bootgroup"
+        Write-Verbose $FullURL
+        $Body = $ZertoVpgSettingBootGroup | ConvertTo-Json -Depth 5
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingJournal {
         [CmdletBinding()]
@@ -4692,6 +4896,41 @@
         }
         return $Result 
     }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoVPGSettingJournal {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Journal block')] [ZertoVPGSettingJournal] $ZertoVPGSettingJournal
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/journal"
+        Write-Verbose $FullURL
+        $Body = $ZertoVPGSettingJournal | ConvertTo-Json -Depth 5
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingNetworks {
@@ -5189,130 +5428,11 @@
 #                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
 # Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} |  Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | Where-Object {$_ -notin $PrivateFunctions} | ForEach-Object {$_ + ", "}
 
-Export-ModuleMember -function   Add-ZertoVPG, 
-                                Add-ZertoVRA, 
-                                Commit-ZertoVPGSetting, 
-                                Convert-ZertoVPGToVPGSetting, 
-                                Get-ZertoAlert, 
-                                Get-ZertoAlertEntities, 
-                                Get-ZertoAlertHelpIdentifierDescription, 
-                                Get-ZertoAlertHelpIdentifiers, 
-                                Get-ZertoAlertLevels, 
-                                Get-ZertoAlerts, 
-                                Get-ZertoAuthToken, 
-                                Get-ZertoEvent, 
-                                Get-ZertoEventCategories, 
-                                Get-ZertoEventEntities, 
-                                Get-ZertoEvents, 
-                                Get-ZertoEventTypes, 
-                                Get-ZertoLocalSite, 
-                                Get-ZertoLocalSiteID, 
-                                Get-ZertoLocalSitePairingStatuses, 
-                                Get-ZertoPeerSite, 
-                                Get-ZertoPeerSiteID, 
-                                Get-ZertoPeerSites, 
-                                Get-ZertoResoureReport, 
-                                Get-ZertoResoureReportAdvFilter, 
-                                Get-ZertoRESTAPIs, 
-                                Get-ZertoServiceProfile, 
-                                Get-ZertoServiceProfileID, 
-                                Get-ZertoServiceProfiles, 
-                                Get-ZertoSite, 
-                                Get-ZertoSiteDatastoreClusterID, 
-                                Get-ZertoSiteDatastoreClusters, 
-                                Get-ZertoSiteDatastoreID, 
-                                Get-ZertoSiteDatastores, 
-                                Get-ZertoSiteFolderID, 
-                                Get-ZertoSiteFolders, 
-                                Get-ZertoSiteHost, 
-                                Get-ZertoSiteHostClusterID, 
-                                Get-ZertoSiteHostClusters, 
-                                Get-ZertoSiteHostID, 
-                                Get-ZertoSiteHosts, 
-                                Get-ZertoSiteID, 
-                                Get-ZertoSiteNetworkID, 
-                                Get-ZertoSiteNetworks, 
-                                Get-ZertoSiteOrgVCDs, 
-                                Get-ZertoSiteResourcePools, 
-                                Get-ZertoSites, 
-                                Get-ZertoSiteVApps, 
-                                Get-ZertoSiteVcdVapps, 
-                                Get-ZertoSiteVMID, 
-                                Get-ZertoSiteVMs, 
-                                Get-ZertoTask, 
-                                Get-ZertoTasks, 
-                                Get-ZertoTasksTypes, 
-                                Get-ZertoVirtualizationSite, 
-                                Get-ZertoVirtualizationSiteID, 
-                                Get-ZertoVirtualizationSites, 
-                                Get-ZertoVM, 
-                                Get-ZertoVMID, 
-                                Get-ZertoVMs, 
-                                Get-ZertoVPG, 
-                                Get-ZertoVPGCheckpointID, 
-                                Get-ZertoVPGCheckpointLastID, 
-                                Get-ZertoVPGCheckpoints, 
-                                Get-ZertoVPGCheckpointSummary, 
-                                Get-ZertoVPGEntityTypes, 
-                                Get-ZertoVPGFailoverCommitPolicies, 
-                                Get-ZertoVPGFailoverShutdownPolicies, 
-                                Get-ZertoVPGID, 
-                                Get-ZertoVPGPriorities, 
-                                Get-ZertoVPGRetentionPolicies, 
-                                Get-ZertoVPGs, 
-                                Get-ZertoVPGSetting, 
-                                Get-ZertoVPGSettingBackup, 
-                                Get-ZertoVPGSettingBackupDayOfWeek, 
-                                Get-ZertoVPGSettingBackupRetentionPeriod, 
-                                Get-ZertoVPGSettingBackupSchedulerPeriod, 
-                                Get-ZertoVPGSettingBasic, 
-                                Get-ZertoVPGSettingBootGroup, 
-                                Get-ZertoVPGSettingID, 
-                                Get-ZertoVPGSettingJournal, 
-                                Get-ZertoVPGSettingNetworks, 
-                                Get-ZertoVPGSettingPriority, 
-                                Get-ZertoVPGSettingRecovery, 
-                                Get-ZertoVPGSettings, 
-                                Get-ZertoVPGSettingScripting, 
-                                Get-ZertoVPGSettingVM, 
-                                Get-ZertoVPGSettingVMNIC, 
-                                Get-ZertoVPGSettingVMNICs, 
-                                Get-ZertoVPGSettingVMs, 
-                                Get-ZertoVPGSettingVMVolume, 
-                                Get-ZertoVPGSettingVMVolumes, 
-                                Get-ZertoVPGStatuses, 
-                                Get-ZertoVPGSubstatuses, 
-                                Get-ZertoVRA, 
-                                Get-ZertoVRAID, 
-                                Get-ZertoVRAIPConfigurationTypes, 
-                                Get-ZertoVRAs, 
-                                Get-ZertoVRAStatuses, 
-                                Get-ZertoZOrg, 
-                                Get-ZertoZOrgs, 
-                                Invoke-ZertoAlertDismiss, 
-                                Invoke-ZertoAlertUndismiss, 
-                                Invoke-ZertoVPGFailoverCommit, 
-                                Invoke-ZertoVPGFailoverRollback, 
-                                Invoke-ZertoVPGForceSync, 
-                                Invoke-ZertoVPGPause, 
-                                Invoke-ZertoVPGResume, 
-                                Invoke-ZertoVRAUpgrade, 
-                                New-ZertoFailoverIPAddress, 
-                                New-ZertoVPGSettingBasic, 
-                                New-ZertoVPGSettingBootgroup, 
-                                New-ZertoVPGSettingJournal, 
-                                New-ZertoVPGSettingJournalLimitation, 
-                                New-ZertoVPGVirtualMachine, 
-                                New-ZertoVRAIPAddressConfig, 
-                                Remove-ZertoAuthToken, 
-                                Remove-ZertoVPG, 
-                                Remove-ZertoVPGSetting, 
-                                Remove-ZertoVRA, 
-                                Set-ZertoVPGSettingBasic, 
-                                Set-ZertoAuthToken,
-                                Start-ZertoVPGClone, 
-                                Start-ZertoVPGFailover, 
-                                Start-ZertoVPGFailoverTest, 
-                                Stop-ZertoVPGClone, 
-                                Stop-ZertoVPGFailoverTest,
-                                Update-ZertoVRA
+$PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `
+                      'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
+
+$Functions = @( ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
+                                         Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | `
+                                         Where-Object {$_ -notin $PrivateFunctions} ) )
+
+Export-ModuleMember -function  $Functions

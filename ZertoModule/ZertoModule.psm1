@@ -589,14 +589,14 @@
             [String] $IPAddress;
             [String] $SubnetMask;
             [String] $Gateway;
-            [ZertoVRAIPConfigType] $VRAIPType;
+            [string] $VRAIPType;
 
         #region base CTOR
         VRAIPAddressConfig ([String] $IPAddress, [String] $SubnetMask, [String] $Gateway, [ZertoVRAIPConfigType] $VRAIPType) {
             $this.IPAddress = $IPAddress;
             $this.SubnetMask = $SubnetMask;
             $this.Gateway = $Gateway;
-            $this.VRAIPType = $VRAIPType;
+            $this.VRAIPType = $VRAIPType.ToString();
         }
         #endregion         
 
@@ -612,6 +612,10 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA IP Config Type')] [ZertoVRAIPConfigType] $VRAIPType
         )
         
+        try { $TestIP = [IPAddress]$IPAddress  } catch {throw "Invalid IP Address '$IPAddress'"}
+        try { $TestIP = [IPAddress]$SubnetMask  } catch {throw "Invalid SubnetMask '$SubnetMask'"}
+        try { $TestIP = [IPAddress]$Gateway  } catch {throw "Invalid Gateway '$Gateway'"}
+
         [VRAIPAddressConfig] $NewVRAIPAddressConfig = [VRAIPAddressConfig]::new( $IPAddress, $SubnetMask, $Gateway, $VRAIPType);
         Return $NewVRAIPAddressConfig    
     }
@@ -630,7 +634,6 @@
         [string] $ZorgIdentifier; 
 
         ZertoVPGSettingBasic([PSCustomObject] $Value) {
-            #Validate object?
             $this.JournalHistoryInHours = $Value.JournalHistoryInHours;                                                
             $this.Name = $Value.Name;                   
             $this.Priority = $Value.Priority; 
@@ -674,11 +677,19 @@
         )
         
         if (-not $VPGSettingBasic) {
+            if ( $JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$JournalHistoryInHours'"}
+            if ( $TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$TestIntervalInMinutes'"}
+            if ( $RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$RpoInSeconds'"}
+
             [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($JournalHistoryInHours, $Name, $Priority, `
                                                                         $ProtectedSiteIdentifier, $RecoverySiteIdentifier, $RpoInSeconds, `
                                                                         $ServiceProfileIdentifier, $TestIntervalInMinutes, $UseWanCompression, `
                                                                         $ZorgIdentifier );
         } else {
+            if ( $VPGSettingBasic.JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$VPGSettingBasic.JournalHistoryInHours'"}
+            if ( $VPGSettingBasic.TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$VPGSettingBasic.TestIntervalInMinutes'"}
+            if ( $VPGSettingBasic.RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$VPGSettingBasic.RpoInSeconds'"}
+
             [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($VPGSettingBasic)
         }
 
@@ -693,7 +704,6 @@
         [string] $BootGroupName;
 
         ZertoVPGSettingBootgroup([PSCustomObject] $Value) {
-            #Validate object?
             $this.BootDelayInSeconds = $Value.BootDelayInSeconds;                                                
             $this.BootGroupIdentifier = $Value.BootGroupIdentifier;
             $this.BootGroupName = $Value.BootGroupName;                   
@@ -716,8 +726,10 @@
         )
         
         if (-not $VPGSettingBootgroup) {
+            if ( $BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$BootDelayInSeconds'"}
             [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($BootDelayInSeconds, $BootGroupIdentifier, $BootGroupName );
         } else {
+            if ( $VPGSettingBootgroup.BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$VPGSettingBootgroup.BootDelayInSeconds'"}
             [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($VPGSettingBootgroup)
         }
 
@@ -733,7 +745,6 @@
         [int] $WarningThresholdInPercent;
 
         ZertoVPGSettingJournalLimitation([PSCustomObject] $Value) {
-            #Validate object?
             $this.HardLimitInMB = $Value.HardLimitInMB;                                                
             $this.HardLimitInPercent = $Value.HardLimitInPercent;                                                
             $this.WarningThresholdInMB = $Value.WarningThresholdInMB;                                                
@@ -759,13 +770,20 @@
         )
         
         if (-not $VPGSettingJournalLimitation) {
+            if ( $HardLimitInMB -lt 0 ) { throw "HardLimitInMB must be greather then 0 - '$HardLimitInMB'"}
+            if ( ($HardLimitInPercent -lt 0) -or ($HardLimitInPercent -gt 100 ) ) { throw "HardLimitInPercent must be between 0 and 100  - '$HardLimitInPercent'"}
+            if ( $WarningThresholdInMB -lt 0 ) { throw "WarningThresholdInMB must be greather then 0 - '$WarningThresholdInMB'"}
+            if ( ($WarningThresholdInPercent -lt 0) -or ($WarningThresholdInPercent -gt 100 ) ) { throw "WarningThresholdInPercent must be between 0 and 100  - '$WarningThresholdInPercent'"}
             [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($HardLimitInMB, $HardLimitInPercent, $WarningThresholdInMB,  $WarningThresholdInPercent);
         } else {
+            if ( $VPGSettingJournalLimitation.HardLimitInMB -lt 0 ) { throw "HardLimitInMB must be greather then 0 - '$VPGSettingJournalLimitation.HardLimitInMB'"}
+            if ( ($VPGSettingJournalLimitation.HardLimitInPercent -lt 0) -or ($VPGSettingJournalLimitation.HardLimitInPercent -gt 100 ) ) { throw "HardLimitInPercent must be between 0 and 100  - '$VPGSettingJournalLimitation.HardLimitInPercent'"}
+            if ( $VPGSettingJournalLimitation.WarningThresholdInMB -lt 0 ) { throw "WarningThresholdInMB must be greather then 0 - '$VPGSettingJournalLimitation.WarningThresholdInMB'"}
+            if ( ($VPGSettingJournalLimitation.WarningThresholdInPercent -lt 0) -or ($VPGSettingJournalLimitation.WarningThresholdInPercent -gt 100 ) ) { throw "WarningThresholdInPercent must be between 0 and 100  - '$VPGSettingJournalLimitation.WarningThresholdInPercent'"}
             [ZertoVPGSettingJournalLimitation] $NewObj = [ZertoVPGSettingJournalLimitation]::New($VPGSettingJournalLimitation)
         }
 
-        Return $NewObj
-        
+        Return $NewObj        
     }
 
     Class ZertoVPGSettingJournal{
@@ -774,7 +792,6 @@
         [ZertoVPGSettingJournalLimitation] $Limitation;
 
         ZertoVPGSettingJournal([PSCustomObject] $Value) {
-            #Validate object?
             $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier;                                                
             $this.DatastoreIdentifier = $Value.DatastoreIdentifier;
             $this.Limitation = $Value.Limitation;                   
@@ -813,7 +830,6 @@
         [bool] $Retry;
     
         ZertoVPGSettingBackupRetry([PSCustomObject] $Value) {
-            #Validate object?
             $this.IntervalInMinutes = $Value.IntervalInMinutes; 
             $this.Number = $Value.Number;
             $this.Retry = $Value.Retry;
@@ -840,11 +856,12 @@
             if ($IntervalInMinutes -lt 1) { throw "Retry Interval must be more than 1" }
             [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($IntervalInMinutes, $Number, $Retry);
         } else {
+            if ($VPGSettingBackupRetry.Number -lt 1) { throw "Number of Retries must be more than 1" }
+            if ($VPGSettingBackupRetry.IntervalInMinutes -lt 1) { throw "Retry Interval must be more than 1" }
             [ZertoVPGSettingBackupRetry] $NewObj = [ZertoVPGSettingBackupRetry]::New($VPGSettingBackupRetry)
         }
 
         Return $NewObj
-        
     }
     
     
@@ -854,10 +871,9 @@
         [string] $TimeOfDay;
     
         ZertoVPGSettingBackupScheduler([PSCustomObject] $Value) {
-            #Validate object?
-            $this.IntervalInMinutes = $Value.IntervalInMinutes; 
-            $this.Number = $Value.Number;
-            $this.Retry = $Value.Retry;
+            $this.DayOfWeek = $Value.DayOfWeek; 
+            $this.SchedulerPeriod = $Value.SchedulerPeriod;
+            $this.TimeOfDay = $Value.TimeOfDay;
         }    
         ZertoVPGSettingBackupScheduler( [ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, [string] $TimeOfDay) {
             $this.DayOfWeek = $DayOfWeek.ToString(); 
@@ -886,6 +902,11 @@
 
             [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($DayOfWeek, $SchedulerPeriod, $TimeOfDay);
         } else {
+            if (-not ($VPGSettingBackupScheduler.TimeOfDay -match "^\d\d:\d\d$") )  { throw "Time Of Day must be in the form '23:59'" }
+            if ( ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[0] -lt 0 ) `
+                 -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[0] -gt 23 ) `
+                 -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[1] -lt 0 ) `
+                 -OR ($VPGSettingBackupScheduler.TimeOfDay.Split(':')[1] -gt 59 )  ) { throw "Time Of Day must be in the form '00:00' through '23:59'" }
             [ZertoVPGSettingBackupScheduler] $NewObj = [ZertoVPGSettingBackupScheduler]::New($VPGSettingBackupScheduler)
         }
 
@@ -899,7 +920,6 @@
         [ZertoVPGSettingBackupScheduler] $Scheduler;
     
         ZertoVPGSettingBackup([PSCustomObject] $Value) {
-            #Validate object?
             $this.RepositoryIdentifier = $Value.RepositoryIdentifier; 
             $this.RetentionPeriod = $Value.RetentionPeriod; 
             $this.Retry = $Value.Retry; 
@@ -929,6 +949,89 @@
             [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($RepositoryIdentifier, $RetentionPeriod, $Retry, $Scheduler);
         } else {
             [ZertoVPGSettingBackup] $NewObj = [ZertoVPGSettingBackup]::New($VPGSettingBackup)
+        }
+
+        Return $NewObj
+    }
+
+    class ZertoVPGSettingScript {
+        [String] $Command;
+        [System.string] $Parameters;
+        [int] $TimeoutInSeconds;
+
+        ZertoVPGSettingScript([PSCustomObject] $Value) {
+            $this.Command = $Value.Command; 
+            $this.Parameters = $Value.Parameters; 
+            $this.TimeoutInSeconds = $Value.TimeoutInSeconds; 
+        }    
+        ZertoVPGSettingScript([string] $Command, [string] $Parameters, [int] $TimeoutInSeconds ) {
+            if ([String]::IsNullOrEmpty($Command) ) { 
+                $this.Command = [NullString]::Value ; 
+            } else {
+                $this.Command = $Command; 
+            }
+            if ([String]::IsNullOrEmpty($Parameters) ) { 
+                $this.Parameters = [NullString]::Value ; 
+            } else {
+                $this.Parameters = $Parameters; 
+            }
+            $this.TimeoutInSeconds = $TimeoutInSeconds; 
+        }  
+
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingScript {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Command')] [AllowNull()]  [AllowEmptyString()]  [string] $Command, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Parameters')] [AllowNull()]  [AllowEmptyString()] [string] $Parameters, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Timeout In Seconds')] [int] $TimeoutInSeconds = 300, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Script')] [PSCustomObject] $VPGSettingScript
+        )
+        
+        if (-not $VPGSettingScript) {
+            if ($TimeoutInSeconds -lt 1) { throw "TimeoutInSeconds must be more than 1" }
+            [ZertoVPGSettingScript] $NewObj = [ZertoVPGSettingScript]::New($Command, $Parameters, $TimeoutInSeconds);
+        } else {
+            if ($VPGSettingScript.TimeoutInSeconds  -lt 1) { throw "TimeoutInSeconds must be more than 1" }
+            [ZertoVPGSettingScript] $NewObj = [ZertoVPGSettingScript]::New($VPGSettingScript)
+        }
+
+        Return $NewObj
+    }
+
+    class ZertoVPGSettingScripting {
+        [ZertoVPGSettingScript] $PostBackup;
+        [ZertoVPGSettingScript] $PostRecovery;
+        [ZertoVPGSettingScript] $PreRecovery;
+
+        ZertoVPGSettingScripting([PSCustomObject] $Value) {
+            $this.PostBackup = $Value.PostBackup; 
+            $this.PostRecovery = $Value.PostRecovery; 
+            $this.PreRecovery = $Value.PreRecovery; 
+        }    
+        ZertoVPGSettingScripting([ZertoVPGSettingScript] $PostBackup, [ZertoVPGSettingScript] $PostRecovery, [ZertoVPGSettingScript] $PreRecovery ) {
+            $this.PostBackup = $PostBackup; 
+            $this.PostRecovery = $PostRecovery; 
+            $this.PreRecovery = $PreRecovery; 
+        }  
+    }
+
+        # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingScripting {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostBackup script object')] [ZertoVPGSettingScript] $PostBackup, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostRecovery script object')] [ZertoVPGSettingScript] $PostRecovery, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PreRecovery script object')] [ZertoVPGSettingScript] $PreRecovery, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Scripting')] [PSCustomObject] $VPGSettingScripting
+        )
+        
+        if (-not $VPGSettingScripting) {
+            [ZertoVPGSettingScripting] $NewObj = [ZertoVPGSettingScripting]::New($PostBackupCommand, $PostRecovery, $PreRecovery);
+        } else {
+            [ZertoVPGSettingScripting] $NewObj = [ZertoVPGSettingScripting]::New($VPGSettingScripting)
         }
 
         Return $NewObj
@@ -2639,7 +2742,57 @@
 
         return $ID
     }
+    
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Get-ZertoSiteRepositories {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
+        )
 
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+            throw "Missing Zerto Site Identifier"
+        }
+
+        $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier + "/repositories"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Get-ZertoSiteRepositoryID {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Backup Repository Name')] [string] $RepositoryName
+        )
+        
+        $ID = Get-ZertoSiteRepositories -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+                    Where-Object {$_.DisplayName -eq $RepositoryName } | `
+                    Select-Object ID  -ExpandProperty ID
+
+        if ($ID.Count -gt 1) {Throw "$RepositoryName returned more than one ID"}
+
+        return $ID
+    }
 #endregion
 
 #region Zerto Tasks
@@ -4642,6 +4795,71 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoVPGSettingBackup {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Basic block')] [ZertoVPGSettingBackup] $ZertoVPGSettingBackup
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/backup"
+        Write-Verbose $FullURL
+        $Body = $ZertoVPGSettingBackup | ConvertTo-Json -Depth 10
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Remove-ZertoVPGSettingBackup {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/backup"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingBackupDayOfWeek {
         [CmdletBinding()]
         param(
@@ -4788,11 +5006,42 @@
 
         $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/basic"
         Write-Verbose $FullURL
-        $Body = $ZertoVpgSettingBasic | ConvertTo-Json -Depth 5
+        $Body = $ZertoVpgSettingBasic | ConvertTo-Json -Depth 10
         Write-Verbose $Body
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Remove-ZertoVPGSettingBasic {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/basic"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete
         } catch {
             Test-RESTError -err $_
         }
@@ -4854,11 +5103,42 @@
 
         $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/bootgroup"
         Write-Verbose $FullURL
-        $Body = $ZertoVpgSettingBootGroup | ConvertTo-Json -Depth 5
+        $Body = $ZertoVpgSettingBootGroup | ConvertTo-Json -Depth 10
         Write-Verbose $Body
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Remove-ZertoVPGSettingBootGroup {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/bootgroup"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete
         } catch {
             Test-RESTError -err $_
         }
@@ -4920,7 +5200,7 @@
 
         $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/journal"
         Write-Verbose $FullURL
-        $Body = $ZertoVPGSettingJournal | ConvertTo-Json -Depth 5
+        $Body = $ZertoVPGSettingJournal | ConvertTo-Json -Depth 10
         Write-Verbose $Body
 
         try {
@@ -5050,6 +5330,71 @@
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoVPGSettingScripting {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Basic block')] [ZertoVPGSettingScripting] $ZertoVPGSettingScripting
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/scripting"
+        Write-Verbose $FullURL
+        $Body = $ZertoVPGSettingScripting | ConvertTo-Json -Depth 10
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Remove-ZertoVPGSettingScripting {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/scripting"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete
         } catch {
             Test-RESTError -err $_
         }

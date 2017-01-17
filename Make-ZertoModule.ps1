@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.9.3' 
-$ReleaseNotes = 'Fixed issue with Get-ZertoSiteFolderID using -match vs -eq.'
+﻿$ModuleVersion = '0.9.4' 
+$ReleaseNotes = 'Updated several VPGSettings commands'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `
@@ -22,7 +22,7 @@ $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Pars
                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
 
 $Functions = @( ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
-                                         Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | `
+                                         Where-Object { $_ -imatch "^Function *" } | Sort-Object | ForEach-Object {  ($_ -split "\s",3)[1] } | `
                                          Where-Object {$_ -notin $PrivateFunctions} ) )
 
 Update-ModuleManifest  .\ZertoModule\ZertoModule.psd1 -FunctionsToExport $Functions

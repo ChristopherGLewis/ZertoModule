@@ -413,7 +413,7 @@
 
 #region Zerto Classes
 
-    class FailoverIPAddress {
+    class VPGFailoverIPAddress {
         [string] $NICName;
         [String] $NetworkID;
         [bool]   $ReplaceMAC;
@@ -436,7 +436,7 @@
 
 
         #CTOR for default + DHCP
-        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, [String] $DNSSuffix, `
+        VPGFailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, [String] $DNSSuffix, `
                              [String] $TestNetworkID, [bool] $TestReplaceMAC, [bool] $TestUseDHCP, [String] $TestDNSSuffix) {
             $this.NICName        = $NICName;
             $this.NetworkID      = $NetworkID;
@@ -450,7 +450,7 @@
         }
 
         #CTOR for default + IP
-        FailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
+        VPGFailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
                             [String] $IPAddress, [String] $Subnetmask, [String] $Gateway, `
                             [String] $DNS1, [String] $DNS2, [String] $DNSSuffix, `
                             [String] $TestNetworkID, [bool] $TestReplaceMAC, `
@@ -479,7 +479,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoFailoverIPAddress {
+    Function New-ZertoVPGFailoverIPAddress {
         #Parameter Sets
         # Default NICName Req, NetworkID,  ReplaceMAC, TestNetworkID TestReplaceMAC Optional
         #  1) DHCP req, FailDHCP optional
@@ -512,7 +512,7 @@
         Write-Verbose $PSCmdlet.ParameterSetName
         If ($PSCmdlet.ParameterSetName -eq 'DHCP') {
             if (-not $UseDHCP) { throw "If UseDHCP is false, IP addresses must be specified" }
-            [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $DNSSuffix, `
+            [VPGFailoverIPAddress] $NewZertoIP = [VPGFailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $UseDHCP, $DNSSuffix, `
                                                                         $TestNetworkID, $TestReplaceMAC, $TestUseDHCP, $TestDNSSuffix);
         } else {
             try { $TestIP = [IPAddress]$IPAddress  } catch {throw "Invalid IP Address '$IPAddress'"}
@@ -526,23 +526,77 @@
             try { if ($TestDNS1)       { $TestIP = [IPAddress]$TestDNS1 }       } catch {throw "Invalid Test DNS1 '$TestDNS1'"}
             try { if ($TestDNS2)       { $TestIP = [IPAddress]$TestDNS2 }       } catch {throw "Invalid Test DNS2 '$TestDNS2'"}
 
-             [FailoverIPAddress] $NewZertoIP = [FailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, `
-                                                                        $IPAddress, $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, `
-                                                                        $TestNetworkID, $TestReplaceMAC, `
-                                                                        $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
+            [VPGFailoverIPAddress] $NewZertoIP = [VPGFailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $IPAddress, `
+                                                    $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, $TestNetworkID, $TestReplaceMAC, `
+                                                    $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
        }
         Return $NewZertoIP    
     }
 
+
+    class VPGVMRecovery {
+        [string] $DatastoreClusterIdentifier;
+        [string] $DatastoreIdentifier;
+        [string] $FolderIdentifier;
+        [string] $HostClusterIdentifier;
+        [string] $HostIdentifier;
+        [string] $ResourcePoolIdentifier;
+
+        VPGVMRecovery ([PSCustomObject] $Value) {
+            $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier;
+            $this.DatastoreIdentifier = $Value.DatastoreIdentifier;     
+            $this.FolderIdentifier = $Value.FolderIdentifier;
+            $this.HostClusterIdentifier = $Value.HostClusterIdentifier;
+            $this.HostIdentifier = $Value.HostIdentifier;
+            $this.ResourcePoolIdentifier = $Value.ResourcePoolIdentifier;
+        }    
+        
+        VPGVMRecovery ([string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [string] $FolderIdentifier, `
+                        [string] $HostClusterIdentifier, [string] $HostIdentifier, [string] $ResourcePoolIdentifier) {
+            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;
+            $this.$DatastoreIdentifier = $DatastoreIdentifier;     
+            $this.$FolderIdentifier = $FolderIdentifier;
+            $this.$HostClusterIdentifier = $HostClusterIdentifier;
+            $this.$HostIdentifier = $HostIdentifier;
+            $this.$ResourcePoolIdentifier = $ResourcePoolIdentifier;
+        }     
+        
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGVMRecovery {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier , 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGVMRecovery ')] [PSCustomObject] $VPGVMRecovery 
+        )
+        
+        if (-not $VPGVMRecovery) {
+            [VPGVMRecovery] $NewObj = [VPGVMRecovery]::New( $DatastoreClusterIdentifier, $DatastoreIdentifier, $FolderIdentifier, `
+                                                            $HostClusterIdentifier, $HostIdentifier, $ResourcePoolIdentifier);
+
+        } else {
+            [VPGVMRecovery] $NewObj = [VPGVMRecovery]::New($VPGVMRecovery)
+        }
+
+        Return $NewObj
+    }
+
     class VPGVirtualMachine {
         [string] $VMName;
-        [FailoverIPAddress[]] $FailoverIPAddresses;
+        [VPGFailoverIPAddress[]] $VPGFailoverIPAddresses;
+        [VPGVMRecovery] $VPGVMRecovery;
         #Add other parts of the VPG here
 
         #region base CTOR
         VPGVirtualMachine ([string] $VMName) {
             $this.VMName = $VMName;
-            $this.FailoverIPAddresses = @();
+            $this.VPGFailoverIPAddresses = @();
             #Initialize othe parts of the VPG here
         }
         #endregion
@@ -557,10 +611,13 @@
         #}
         #endregion
 
-        AddFailoverIPAddress ([FailoverIPAddress[]] $FailoverIPAddress) {
-            $FailoverIPAddress | ForEach-Object {
-                $this.FailoverIPAddresses += $_
+        AddVPGFailoverIPAddress ([VPGFailoverIPAddress[]] $VPGFailoverIPAddresses) {
+            $VPGFailoverIPAddresses | ForEach-Object {
+                $this.VPGFailoverIPAddresses += $_
             }
+        }
+        AddVPGVMRecovery ([VPGVMRecovery] $VPGVMRecovery) {
+            $this.VPGVMRecovery =  $VPGVMRecovery
         }
 
         #Add methods to add/update other parts of the VPG here
@@ -571,14 +628,18 @@
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')]     [String] $VMName,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto IPAddresses')]  [FailoverIPAddress[]] $FailoverIPAddress
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto IPAddresses')]  [VPGFailoverIPAddress[]] $VPGFailoverIPAddress,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Recovery Object')]  [VPGVMRecovery] $VPGVMRecovery
             #Add other optional vpg components here
         )
         
         [VPGVirtualMachine] $NewZertoVM = [VPGVirtualMachine]::New($VMName);
 
-        if ($FailoverIPAddress)  {
-            $NewZertoVM.AddFailoverIPAddress($FailoverIPAddress)
+        if ($VPGFailoverIPAddress)  {
+            $NewZertoVM.AddVPGFailoverIPAddress($VPGFailoverIPAddress)
+        }
+        if ($VPGVMRecovery)  {
+            $NewZertoVM.AddVPGVMRecovery($VPGVMRecovery)
         }
         #Add other optional vpg components Add's here
 
@@ -750,7 +811,6 @@
         Return $NewObj
     }
 
-
     Class ZertoVPGSettingBasic {
         [int] $JournalHistoryInHours; 
         [string] $Name; 
@@ -775,7 +835,9 @@
             $this.UseWanCompression = $Value.UseWanCompression;    
             $this.ZorgIdentifier = $Value.ZorgIdentifier; 
         }    
-        ZertoVPGSettingBasic([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, [int] $TestIntervalInMinutes, [Boolean] $UseWanCompression, [string] $ZorgIdentifier) {
+        ZertoVPGSettingBasic([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, `
+                            [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, `
+                            [int] $TestIntervalInMinutes, [Boolean] $UseWanCompression, [string] $ZorgIdentifier) {
             $this.JournalHistoryInHours = $JournalHistoryInHours; 
             $this.Name = $Name;
             $this.Priority = $Priority;
@@ -827,7 +889,6 @@
         
     }
 
-
     Class ZertoVPGSettingBootgroup {
         [int] $BootDelayInSeconds; 
         [string] $BootGroupIdentifier; 
@@ -866,7 +927,6 @@
         Return $NewObj
         
     }
-
 
     Class ZertoVPGSettingJournalLimitation {
         [int] $HardLimitInMB; 
@@ -1001,13 +1061,13 @@
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Hypervisor')] [ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor,
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'ZertoVPGSettingNetworksNetworkHypervisor object')] [PSCustomObject] $VPGSettingNetworkingNetworkHypervisor
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'ZertoVPGSettingNetworksNetworkHypervisor object')] [PSCustomObject] $VPGSettingNetworksNetwork
         )
         
-        if (-not $VPGSettingNetworkHypervisor) {
+        if (-not $VPGSettingNetworksNetwork) {
             [ZertoVPGSettingNetworksNetwork] $NewObj = [ZertoVPGSettingNetworksNetwork]::New($Hypervisor);
         } else {
-            [ZertoVPGSettingNetworksNetwork] $NewObj = [ZertoVPGSettingNetworksNetwork]::New($VPGSettingNetworkHypervisor)
+            [ZertoVPGSettingNetworksNetwork] $NewObj = [ZertoVPGSettingNetworksNetwork]::New($VPGSettingNetworksNetwork)
         }
 
         Return $NewObj
@@ -1033,23 +1093,70 @@
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Network Failover object')] [ZertoVPGSettingNetworksNetwork] $Failover, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Network FailoverTest object')] [ZertoVPGSettingNetworksNetwork] $FailoverTest, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Network')] [PSCustomObject] $VPGSettingNetworking
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Network')] [PSCustomObject] $VPGSettingNetworks
         )
         
-        if (-not $VPGSettingNetworking) {
+        if (-not $VPGSettingNetworks) {
             #Reset Null Networks
             if ($Failover -eq $null) { $Failover = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
             if ($FailoverTest -eq $null) { $FailoverTest = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
             [ZertoVPGSettingNetworks] $NewObj = [ZertoVPGSettingNetworks]::New($Failover, $FailoverTest);
         } else {
-            if ($VPGSettingNetwork.Failover -eq $null) { $VPGSettingNetwork.Failover = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-            if ($VPGSettingNetwork.FailoverTest -eq $null) { $VPGSettingNetwork.FailoverTest = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
-            [ZertoVPGSettingNetworks] $NewObj = [ZertoVPGSettingNetworks]::New($VPGSettingNetwork)
+            if ($VPGSettingNetworks.Failover -eq $null) { $VPGSettingNetworks.Failover = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
+            if ($VPGSettingNetworks.FailoverTest -eq $null) { $VPGSettingNetworks.FailoverTest = New-ZertoVPGSettingNetworkHypervisor -DefaultNetworkIdentifier $null }
+            [ZertoVPGSettingNetworks] $NewObj = [ZertoVPGSettingNetworks]::New($VPGSettingNetworks)
         }
 
         Return $NewObj
     }
 
+    Class ZertoVPGSettingRecovery {
+        [string] $DefaultDatastoreIdentifier; 
+        [string] $DefaultFolderIdentifier; 
+        [string] $DefaultHostClusterIdentifier; 
+        [string] $DefaultHostIdentifier; 
+        [string] $ResourcePoolIdentifier; 
+
+        ZertoVPGSettingBasic([PSCustomObject] $Value) {
+            $this.DefaultDatastoreIdentifier = $Value.DefaultDatastoreIdentifier;                                                
+            $this.DefaultFolderIdentifier = $Value.DefaultFolderIdentifier;                   
+            $this.DefaultHostClusterIdentifier = $Value.DefaultHostClusterIdentifier; 
+            $this.DefaultHostIdentifier = $Value.DefaultHostIdentifier; 
+            $this.ResourcePoolIdentifier = $Value.ResourcePoolIdentifier;
+        }    
+        ZertoVPGSettingBasic([string] $DefaultDatastoreIdentifier, [string] $DefaultFolderIdentifier, [string] $DefaultHostClusterIdentifier, `
+                            [string] $DefaultHostIdentifier, [string] $ResourcePoolIdentifier ) {
+            $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier;                                                
+            $this.DefaultFolderIdentifier = $DefaultFolderIdentifier;                   
+            $this.DefaultHostClusterIdentifier = $DefaultHostClusterIdentifier; 
+            $this.DefaultHostIdentifier = $DefaultHostIdentifier; 
+            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier;
+        }                 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingRecovery {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Datastore Identifier')] [string] $DefaultDatastoreIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Folder Identifier')] [string] $DefaultFolderIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Cluster Identifier')] [string] $DefaultHostClusterIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Identifier')] [string] $DefaultHostIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Resource Pool Identifier')] [string] $ResourcePoolIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Recovery')] [PSCustomObject] $VPGSettingRecovery
+        )
+        
+        if (-not $VPGSettingRecovery) {
+
+            [ZertoVPGSettingRecovery] $NewObj = [ZertoVPGSettingRecovery]::New($DefaultDatastoreIdentifier, $DefaultFolderIdentifier, `
+                                                $DefaultHostClusterIdentifier, $DefaultHostIdentifier, $ResourcePoolIdentifier );
+        } else {
+
+            [ZertoVPGSettingRecovery] $NewObj = [ZertoVPGSettingRecovery]::New($VPGSettingRecovery)
+        }
+
+        Return $NewObj
+    }
 
     class ZertoVPGSettingScript {
         [String] $Command;
@@ -1138,7 +1245,6 @@
 
         Return $NewObj
     }
-
 
 #endregion
 
@@ -1263,7 +1369,7 @@
 
     Function Get-EnvZertoServer {
         If ( (get-item Env:\ZertoServer -ErrorAction SilentlyContinue) ) {
-             return (get-item Env:\ZertoServer).Value 
+            return (get-item Env:\ZertoServer).Value 
         } 
     }
 
@@ -2103,13 +2209,14 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto PeerSite Name')] [string] $ZertoPeerSiteName
         )
         
-        $Result = Get-ZertoPeerSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoPeerSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.PeerSiteName -eq $ZertoPeerSiteName} | `
                             Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$ZertoPeerSiteName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$ZertoPeerSiteName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$ZertoPeerSiteName' was not found"}
 
-        return $Result
+        return $ID.ToString()
     }
 #endregion
 
@@ -2190,13 +2297,14 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Service Profile Name')] [string] $ZertoServiceProfileName
         )
         
-        $Result = Get-ZertoServiceProfiles -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -SiteIdentifier $SiteIdentifier | `
+        $ID = Get-ZertoServiceProfiles -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -SiteIdentifier $SiteIdentifier | `
                             Where-Object {$_.ServiceProfileName -eq $ZertoServiceProfileName} | `
                             Select-Object ServiceProfileIdentifier -ExpandProperty ServiceProfileIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$ZertoServiceProfileName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$ZertoServiceProfileName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$ZertoServiceProfileName' was not found"}
 
-        return $Result
+        return $ID.ToString()
     }
 #endregion
 
@@ -2308,13 +2416,14 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Name')] [string] $ZertoSiteName
         )
         
-        $Result = Get-ZertoVirtualizationSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoVirtualizationSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VirtualizationSiteName -eq $ZertoSiteName} | `
                             Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$ZertoSiteName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$ZertoSiteName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$ZertoSiteName' was not found"}
         
-        return $Result
+        return $ID.ToString()
     }
 
 #endregion
@@ -2368,7 +2477,8 @@
                             Where-Object {$_.DatastoreClusterName -eq $DatastoreClusterName} | `
                             Select-Object DatastoreClusterIdentifier -ExpandProperty DatastoreClusterIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$DatastoreClusterName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$DatastoreClusterName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$DatastoreClusterName' was not found"}
 
         return $ID.ToString()
     }
@@ -2416,11 +2526,12 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Datastore Name')] [string] $DatastoreName
         )
 
-        $ID =  Get-ZertoSiteDatastores -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
+        $ID = Get-ZertoSiteDatastores -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
                             Where-Object {$_.DatastoreName -eq $DatastoreName} | `
                             Select-Object DatastoreIdentifier -ExpandProperty DatastoreIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$DatastoreName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$DatastoreName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$DatastoreName' was not found"}
 
         return $ID.ToString()
     }
@@ -2473,6 +2584,7 @@
                             Select-Object FolderIdentifier -ExpandProperty FolderIdentifier
 
         if ($ID.Count -gt 1) {Throw "'$FolderName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$FolderName' was not found"}
 
         return $ID.ToString()
     }
@@ -2524,7 +2636,8 @@
                                 Where-Object {$_.VirtualizationClusterName -eq $HostClusterName} | `
                                 Select ClusterIdentifier -ExpandProperty ClusterIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$HostClusterName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$HostClusterName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$HostClusterName' was not found"}
 
         return $ID.ToString()
     }
@@ -2612,7 +2725,8 @@
                                 Where-Object {$_.VirtualizationHostName -eq $HostName} | `
                                 Select HostIdentifier -ExpandProperty HostIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$HostName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$HostName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$HostName' was not found"}
 
         return $ID.ToString()
     }
@@ -2664,7 +2778,8 @@
                 Where-Object {$_.VirtualizationNetworkName -eq $NetworkName} | `
                 Select-Object   NetworkIdentifier -ExpandProperty NetworkIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$NetworkName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$NetworkName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$NetworkName' was not found"}
 
         return $ID.ToString()
     }
@@ -2840,7 +2955,8 @@
                     Where-Object {$_.VmName -eq $VMName } | `
                     Select-Object VmIdentifier -ExpandProperty VmIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$VMName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$VMName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$VMName' was not found"}
 
         return $ID.ToString()
     }
@@ -2891,7 +3007,8 @@
                     Where-Object {$_.DisplayName -eq $RepositoryName } | `
                     Select-Object ID  -ExpandProperty ID
 
-        if ($ID.Count -gt 1) {Throw "$RepositoryName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$RepositoryName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$RepositoryName' was not found"}
 
         return $ID.ToString()
     }
@@ -3099,13 +3216,14 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')] [string] $VmName
         )
         
-        $Result = Get-ZertoVMs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoVMs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VmName -eq $VmName} | `
                             Select-Object VmIdentifier -ExpandProperty VmIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$VMName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$VMName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$VMName' was not found"}
 
-        return $Result
+        return $ID.ToString()
     }
 #endregion
 
@@ -3206,7 +3324,8 @@
                             Where-Object {$_.VraName -eq $VraName} | `
                             Select-Object VraIdentifier -ExpandProperty VraIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$VraName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$VraName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$VraName' was not found"}
 
         return $ID.ToString()
     }
@@ -3642,7 +3761,8 @@
                             Where-Object {$_.VpgName -eq $VpgName} | `
                             Select-Object VpgIdentifier -ExpandProperty VpgIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$VpgName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$VpgName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$VpgName' was not found"}
 
         return $ID.ToString()
     }
@@ -3704,12 +3824,17 @@
         #                        Where-Object {$_.CheckpointIdentifier -eq $ZertoVpgCheckpointIdentifier} | `
         #                        Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
         #} elseif ($ZertoVpgCheckpointTag) {
-            $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
-                                Where-Object {$_.Tag -eq $ZertoVpgCheckpointTag} | `
-                                Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
+        #    $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
+        #                        Where-Object {$_.Tag -eq $ZertoVpgCheckpointTag} | `
+        #                        Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
         #}
 
-        if ($ID.Count -gt 1) {Throw "$ZertoVpgCheckpointTag returned more than one ID"}
+        $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
+                            Where-Object {$_.Tag -eq $ZertoVpgCheckpointTag} | `
+                            Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
+
+        if ($ID.Count -gt 1) {Throw "'$ZertoVpgCheckpointTag' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$ZertoVpgCheckpointTag' was not found"}
 
         return $ID.ToString()
     }
@@ -3956,14 +4081,15 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Recovery Site Name')] [string] $RecoverySiteName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto RPO Alert in seconds')] [ValidateRange(0,99999)]  [int] $RPOAlertInSeconds = 300, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Test Interval in minutes')] [ValidateRange(0,9999999)] [int] $TestIntervalInMinutes = 262080, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Cluster Name')] [string] $ClusterName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Host Name')] [string] $HostName, 
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Failover Network')] [string] $FailoverNetwork, 
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Test Network')] [string] $TestNetwork, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Datastore Name')] [string] $DatastoreName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Datastore Cluster Name')] [string] $DatastoreClusterName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Datastore Name')] [string] $JournalDatastoreName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Host Cluster Name')] [string] $ClusterName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Host Name')] [string] $HostName, 
+            [Parameter(Mandatory=$true, HelpMessage = 'Failover Network')] [string] $FailoverNetwork, 
+            [Parameter(Mandatory=$true, HelpMessage = 'Test Network')] [string] $TestNetwork, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Datastore Name')] [string] $DatastoreName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Datastore Cluster Name')] [string] $DatastoreClusterName,
+            [Parameter(Mandatory=$false, HelpMessage = 'Use Default for Journal Datastore')] [bool] $JournalUseDefault, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Journal Datastore Name')] [string] $JournalDatastoreName, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal History In Hours')] [ValidateRange(0,9999)] [int] $JournalHistoryInHours = 24, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Hard Limit in MB')] [ValidateRange(0,9999999)] [int] $JournalHardLimitMB = 153600, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal Warning Threshold in MB')] [ValidateRange(0,9999999)] [int] $JournalWarningThresholdMB = 115200, 
@@ -3991,11 +4117,12 @@
         if ($DatastoreName -and $DatastoreClusterName) {throw "Cannot specify both Datastore Name and Datastore Cluster Name"}
         if (-not $DatastoreName -and -not $DatastoreclusterName) {throw "Must specify either Datastore Name or Datastore Cluster Name"}
 
-        if ($JournalDatastoreName -and $JournalDatastoreclusterName) {throw "Cannot specify both Journal Datastore Name and Journal Datastore Cluster Name"}
-        if (-not $JournalDatastoreName -and -not $JournalDatastoreclusterName) {throw "Must specify either Journal Datastore Name or Journal Datastore Cluster Name"}
+        if ($JournalUseDefault -and ($JournalDatastoreName -OR $JournalDatastoreclusterName ) )  {throw "Cannot specify JournalUseDefault and JournalDatastoreName or JournalDatastoreClusterName"}
+        if ((-not $JournalUseDefault ) -and ($JournalDatastoreName -AND $JournalDatastoreclusterName) ) {throw "Cannot specify both JournalDatastoreName and JournalDatastoreClusterName"}
+        if ((-not $JournalUseDefault ) -and (-not $JournalDatastoreName -and -not $JournalDatastoreclusterName)) {throw "Must specify either Journal Datastore Name or Journal Datastore Cluster Name"}
 
         ### Temp validation
-        If ($DatastoreClusterName)  {throw "Cannot DatastoreClusterName as a default value for the VPG (bug in zerto 5.0)"}
+        #If ($DatastoreClusterName)  {throw "Cannot specify DatastoreClusterName as a default value for the VPG (bug in zerto 5.0)"}
 
         if ( $VmNames.Count -lt 1 -and $VPGVirtualMachines.Count -lt 1 ) { throw "Must specify at least one VmName or VPGVirtualMachine"}
 
@@ -4036,15 +4163,16 @@
                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
         }
 
-
-        if ($JournalDatastoreName) {
-            $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
-                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName
-            $JournalDatastoreClusterID = $null
-        } elseif ($JournalDatastoreClusterName) {
-            $JournalDatastoreID = $null
-            $JournalDatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
-                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName  $JournalDatastoreClusterName
+        if (-NOT $JournalUseDefault) {
+            if ($JournalDatastoreName) {
+                $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                        -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName
+                $JournalDatastoreClusterID = $null
+            } elseif ($JournalDatastoreClusterName) {
+                $JournalDatastoreID = $null
+                $JournalDatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
+                                                        -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName  $JournalDatastoreClusterName
+            }
         }
 
         $FolderID = Get-ZertoSiteFolderID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
@@ -4088,11 +4216,13 @@
             if ( [string]::IsNullOrEmpty($DatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $DatastoreclusterName " }
         }
 
-        if ($JournalDatastoreName) {
-            if ( [string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Datastore ID for $JournalDatastoreName " }
-        }
-        if ($JournalDatastoreClusterName) {
-            if ( [string]::IsNullOrEmpty($JournalDatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $JournalDatastoreclusterName " }
+        if (-NOT $JournalUseDefault) {
+            if ($JournalDatastoreName) {
+                if ( [string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Datastore ID for $JournalDatastoreName " }
+            }
+            if ($JournalDatastoreClusterName) {
+                if ( [string]::IsNullOrEmpty($JournalDatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $JournalDatastoreclusterName " }
+            }
         }
         
         if ( [string]::IsNullOrEmpty($FolderID)  ) { throw "Could not find Folder ID for $vCenterFolder " }
@@ -4112,10 +4242,12 @@
             if ( $DatastoreClusterID.Count -gt 1 ) { throw "More than one Datastore Cluster ID has the name $DatastoreclusterName " }
         }
 
-        if ($JournalDatastoreName) {
-            if ( $JournalDatastoreID.Count -gt 1 ) { throw "More than one Datastore ID has the name $JournalDatastoreName " }
-        } elseif ($JournalDatastoreClusterName) {
-            if ( $JournalDatastoreClusterID.Count -gt 1 ) { throw "More than one Datastore Cluster ID has the name $JournalDatastoreclusterName " }
+        if (-NOT $JournalUseDefault) {
+            if ($JournalDatastoreName) {
+                if ( $JournalDatastoreID.Count -gt 1 ) { throw "More than one Datastore ID has the name $JournalDatastoreName " }
+            } elseif ($JournalDatastoreClusterName) {
+                if ( $JournalDatastoreClusterID.Count -gt 1 ) { throw "More than one Datastore Cluster ID has the name $JournalDatastoreclusterName " }
+            }
         }
 
         if ( $FolderID.Count -gt 1 ) { throw "More than one Folder ID has the name $vCenterFolder " }
@@ -4145,12 +4277,25 @@
             $BootGroups= @{'BootGroups' = $BootGroupsArray }
             $NewVPGHash.Add('BootGroups' , $BootGroups )
         $Journal = [ordered] @{}
-            if ($JournalDatastoreID) {
+            if ($JournalUseDefault) {
+                #Use the defaults
+                #if ($DatastoreID) {
+                #    $Journal.Add( 'DatastoreClusterIdentifier', $null)
+                #    $Journal.Add( 'DatastoreIdentifier', $DatastoreID)
+                #} else {
+                #    $Journal.Add( 'DatastoreClusterIdentifier', $DatastoreClusterID)
+                #    $Journal.Add( 'DatastoreIdentifier', $null)
+                #}
                 $Journal.Add( 'DatastoreClusterIdentifier', $null)
-                $Journal.Add( 'DatastoreIdentifier', $JournalDatastoreID)
-            } else {
-                $Journal.Add( 'DatastoreClusterIdentifier', $JournalDatastoreClusterID)
                 $Journal.Add( 'DatastoreIdentifier', $null)
+            } else {
+                if ($JournalDatastoreID) {
+                    $Journal.Add( 'DatastoreClusterIdentifier', $null)
+                    $Journal.Add( 'DatastoreIdentifier', $JournalDatastoreID)
+                } else {
+                    $Journal.Add( 'DatastoreClusterIdentifier', $JournalDatastoreClusterID)
+                    $Journal.Add( 'DatastoreIdentifier', $null)
+                }
             }
             $JournalLimit = [ordered] @{}
             $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
@@ -4176,9 +4321,10 @@
                 #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $null)
                 $Recovery.Add( 'DefaultDatastoreIdentifier', $DatastoreID)
             } else {
-                #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $DatastoreClusterID)
-                #$Recovery.Add( 'DefaultDatastoreIdentifier', $null)
-                $Recovery.Add( 'DefaultDatastoreIdentifier', $DatastoreClusterID)
+                #### NOTE THIS IS BROKEN 
+                #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $DatastoreClusterID) 
+                $Recovery.Add( 'DefaultDatastoreClusterIdentifier', $null)
+                $Recovery.Add( 'DefaultDatastoreIdentifier', $null)
             }
             $Recovery.Add( 'DefaultFolderIdentifier', $FolderID)
             if ($ClusterID) {
@@ -4220,7 +4366,7 @@
                         $NewVmHash.Add('BootGroupIdentifier', '00000000-0000-0000-0000-000000000000' )
                         #Loop through our NICs
                         $AllNics = @()
-                        $_.FailoverIPAddresses | ForEach-Object {
+                        $_.VPGFailoverIPAddresses | ForEach-Object {
                             $Nic = [ordered] @{}
                                 $Nic.Add( "NicIdentifier" , $_.NicName)
                                 $NicFail = [ordered] @{}
@@ -4285,8 +4431,22 @@
                             }
                         
                             $AllNics += $Nic
-                        }  #end of foreach $_.FailoverIPAddresses 
+                        }  #end of foreach $_.VPGFailoverIPAddresses 
                         $NewVmHash.Add('Nics', $AllNics )
+                        #Recovery block if DatastoreClusterID - deals with VPG Recovery Block not supporting a default DatastoreClusterID
+                        if ($DatastoreClusterID) {
+                            #Need to find all volumes for this VM
+                            $AllVMVolumes = @()
+                                $VMVolume = [ordered] @{}
+                                    $VMVolDatastore = [ordered] @{}
+                                        $VMVolDatastore.Add( 'DatastoreClusterIdentifier', $DatastoreClusterID)
+                                        $VMVolDatastore.Add( 'DatastoreIdentifier', $null)
+                                        $VMVolDatastore.Add( 'IsThin', $true)
+                                    $VMVolume.Add('Datastore', $VMVolDatastore)
+                                    $VMVolume.Add('VolumeIdentifier', $null)
+                                $AllVMVolumes += $VMVolume
+                            $NewVmHash.Add('Volumes', $AllVMVolumes )
+                        }
                     #Add this VM Hash to the VMArray
                     $VMArray += $NewVmHash
                     #endregion
@@ -4798,7 +4958,8 @@
                             Where-Object {$_.Basic.Name -eq $VpgSettingName} | `
                             Select-Object VpgSettingsIdentifier -ExpandProperty VpgSettingsIdentifier
 
-        if ($ID.Count -gt 1) {Throw "$VpgSettingName returned more than one ID"}
+        if ($ID.Count -gt 1) {Throw "'$VpgSettingName' returned more than one ID"}
+        if ($ID.Count -eq 0) {Throw "'$VpgSettingName' was not found"}
 
         return $ID.ToString()
     }
@@ -5476,6 +5637,71 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Set-ZertoVPGSettingRecovery {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Scripting object')] [ZertoVPGSettingRecovery] $ZertoVPGSettingRecovery
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/recovery"
+        Write-Verbose $FullURL
+        $Body = $ZertoVPGSettingRecovery | ConvertTo-Json -Depth 10
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Remove-ZertoVPGSettingRecovery {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+            throw "Missing Zerto VPG Settings Identifier"
+        }
+
+        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/recovery"
+        Write-Verbose $FullURL
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }    
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGSettingScripting {
         [CmdletBinding()]
         param(
@@ -5947,7 +6173,7 @@ $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Pars
                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
 
 $Functions = @( ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
-                                         Where-Object { $_ -imatch "^Function *" } | sort | ForEach-Object {  ($_ -split "\s",3)[1] } | `
+                                         Where-Object { $_ -imatch "^Function *" } | Sort-Object | ForEach-Object {  ($_ -split "\s",3)[1] } | `
                                          Where-Object {$_ -notin $PrivateFunctions} ) )
 
 Export-ModuleMember -function  $Functions

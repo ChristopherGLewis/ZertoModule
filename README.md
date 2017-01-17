@@ -79,6 +79,8 @@ Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 
 ## Release Notes
+**0.9.4** - Updated several VPGSettings commands
+
 **0.9.1** - Updated help for 0.9.0, fixed TestNetworkID for Add-ZertoVPG
 
 **0.9.0** - Added ability to specify Failover/Test network ID to Add-ZertoVPG.  Note that this

@@ -1,4 +1,4 @@
-﻿$ModuleVersion = '0.9.4' 
+﻿$ModuleVersion = '0.9.8' 
 $ReleaseNotes = 'Updated several VPGSettings commands'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `

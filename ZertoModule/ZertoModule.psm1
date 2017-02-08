@@ -54,7 +54,7 @@
         VmNotProtectedError                  = 32
     }
 
-    enum ZertoSourceType {
+    enum ZertoProtectedSiteType {
         VCVpg    = 0 
         VCvApp   = 1 
         VCDvApp  = 2 
@@ -62,7 +62,7 @@
         HyperV   = 4 
     }
 
-    enum ZertoTargetType {
+    enum ZertoRecoverySiteType {
         VCVpg    = 0 
         VCvApp   = 1 
         VCDvApp  = 2 
@@ -436,7 +436,7 @@
 
 
         #CTOR for default + DHCP
-        VPGFailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, [String] $DNSSuffix, `
+        VPGFailoverIPAddress ([string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC, [bool] $UseDHCP, [String] $DNSSuffix, `
                              [String] $TestNetworkID, [bool] $TestReplaceMAC, [bool] $TestUseDHCP, [String] $TestDNSSuffix) {
             $this.NICName        = $NICName;
             $this.NetworkID      = $NetworkID;
@@ -450,7 +450,7 @@
         }
 
         #CTOR for default + IP
-        VPGFailoverIPAddress( [string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
+        VPGFailoverIPAddress ([string] $NICName, [String] $NetworkID, [bool] $ReplaceMAC,  `
                             [String] $IPAddress, [String] $Subnetmask, [String] $Gateway, `
                             [String] $DNS1, [String] $DNS2, [String] $DNSSuffix, `
                             [String] $TestNetworkID, [bool] $TestReplaceMAC, `
@@ -529,10 +529,9 @@
             [VPGFailoverIPAddress] $NewZertoIP = [VPGFailoverIPAddress]::new( $NICName, $NetworkID, $ReplaceMAC, $IPAddress, `
                                                     $SubnetMask, $Gateway, $DNS1, $DNS2, $DNSSuffix, $TestNetworkID, $TestReplaceMAC, `
                                                     $TestIPAddress, $TestSubnetMask, $TestGateway, $TestDNS1, $TestDNS2, $TestDNSSuffix);
-       }
+        }
         Return $NewZertoIP    
     }
-
 
     class VPGVMRecovery {
         [string] $DatastoreClusterIdentifier;
@@ -559,8 +558,7 @@
             $this.$HostClusterIdentifier = $HostClusterIdentifier;
             $this.$HostIdentifier = $HostIdentifier;
             $this.$ResourcePoolIdentifier = $ResourcePoolIdentifier;
-        }     
-        
+        }        
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -659,8 +657,7 @@
             $this.Gateway = $Gateway;
             $this.VRAIPType = $VRAIPType.ToString();
         }
-        #endregion         
-
+        #endregion
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -681,18 +678,17 @@
         Return $NewVRAIPAddressConfig    
     }
 
-
     class ZertoVPGSettingBackupRetry {
         [int] $IntervalInMinutes; 
         [int] $Number; 
         [bool] $Retry;
     
-        ZertoVPGSettingBackupRetry([PSCustomObject] $Value) {
+        ZertoVPGSettingBackupRetry ([PSCustomObject] $Value) {
             $this.IntervalInMinutes = $Value.IntervalInMinutes; 
             $this.Number = $Value.Number;
             $this.Retry = $Value.Retry;
         }    
-        ZertoVPGSettingBackupRetry( [int] $IntervalInMinutes, [int] $Number, [bool] $Retry) {
+        ZertoVPGSettingBackupRetry ([int] $IntervalInMinutes, [int] $Number, [bool] $Retry) {
             $this.IntervalInMinutes = $IntervalInMinutes; 
             $this.Number = $Number;
             $this.Retry = $Retry;
@@ -727,12 +723,12 @@
         [string] $SchedulerPeriod; 
         [string] $TimeOfDay;
     
-        ZertoVPGSettingBackupScheduler([PSCustomObject] $Value) {
+        ZertoVPGSettingBackupScheduler ([PSCustomObject] $Value) {
             $this.DayOfWeek = $Value.DayOfWeek; 
             $this.SchedulerPeriod = $Value.SchedulerPeriod;
             $this.TimeOfDay = $Value.TimeOfDay;
         }    
-        ZertoVPGSettingBackupScheduler( [ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, [string] $TimeOfDay) {
+        ZertoVPGSettingBackupScheduler ([ZertoVPGSettingsBackupSchedulerDOW] $DayOfWeek, [ZertoVPGSettingsBackupSchedulerPeriod] $SchedulerPeriod, [string] $TimeOfDay) {
             $this.DayOfWeek = $DayOfWeek.ToString(); 
             $this.SchedulerPeriod = $SchedulerPeriod.ToString();
             $this.TimeOfDay = $TimeOfDay;
@@ -776,19 +772,18 @@
         [ZertoVPGSettingBackupRetry] $Retry;
         [ZertoVPGSettingBackupScheduler] $Scheduler;
     
-        ZertoVPGSettingBackup([PSCustomObject] $Value) {
+        ZertoVPGSettingBackup ([PSCustomObject] $Value) {
             $this.RepositoryIdentifier = $Value.RepositoryIdentifier; 
             $this.RetentionPeriod = $Value.RetentionPeriod; 
             $this.Retry = $Value.Retry; 
             $this.Scheduler = $Value.Scheduler; 
         }    
-        ZertoVPGSettingBackup( [string] $RepositoryIdentifier, [ZertoVPGSettingsBackupRetentionPeriod] $RetentionPeriod, [ZertoVPGSettingBackupRetry] $Retry, [ZertoVPGSettingBackupScheduler] $Scheduler ) {
+        ZertoVPGSettingBackup ([string] $RepositoryIdentifier, [ZertoVPGSettingsBackupRetentionPeriod] $RetentionPeriod, [ZertoVPGSettingBackupRetry] $Retry, [ZertoVPGSettingBackupScheduler] $Scheduler ) {
             $this.RepositoryIdentifier = $RepositoryIdentifier; 
             $this.RetentionPeriod = $RetentionPeriod.ToString(); 
             $this.Retry = $Retry; 
             $this.Scheduler = $Scheduler; 
-        }   
-
+        }
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -823,7 +818,7 @@
         [Boolean] $UseWanCompression; 
         [string] $ZorgIdentifier; 
 
-        ZertoVPGSettingBasic([PSCustomObject] $Value) {
+        ZertoVPGSettingBasic ([PSCustomObject] $Value) {
             $this.JournalHistoryInHours = $Value.JournalHistoryInHours;                                                
             $this.Name = $Value.Name;                   
             $this.Priority = $Value.Priority; 
@@ -835,7 +830,7 @@
             $this.UseWanCompression = $Value.UseWanCompression;    
             $this.ZorgIdentifier = $Value.ZorgIdentifier; 
         }    
-        ZertoVPGSettingBasic([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, `
+        ZertoVPGSettingBasic ([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, `
                             [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, `
                             [int] $TestIntervalInMinutes, [Boolean] $UseWanCompression, [string] $ZorgIdentifier) {
             $this.JournalHistoryInHours = $JournalHistoryInHours; 
@@ -873,7 +868,6 @@
             if ( $JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$JournalHistoryInHours'"}
             if ( $TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$TestIntervalInMinutes'"}
             if ( $RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$RpoInSeconds'"}
-
             [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($JournalHistoryInHours, $Name, $Priority, `
                                                                         $ProtectedSiteIdentifier, $RecoverySiteIdentifier, $RpoInSeconds, `
                                                                         $ServiceProfileIdentifier, $TestIntervalInMinutes, $UseWanCompression, `
@@ -882,12 +876,10 @@
             if ( $VPGSettingBasic.JournalHistoryInHours -lt 1 ) { throw "Journal history must be greather then 0 - '$VPGSettingBasic.JournalHistoryInHours'"}
             if ( $VPGSettingBasic.TestIntervalInMinutes -lt 1 ) { throw "Test Interval In Minutes must be greather then 0 - '$VPGSettingBasic.TestIntervalInMinutes'"}
             if ( $VPGSettingBasic.RpoInSeconds -lt 1 ) { throw "RpoInSeconds  must be greather then 0 - '$VPGSettingBasic.RpoInSeconds'"}
-
             [ZertoVPGSettingBasic] $NewObj = [ZertoVPGSettingBasic]::New($VPGSettingBasic)
         }
 
-        Return $NewObj
-        
+        Return $NewObj       
     }
 
     Class ZertoVPGSettingBootgroup {
@@ -895,12 +887,12 @@
         [string] $BootGroupIdentifier; 
         [string] $BootGroupName;
 
-        ZertoVPGSettingBootgroup([PSCustomObject] $Value) {
+        ZertoVPGSettingBootgroup ([PSCustomObject] $Value) {
             $this.BootDelayInSeconds = $Value.BootDelayInSeconds;                                                
             $this.BootGroupIdentifier = $Value.BootGroupIdentifier;
             $this.BootGroupName = $Value.BootGroupName;                   
         }    
-        ZertoVPGSettingBootgroup( [int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $BootGroupName ) {
+        ZertoVPGSettingBootgroup ([int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $BootGroupName ) {
             $this.BootDelayInSeconds = $BootDelayInSeconds;                                                
             $this.BootGroupIdentifier = $BootGroupIdentifier; 
             $this.BootGroupName = $BootGroupName;                   
@@ -934,13 +926,13 @@
         [int] $WarningThresholdInMB;
         [int] $WarningThresholdInPercent;
 
-        ZertoVPGSettingJournalLimitation([PSCustomObject] $Value) {
+        ZertoVPGSettingJournalLimitation ([PSCustomObject] $Value) {
             $this.HardLimitInMB = $Value.HardLimitInMB;                                                
             $this.HardLimitInPercent = $Value.HardLimitInPercent;                                                
             $this.WarningThresholdInMB = $Value.WarningThresholdInMB;                                                
             $this.WarningThresholdInPercent = $Value.WarningThresholdInPercent;                                                
         }    
-        ZertoVPGSettingJournalLimitation( [int] $HardLimitInMB, [int] $HardLimitInPercent, [int] $WarningThresholdInMB, [int] $WarningThresholdInPercent ) {
+        ZertoVPGSettingJournalLimitation ([int] $HardLimitInMB, [int] $HardLimitInPercent, [int] $WarningThresholdInMB, [int] $WarningThresholdInPercent ) {
             $this.HardLimitInMB = $HardLimitInMB;                                                
             $this.HardLimitInPercent = $HardLimitInPercent;                                                
             $this.WarningThresholdInMB = $WarningThresholdInMB;                                                
@@ -981,12 +973,12 @@
         [string] $DatastoreIdentifier; 
         [ZertoVPGSettingJournalLimitation] $Limitation;
 
-        ZertoVPGSettingJournal([PSCustomObject] $Value) {
+        ZertoVPGSettingJournal ([PSCustomObject] $Value) {
             $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier;                                                
             $this.DatastoreIdentifier = $Value.DatastoreIdentifier;
             $this.Limitation = $Value.Limitation;                   
         }    
-        ZertoVPGSettingJournal( [string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [ZertoVPGSettingJournalLimitation] $Limitation) {
+        ZertoVPGSettingJournal ([string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [ZertoVPGSettingJournalLimitation] $Limitation) {
             $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;                                                
             $this.DatastoreIdentifier = $DatastoreIdentifier; 
             $this.Limitation = $Limitation;                   
@@ -1010,7 +1002,6 @@
         }
 
         Return $NewObj
-        
     }
 
     class ZertoVPGSettingNetworksNetworkHypervisor  {
@@ -1048,10 +1039,10 @@
     class ZertoVPGSettingNetworksNetwork {
         [ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor;
 
-        ZertoVPGSettingNetworksNetwork([PSCustomObject] $Value) {
+        ZertoVPGSettingNetworksNetwork ([PSCustomObject] $Value) {
             $this.Hypervisor = $Value.Hypervisor; 
         }    
-        ZertoVPGSettingNetworksNetwork([ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor) {
+        ZertoVPGSettingNetworksNetwork ([ZertoVPGSettingNetworksNetworkHypervisor] $Hypervisor) {
             $this.Hypervisor = $Hypervisor; 
         }  
     }
@@ -1077,11 +1068,11 @@
         [ZertoVPGSettingNetworksNetwork] $Failover;
         [ZertoVPGSettingNetworksNetwork] $FailoverTest;
 
-        ZertoVPGSettingNetworks([PSCustomObject] $Value) {
+        ZertoVPGSettingNetworks ([PSCustomObject] $Value) {
             $this.Failover = $Value.Failover; 
             $this.FailoverTest = $Value.FailoverTest; 
         }    
-        ZertoVPGSettingNetworks([ZertoVPGSettingNetworksNetwork] $Failover, [ZertoVPGSettingNetworksNetwork] $FailoverTest) {
+        ZertoVPGSettingNetworks ([ZertoVPGSettingNetworksNetwork] $Failover, [ZertoVPGSettingNetworksNetwork] $FailoverTest) {
             $this.Failover = $Failover; 
             $this.FailoverTest = $FailoverTest; 
         }  
@@ -1117,14 +1108,14 @@
         [string] $DefaultHostIdentifier; 
         [string] $ResourcePoolIdentifier; 
 
-        ZertoVPGSettingBasic([PSCustomObject] $Value) {
+        ZertoVPGSettingRecovery ([PSCustomObject] $Value) {
             $this.DefaultDatastoreIdentifier = $Value.DefaultDatastoreIdentifier;                                                
             $this.DefaultFolderIdentifier = $Value.DefaultFolderIdentifier;                   
             $this.DefaultHostClusterIdentifier = $Value.DefaultHostClusterIdentifier; 
             $this.DefaultHostIdentifier = $Value.DefaultHostIdentifier; 
             $this.ResourcePoolIdentifier = $Value.ResourcePoolIdentifier;
         }    
-        ZertoVPGSettingBasic([string] $DefaultDatastoreIdentifier, [string] $DefaultFolderIdentifier, [string] $DefaultHostClusterIdentifier, `
+        ZertoVPGSettingRecovery ([string] $DefaultDatastoreIdentifier, [string] $DefaultFolderIdentifier, [string] $DefaultHostClusterIdentifier, `
                             [string] $DefaultHostIdentifier, [string] $ResourcePoolIdentifier ) {
             $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier;                                                
             $this.DefaultFolderIdentifier = $DefaultFolderIdentifier;                   
@@ -1163,12 +1154,12 @@
         [string] $Parameters;
         [int] $TimeoutInSeconds;
 
-        ZertoVPGSettingScript([PSCustomObject] $Value) {
+        ZertoVPGSettingScript ([PSCustomObject] $Value) {
             $this.Command = $Value.Command; 
             $this.Parameters = $Value.Parameters; 
             $this.TimeoutInSeconds = $Value.TimeoutInSeconds; 
         }    
-        ZertoVPGSettingScript([string] $Command, [string] $Parameters, [int] $TimeoutInSeconds ) {
+        ZertoVPGSettingScript ([string] $Command, [string] $Parameters, [int] $TimeoutInSeconds ) {
             if ([String]::IsNullOrEmpty($Command) ) { 
                 $this.Command = [NullString]::Value ; 
             } else {
@@ -1210,12 +1201,12 @@
         [ZertoVPGSettingScript] $PostRecovery;
         [ZertoVPGSettingScript] $PreRecovery;
 
-        ZertoVPGSettingScripting([PSCustomObject] $Value) {
+        ZertoVPGSettingScripting ([PSCustomObject] $Value) {
             $this.PostBackup = $Value.PostBackup; 
             $this.PostRecovery = $Value.PostRecovery; 
             $this.PreRecovery = $Value.PreRecovery; 
         }    
-        ZertoVPGSettingScripting([ZertoVPGSettingScript] $PostBackup, [ZertoVPGSettingScript] $PostRecovery, [ZertoVPGSettingScript] $PreRecovery ) {
+        ZertoVPGSettingScripting ([ZertoVPGSettingScript] $PostBackup, [ZertoVPGSettingScript] $PostRecovery, [ZertoVPGSettingScript] $PreRecovery ) {
             $this.PostBackup = $PostBackup; 
             $this.PostRecovery = $PostRecovery; 
             $this.PreRecovery = $PreRecovery; 
@@ -1246,7 +1237,7 @@
         Return $NewObj
     }
 
-    class ZertoVPGSettingsVMNicNetworkHypervisorIpConfig {
+    class ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
         [bool] $IsDhcp; 
         [string] $StaticIp; 
         [string] $SubnetMask; 
@@ -1254,7 +1245,7 @@
         [string] $PrimaryDns; 
         [string] $SecondaryDns;
 
-        ZertoVPGSettingsVMNicNetworkHypervisorIpConfig([PSCustomObject] $Value) {
+        ZertoVPGSettingVMNicNetworkHypervisorIpConfig ([PSCustomObject] $Value) {
             $this.Gateway = $value.Gateway;
             $this.IsDhcp = $value.IsDhcp;
             $this.PrimaryDns = $value.PrimaryDns;
@@ -1262,7 +1253,7 @@
             $this.StaticIp = $value.StaticIp;
             $this.SubnetMask = $value.SubnetMask;
         }
-        ZertoVPGSettingsVMNicNetwork( [string] $Gateway,
+        ZertoVPGSettingVMNicNetworkHypervisorIpConfig ([string] $Gateway,
                                     [bool] $IsDhcp, 
                                     [string] $PrimaryDns,
                                     [string] $SecondaryDns,
@@ -1278,7 +1269,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoVPGSettingsVMNicNetworkHypervisorIpConfig {
+    Function New-ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'IsDHCP')] [bool] $IsDhcp = $false,
@@ -1287,37 +1278,37 @@
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Gateway')] [string] $Gateway,
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PrimaryDNS')] [string] $PrimaryDNS,
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'SecondaryDns')] [string] $SecondaryDns,
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingsVMNicNetworkHypervisorIpConfig
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetworkHypervisorIpConfig
         )
 
-        if (-not $VPGSettingsVMNicNetworkHypervisorIpConfig) {
-            [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig]::New( $Gateway,
+        if (-not $VPGSettingVMNicNetworkHypervisorIpConfig) {
+            [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisorIpConfig]::New( $Gateway,
                                                                                                                         $IsDhcp, 
                                                                                                                         $PrimaryDns,
                                                                                                                         $SecondaryDns,
                                                                                                                         $StaticIp,
                                                                                                                         $SubnetMask );
         } else {
-            [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig]::New($VPGSettingsVMNicNetworkHypervisorIpConfig)
+            [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisorIpConfig]::New($VPGSettingVMNicNetworkHypervisorIpConfig)
         }
 
         Return $NewObj
     }  
 
-    class ZertoVPGSettingsVMNicNetworkHypervisor {
+    class ZertoVPGSettingVMNicNetworkHypervisor {
         [string] $DnsSuffix;
-        [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig] $IpConfig;
+        [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $IpConfig;
         [string] $NetworkIdentifier;
         [bool] $ShouldReplaceMacAddress;
 
-        ZertoVPGSettingsVMNicNetworkHypervisor([PSCustomObject] $Value) {
+        ZertoVPGSettingVMNicNetworkHypervisor ([PSCustomObject] $Value) {
             $this.DnsSuffix = $Value.DnsSuffix; 
             $this.IpConfig = $Value.IpConfig; 
             $this.NetworkIdentifier = $Value.NetworkIdentifier; 
             $this.ShouldReplaceMacAddress = $Value.ShouldReplaceMacAddress; 
         }
-        ZertoVPGSettingsVMNicNetwork([string] $DnsSuffix, 
-                                    [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig] $IpConfig, 
+        ZertoVPGSettingVMNicNetworkHypervisor ([string] $DnsSuffix, 
+                                    [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $IpConfig, 
                                     [string] $NetworkIdentifier, 
                                     [bool] $ShouldReplaceMacAddress) {
             $this.DnsSuffix = $DnsSuffix; 
@@ -1328,48 +1319,48 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoVPGSettingsVMNicNetworkHypervisor {
+    Function New-ZertoVPGSettingVMNicNetworkHypervisor {
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DNS Suffix')] [string] $DnsSuffix, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor IpConfig object')] [ZertoVPGSettingsVMNicNetworkHypervisorIpConfig] $IpConfig, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor IpConfig object')] [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $IpConfig, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network ID')] [string] $NetworkIdentifier,
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Should Replace MacAddress')] [bool] $ShouldReplaceMacAddress, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingsVMNicNetworkHypervisor
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetworkHypervisor
         )
 
-        if (-not $VPGSettingsVMNicNetworkHypervisor) {
-            [ZertoVPGSettingsVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingsVMNicNetworkHypervisor]::New($Hypervisor);
+        if (-not $VPGSettingVMNicNetworkHypervisor) {
+            [ZertoVPGSettingVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisor]::New($Hypervisor);
         } else {
-            [ZertoVPGSettingsVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingsVMNicNetworkHypervisor]::New($VPGSettingVMNicNetwork)
+            [ZertoVPGSettingVMNicNetworkHypervisor] $NewObj = [ZertoVPGSettingVMNicNetworkHypervisor]::New($VPGSettingVMNicNetwork)
         }
 
         Return $NewObj
     }  
 
-    class ZertoVPGSettingsVMNicNetwork {
-        [ZertoVPGSettingsVMNicNetworkHypervisor] $Hypervisor;
+    class ZertoVPGSettingVMNicNetwork {
+        [ZertoVPGSettingVMNicNetworkHypervisor] $Hypervisor;
 
-        ZertoVPGSettingsVMNicNetwork([PSCustomObject] $Value) {
+        ZertoVPGSettingVMNicNetwork ([PSCustomObject] $Value) {
             $this.Hypervisor = $Value.Hypervisor; 
         }
-        ZertoVPGSettingsVMNicNetwork([ZertoVPGSettingsVMNicNetworkHypervisor] $Hypervisor) {
+        ZertoVPGSettingVMNicNetwork ([ZertoVPGSettingVMNicNetworkHypervisor] $Hypervisor) {
             $this.Hypervisor = $Hypervisor; 
         }
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoVPGSettingsVMNicNetwork {
+    Function New-ZertoVPGSettingVMNicNetwork {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor')] [ZertoVPGSettingsVMNicNetworkHypervisor] $Hypervisor, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPGSetting VM NIC Network Hypervisor')] [ZertoVPGSettingVMNicNetworkHypervisor] $Hypervisor, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC Network object')] [PSCustomObject] $VPGSettingVMNicNetwork
         )
 
         if (-not $VPGSettingVMNicNetwork) {
-            [ZertoVPGSettingsVMNicNetwork] $NewObj = [ZertoVPGSettingsVMNicNetwork]::New($Hypervisor);
+            [ZertoVPGSettingVMNicNetwork] $NewObj = [ZertoVPGSettingVMNicNetwork]::New($Hypervisor);
         } else {
-            [ZertoVPGSettingsVMNicNetwork] $NewObj = [ZertoVPGSettingsVMNicNetwork]::New($VPGSettingVMNicNetwork)
+            [ZertoVPGSettingVMNicNetwork] $NewObj = [ZertoVPGSettingVMNicNetwork]::New($VPGSettingVMNicNetwork)
         }
 
         Return $NewObj
@@ -1377,16 +1368,16 @@
 
     class ZertoVPGSettingVMNic {
         [string] $NicIdentifier;
-        [ZertoVPGSettingsVMNicNetwork] $Failover;
-        [ZertoVPGSettingsVMNicNetwork] $FailoverTest;
+        [ZertoVPGSettingVMNicNetwork] $Failover;
+        [ZertoVPGSettingVMNicNetwork] $FailoverTest;
 
 
-        ZertoVPGSettingVMNic([PSCustomObject] $Value) {
+        ZertoVPGSettingVMNic ([PSCustomObject] $Value) {
             $this.NicIdentifier = $Value.NicIdentifier; 
             $this.Failover = $Value.Failover; 
             $this.FailoverTest = $Value.FailoverTest; 
         }
-        ZertoVPGSettingVMNic([string] $NicIdentifier, [ZertoVPGSettingsVMNicNetwork] $Failover,  [ZertoVPGSettingsVMNicNetwork] $FailoverTest) {
+        ZertoVPGSettingVMNic ([string] $NicIdentifier, [ZertoVPGSettingVMNicNetwork] $Failover,  [ZertoVPGSettingVMNicNetwork] $FailoverTest) {
             $this.NicIdentifier = $NicIdentifier; 
             $this.Failover = $Failover; 
             $this.FailoverTest = $FailoverTest; 
@@ -1398,8 +1389,8 @@
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Nic Identifier')] [string] $NicIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Failover Network')] [ZertoVPGSettingsVMNicNetwork] $VMNetworkFailover, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Test Network')] [ZertoVPGSettingsVMNicNetwork] $VMNetworkTest, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Failover Network')] [ZertoVPGSettingVMNicNetwork] $VMNetworkFailover, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Test Network')] [ZertoVPGSettingVMNicNetwork] $VMNetworkTest, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM NIC object')] [PSCustomObject] $VPGSettingVMNic
         )
 
@@ -1420,7 +1411,7 @@
         [string] $HostIdentifier;
         [string] $ResourcePoolIdentifier;
 
-        ZertoVPGSettingVMRecovery([PSCustomObject] $Value) {
+        ZertoVPGSettingVMRecovery ([PSCustomObject] $Value) {
             $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier;    
             $this.DatastoreIdentifier = $value.DatastoreIdentifier;
             $this.FolderIdentifier = $value.FolderIdentifier;
@@ -1428,7 +1419,7 @@
             $this.HostIdentifier = $value.HostIdentifier;
             $this.ResourcePoolIdentifier = $value.ResourcePoolIdentifier;            
         }
-        ZertoVPGSettingVMRecovery([string] $DatastoreClusterIdentifier,
+        ZertoVPGSettingVMRecovery ([string] $DatastoreClusterIdentifier,
                                 [string] $DatastoreIdentifier,
                                 [string] $FolderIdentifier,
                                 [string] $HostClusterIdentifier,
@@ -1470,17 +1461,17 @@
         Return $NewObj
     }
 
-    class ZertoVPGSettingsVMVolumeDatastore {
+    class ZertoVPGSettingVMVolumeDatastore {
         [string] $DatastoreClusterIdentifier;
         [string] $DatastoreIdentifier;
         [bool] $IsThin;
 
-        ZertoVPGSettingVMVolumeDatastore([PSCustomObject] $Value) {
+        ZertoVPGSettingVMVolumeDatastore ([PSCustomObject] $Value) {
             $this.IsThin = $value.IsThin;    
             $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier;
             $this.DatastoreIdentifier = $value.DatastoreIdentifier;
         }
-        ZertoVPGSettingVMVolumeDatastore([bool] $IsThin,
+        ZertoVPGSettingVMVolumeDatastore ([bool] $IsThin,
                                 [string] $DatastoreClusterIdentifier,
                                 [string] $DatastoreIdentifier) {
             $this.IsThin = $IsThin;    
@@ -1510,19 +1501,19 @@
         Return $NewObj
     }
 
-    class ZertoVPGSettingsVMVolumeExistingVolume {
+    class ZertoVPGSettingVMVolumeExistingVolume {
         [string] $DatastoreIdentifier;
         [string] $ExistingVmIdentifier;
         [string] $Mode;
         [string] $Path;
 
-        ZertoVPGSettingsVMVolumeExistingVolume([PSCustomObject] $Value) {
+        ZertoVPGSettingVMVolumeExistingVolume ([PSCustomObject] $Value) {
             $this.DatastoreIdentifier = $value.DatastoreIdentifier;    
             $this.ExistingVmIdentifier = $value.ExistingVmIdentifier;
             $this.Mode = $value.Mode;
             $this.Path = $value.Path;
         }
-        ZertoVPGSettingsVMVolumeExistingVolume([string] $DatastoreIdentifier,
+        ZertoVPGSettingVMVolumeExistingVolume ([string] $DatastoreIdentifier,
                                 [string] $ExistingVmIdentifier,
                                 [string] $Mode,
                                 [string] $Path) {
@@ -1534,7 +1525,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoVPGSettingsVMVolumeExistingVolume {
+    Function New-ZertoVPGSettingVMVolumeExistingVolume {
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
@@ -1545,12 +1536,12 @@
         )
 
         if (-not $VPGSettingVMVolumeExistingVolume) {
-            [ZertoVPGSettingsVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingsVMVolumeExistingVolume]::New($DatastoreIdentifier,
+            [ZertoVPGSettingVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingVMVolumeExistingVolume]::New($DatastoreIdentifier,
                                                                             $ExistingVmIdentifier,
                                                                             $Mode,
                                                                             $Path);
         } else {
-            [ZertoVPGSettingsVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingsVMVolumeExistingVolume]::New($VPGSettingVMVolumeExistingVolume)
+            [ZertoVPGSettingVMVolumeExistingVolume] $NewObj = [ZertoVPGSettingVMVolumeExistingVolume]::New($VPGSettingVMVolumeExistingVolume)
         }
 
         Return $NewObj
@@ -1559,19 +1550,19 @@
     class ZertoVPGSettingVMVolume {
         [bool] $IsSwap;
         [string] $VolumeIdentifier;
-        [ZertoVPGSettingsVMVolumeDatastore] $Datastore;
-        [ZertoVPGSettingsVMVolumeExistingVolume] $ExistingVolume;
+        [ZertoVPGSettingVMVolumeDatastore] $Datastore;
+        [ZertoVPGSettingVMVolumeExistingVolume] $ExistingVolume;
 
-        ZertoVPGSettingVMVolume([PSCustomObject] $Value) {
+        ZertoVPGSettingVMVolume ([PSCustomObject] $Value) {
             $this.IsSwap = $value.IsSwap;    
             $this.VolumeIdentifier = $value.VolumeIdentifier;
             $this.Datastore = $value.Datastore;
             $this.ExistingVolume = $value.ExistingVolume;
         }
-        ZertoVPGSettingVMVolume([bool] $IsSwap,
+        ZertoVPGSettingVMVolume ([bool] $IsSwap,
                                 [string] $VolumeIdentifier,
-                                [ZertoVPGSettingsVMVolumeDatastore] $Datastore,
-                                [ZertoVPGSettingsVMVolumeExistingVolume] $ExistingVolume) {
+                                [ZertoVPGSettingVMVolumeDatastore] $Datastore,
+                                [ZertoVPGSettingVMVolumeExistingVolume] $ExistingVolume) {
             $this.IsSwap = $IsSwap;    
             $this.VolumeIdentifier = $VolumeIdentifier;
             $this.Datastore = $Datastore;
@@ -1585,8 +1576,8 @@
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'IsSwap')] [bool] $IsSwap, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VolumeIdentifier')] [string] $VolumeIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingsVMVolumeDatastore')] [string] $Datastore, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingsVMVolumeExistingVolume')] [string] $ExistingVolume, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeDatastore')] [string] $Datastore, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeExistingVolume')] [string] $ExistingVolume, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMVolume
         )
 
@@ -1611,7 +1602,7 @@
         [ZertoVPGSettingVMVolume[]] $Volumes;
   
  
-        ZertoVPGSettingVM([PSCustomObject] $Value) {
+        ZertoVPGSettingVM ([PSCustomObject] $Value) {
             $this.BootGroupIdentifier = $Value.BootGroupIdentifier; 
             $this.Journal = $Value.Journal; 
 
@@ -1622,7 +1613,7 @@
             $this.Volumes = @();
             $Value.Volumes | ForEach-Object { $this.Volumes += $_ };
         }    
-        ZertoVPGSettingVM([string] $BootGroupIdentifier, [ZertoVPGSettingJournal] $Journal, [ZertoVPGSettingVMNic[]] $VMNICs, `
+        ZertoVPGSettingVM ([string] $BootGroupIdentifier, [ZertoVPGSettingJournal] $Journal, [ZertoVPGSettingVMNic[]] $VMNICs, `
                         [ZertoVPGSettingVMRecovery] $VMRecovery, [string] $VmIdentifier, [ZertoVPGSettingVMVolume[]] $VMVolumes ) {
             $this.BootGroupIdentifier = $BootGroupIdentifier; 
             $this.Journal = $Journal; 
@@ -1812,7 +1803,7 @@
         
         Set-SSLCertByPass
 
-        if ( [String]::IsNullOrEmpty($ZertoServer) ) {
+        if ([String]::IsNullOrEmpty($ZertoServer) ) {
             throw "Missing Zerto Server"
         }
 
@@ -1821,7 +1812,7 @@
         $TypeJSON = "application/json"
         Write-Verbose $FullURL
 
-        if ( [String]::IsNullOrEmpty($ZertoUser) ) {
+        if ([String]::IsNullOrEmpty($ZertoUser) ) {
             $cred = Get-Credential -Message "Enter your Zerto credentials"
         } else {
             $cred = Get-Credential -Message "Enter your Zerto credentials" -UserName $ZertoUser
@@ -1899,7 +1890,6 @@
 #endregion
 
 #region Zerto Rest API
-
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoRESTAPIs {
@@ -1989,7 +1979,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
             
@@ -2166,7 +2156,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoAlertIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoAlertIdentifier)  ) {
             throw "Missing Zerto Alert Identifier"
         }
             
@@ -2196,7 +2186,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoAlertIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoAlertIdentifier)  ) {
             throw "Missing Zerto Alert Identifier"
         }
             
@@ -2365,7 +2355,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
             
@@ -2593,7 +2583,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -2680,7 +2670,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoServiceProfile)  ) {
+        if ([string]::IsNullOrEmpty($ZertoServiceProfile)  ) {
             throw "Missing Zerto ServciceProfile"
         }
 
@@ -2800,7 +2790,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -2856,7 +2846,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -2909,7 +2899,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -2962,7 +2952,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3015,7 +3005,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3068,7 +3058,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3101,10 +3091,10 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoHostIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoHostIdentifier)  ) {
             throw "Missing Zerto Host Identifier"
         }
 
@@ -3157,7 +3147,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3210,7 +3200,7 @@
             throw "Missing Zerto Authentication Token"
         }
         
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3241,7 +3231,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3272,7 +3262,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3303,7 +3293,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3334,7 +3324,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3386,7 +3376,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
 
@@ -3485,7 +3475,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoTaskIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoTaskIdentifier)  ) {
             throw "Missing Zerto Task Identifier"
         }
 
@@ -3542,10 +3532,10 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM name')] [string] $VMName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Status')] [ZertoVPGStatus] $Status, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Substatus')] [ZertoVPGSubstatus] $SubStatus, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Source Type')] [ZertoSourceType] $SourceType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Target Type')] [ZertoTargetType] $TargetType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Source Site')] [string] $SourceSite, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Target Site')] [string] $TargetSite, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Organization Name')] [string] $OrganizationName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Priority')] [ZertoVPGPriority] $Priority
         )
@@ -3558,19 +3548,19 @@
         }
         $FullURL = $baseURL + "vms"
         if ($VPGName -or $VMName -or $Status -ne $null -or $Substatus -ne $null -or `
-                $SourceType -ne $null -or $TargetType -ne $null -or $SourceSite -or $TargetSite -or $OrganizationName `
+                $ProtectedSiteType -ne $null -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or $RecoverySiteIdentifier -or $OrganizationName `
                 -or $Priority -ne $null) {
             $qs = [ordered] @{}
-            if ($VPGName)              { $qs.Add("vpgName", $VPGName) }
-            if ($VMName)               { $qs.Add("vmName", $VMName) }
-            if ($Status -ne $null)     { $qs.Add("status", $Status) }
-            if ($Substatus -ne $null)  { $qs.Add("substatus", $Substatus) }
-            if ($SourceType -ne $null) { $qs.Add("sourceType", $SourceType) }
-            if ($TargetType -ne $null) { $qs.Add("targetType", $TargetType) }
-            if ($SourceSite)           { $qs.Add("sourceSite", $SourceSite) }
-            if ($TargetSite)           { $qs.Add("targetSite", $TargetSite) }
-            if ($OrganizationName)     { $qs.Add("organizationName", $OrganizationName) }
-            if ($Priority -ne $null)   { $qs.Add("priority", $Priority) }
+            if ($VPGName)                     { $qs.Add("vpgName", $VPGName) }
+            if ($VMName)                      { $qs.Add("vmName", $VMName) }
+            if ($Status -ne $null)            { $qs.Add("status", $Status) }
+            if ($Substatus -ne $null)         { $qs.Add("substatus", $Substatus) }
+            if ($ProtectedSiteType -ne $null) { $qs.Add("protectedSiteType", $ProtectedSiteType) }
+            if ($RecoverySiteType -ne $null)  { $qs.Add("recoverySiteType", $RecoverySiteType) }
+            if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
+            if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
+            if ($OrganizationName)            { $qs.Add("organizationName", $OrganizationName) }
+            if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
 
             $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
         }
@@ -3600,7 +3590,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVMIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVMIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
 
@@ -3704,7 +3694,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
             throw "Missing Zerto VRA Identifier"
         }
             
@@ -3808,7 +3798,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
             throw "Missing Zerto VRA Identifier"
         }
             
@@ -3838,7 +3828,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
             throw "Missing Zerto VRA Identifier"
         }
             
@@ -3888,7 +3878,7 @@
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
-        if ( [string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
+        if ([string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
 
         $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -HostName $HostName
  
@@ -3897,9 +3887,9 @@
         $NetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $LocalSiteID -NetworkName $NetworkName
 
         #Validate IDs
-        if ( [string]::IsNullOrEmpty($DatastoreID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
-        if ( [string]::IsNullOrEmpty($HostID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
-        if ( [string]::IsNullOrEmpty($NetworkID)  ) { throw "Could not find  Network ID for $NetworkName " }
+        if ([string]::IsNullOrEmpty($DatastoreID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
+        if ([string]::IsNullOrEmpty($HostID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
+        if ([string]::IsNullOrEmpty($NetworkID)  ) { throw "Could not find  Network ID for $NetworkName " }
 
         $FullURL = $baseURL + "vras"  
         Write-Verbose $FullURL
@@ -3973,7 +3963,7 @@
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
-        if ( [string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
+        if ([string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
 
         $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier
         Write-Verbose $FullURL
@@ -4031,14 +4021,10 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Name')] [string] $VPGName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGStatus] $Status,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGSubStatus] $SubStatus,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Type')] [ZertoSourceType] $ProtectedSiteType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Type')] [ZertoSourceType] $RecoverySiteType, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Source Site Name')] [string] $SourceSite, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Target Site Name')] [string] $TargetSite, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Source Type')] [ZertoSourceType] $SourceType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Target Type')] [ZertoSourceType] $TargetType, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZOrg Name')] [string] $ZOrganizationName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZOrg Identifier')] [string] $ZOrgIdentifier, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Priority')] [string] $Priority, 
@@ -4056,8 +4042,7 @@
         $FullURL = $baseURL + "vpgs"
         if ($VPGName -or $Status -ne $null -or $SubStatus -ne $null -or $ProtectedSiteType -ne $null `
                 -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or `
-                $RecoverySiteIdentifier -or $SourceSite -or $TargetSite -or $SourceType -ne $null `
-                -or $TargetType -ne $null -or $ZOrganizationName -or $ZOrgIdentifier `
+                $RecoverySiteIdentifier -or $ZOrganizationName -or $ZOrgIdentifier `
                 -or $priority -ne $null -or $serviceProfileIdentifier -or $backupEnabled ) {
             $qs = [ordered] @{}
             if ($VPGName)                     { $qs.Add("Name", $VPGName) }
@@ -4067,10 +4052,6 @@
             if ($RecoverySiteType -ne $null)  { $qs.Add("RecoverySiteType", $RecoverySiteType) }
             if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
             if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
-            if ($SourceSite)                  { $qs.Add("SourceSite", $SourceSite) }
-            if ($TargetSite)                  { $qs.Add("TargetSite", $TargetSite) }
-            if ($SourceType -ne $null)        { $qs.Add("SourceType", $SourceType) }
-            if ($TargetType -ne $null)        { $qs.Add("TargetType", $TargetType) }
             if ($ZOrganizationName)           { $qs.Add("ZOrganizationName", $ZOrganizationName) }
             if ($ZOrgIdentifier)              { $qs.Add("ZOrgIdentifier", $ZOrgIdentifier) }
             if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
@@ -4105,7 +4086,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -4136,7 +4117,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
         
@@ -4194,7 +4175,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -4280,7 +4261,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -4520,8 +4501,8 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($VPGName)  ) { throw "Missing Zerto VPG Name" }
-        if ( [string]::IsNullOrEmpty($Priority)  ) { throw "Missing Zerto Priority" }
+        if ([string]::IsNullOrEmpty($VPGName)  ) { throw "Missing Zerto VPG Name" }
+        if ([string]::IsNullOrEmpty($Priority)  ) { throw "Missing Zerto Priority" }
 
         #Validate Parameter Sets
         if ($FailoverNetwork -and $FailoverNetworkID) {throw "Cannot specify both Failover Network and Failover Network ID"}
@@ -4551,37 +4532,37 @@
 
         #Get Identifiers
         $LocalSiteID = Get-ZertoLocalSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
-        if ( [string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
+        if ([string]::IsNullOrEmpty($LocalSiteID)  ) { throw "Could not find Local Site ID" }
 
         $RecoverySiteID = Get-ZertoVirtualizationSiteID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                      -ZertoSiteName $RecoverySiteName
-        if ( [string]::IsNullOrEmpty($RecoverySiteID)  ) { throw "Could not find Recovery Site ID for $RecoverySiteName " }
+        if ([string]::IsNullOrEmpty($RecoverySiteID)  ) { throw "Could not find Recovery Site ID for $RecoverySiteName " }
         
         #Get FailoverNeworkID if not specified
         if ($FailoverNetwork ) {
             $FailoverNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken `
                                                         -ZertoSiteIdentifier $RecoverySiteID -NetworkName $FailoverNetwork
-            if ( [string]::IsNullOrEmpty($FailoverNetworkID)  ) { throw "Could not find Failover Network ID for $FailoverNetwork " }
+            if ([string]::IsNullOrEmpty($FailoverNetworkID)  ) { throw "Could not find Failover Network ID for $FailoverNetwork " }
             if ( $FailoverNetworkID.Count -gt 1 ) { throw "More than one Failover Network ID has the name $FailoverNetwork " }
         }
         #Get FailoverNeworkID if not specified
         if ($TestNetwork ) {
             $TestNetworkID = Get-ZertoSiteNetworkID -ZertoServer $ZertoServer -ZertoPort $ZertoPort  -ZertoToken $ZertoToken `
                                                      -ZertoSiteIdentifier $RecoverySiteID -NetworkName $TestNetwork
-            if ( [string]::IsNullOrEmpty($TestNetworkID)  ) { throw "Could not find Test Network ID for $TestNetwork " }
+            if ([string]::IsNullOrEmpty($TestNetworkID)  ) { throw "Could not find Test Network ID for $TestNetwork " }
             if ( $TestNetworkID.Count -gt 1 ) { throw "More than one Test Network ID has the name $TestNetwork " }
         }
 
         if ($ClusterName) {
             $ClusterID = Get-ZertoSiteHostClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                      -ZertoSiteIdentifier $RecoverySiteID -HostClusterName $ClusterName
-            if ( [string]::IsNullOrEmpty($ClusterID)  ) { throw "Could not find Cluster ID for $ClusterName " }
+            if ([string]::IsNullOrEmpty($ClusterID)  ) { throw "Could not find Cluster ID for $ClusterName " }
             $HostID = $null
         } elseif ($HostName) {
             $ClusterID = $null
             $HostID = Get-ZertoSiteHostID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                      -ZertoSiteIdentifier $RecoverySiteID -HostName $HostName
-            if ( [string]::IsNullOrEmpty($HostID)  ) { throw "Could not find Host ID for $HostName " }
+            if ([string]::IsNullOrEmpty($HostID)  ) { throw "Could not find Host ID for $HostName " }
         }
 
         #BROKEN
@@ -4592,13 +4573,13 @@
         if ($DatastoreName) {
             $DatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreName $DatastoreName
-            if ( [string]::IsNullOrEmpty($DatastoreID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
+            if ([string]::IsNullOrEmpty($DatastoreID)  ) { throw "Could not find Datastore ID for $DatastoreName " }
             $DatastoreClusterID = $null
         } elseif ($DatastoreClusterName) {
             $DatastoreID = $null
             $DatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                     -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName $DatastoreclusterName
-            if ( [string]::IsNullOrEmpty($DatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $DatastoreclusterName " }
+            if ([string]::IsNullOrEmpty($DatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $DatastoreclusterName " }
         }
 
         if (-NOT $JournalUseDefault) {
@@ -4606,12 +4587,12 @@
                 $JournalDatastoreID = Get-ZertoSiteDatastoreID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                         -ZertoSiteIdentifier $RecoverySiteID -DatastoreName  $JournalDatastoreName
                 $JournalDatastoreClusterID = $null
-                if ( [string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Datastore ID for $JournalDatastoreName " }
+                if ([string]::IsNullOrEmpty($JournalDatastoreID)  ) { throw "Could not find Datastore ID for $JournalDatastoreName " }
             } elseif ($JournalDatastoreClusterName) {
                 $JournalDatastoreID = $null
                 $JournalDatastoreClusterID = Get-ZertoSiteDatastoreClusterID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                         -ZertoSiteIdentifier $RecoverySiteID -DatastoreClusterName  $JournalDatastoreClusterName
-                if ( [string]::IsNullOrEmpty($JournalDatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $JournalDatastoreclusterName " }
+                if ([string]::IsNullOrEmpty($JournalDatastoreClusterID)  ) { throw "Could not find Datastore Cluster ID for $JournalDatastoreclusterName " }
             }
         }
 
@@ -4619,7 +4600,7 @@
         if ($Folder ) {
             $FolderID = Get-ZertoSiteFolderID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                          -ZertoSiteIdentifier $RecoverySiteID -FolderName $Folder
-            if ( [string]::IsNullOrEmpty($FolderID)  ) { throw "Could not find Folder ID for $Folder " }
+            if ([string]::IsNullOrEmpty($FolderID)  ) { throw "Could not find Folder ID for $Folder " }
             if ( $FolderID.Count -gt 1 ) { throw "More than one Folder ID has the name $Folder " }
         }
 
@@ -4924,7 +4905,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -4962,7 +4943,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -4994,7 +4975,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -5032,7 +5013,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -5068,7 +5049,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -5112,7 +5093,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG  Identifier"
         }
 
@@ -5143,7 +5124,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG  Identifier"
         }
 
@@ -5175,7 +5156,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -5215,7 +5196,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
 
@@ -5252,7 +5233,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG  Identifier"
         }
 
@@ -5283,7 +5264,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG  Identifier"
         }
 
@@ -5343,7 +5324,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5394,7 +5375,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5425,7 +5406,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5456,7 +5437,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5488,7 +5469,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5521,7 +5502,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5552,7 +5533,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5583,7 +5564,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5614,7 +5595,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5645,7 +5626,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5677,7 +5658,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5710,7 +5691,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5741,7 +5722,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5773,7 +5754,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5806,7 +5787,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5837,7 +5818,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5869,7 +5850,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5902,7 +5883,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5934,7 +5915,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5967,7 +5948,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -5998,7 +5979,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6029,7 +6010,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6061,7 +6042,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6094,7 +6075,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6125,7 +6106,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6157,7 +6138,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6190,7 +6171,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6221,7 +6202,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6253,10 +6234,10 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
 
@@ -6289,7 +6270,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6323,10 +6304,10 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
 
@@ -6358,7 +6339,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
 
@@ -6392,10 +6373,10 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
 
@@ -6428,13 +6409,13 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoNicIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoNicIdentifier)  ) {
             throw "Missing Zerto NIC Identifier"
         }
         $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/vms/" + $ZertoVmIdentifier + "/nics/" + $ZertoNicIdentifier
@@ -6466,13 +6447,13 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoNicIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoNicIdentifier)  ) {
             throw "Missing Zerto NIC Identifier"
         }
         $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier + "/vms/" + $ZertoVmIdentifier + "/nics/" + $ZertoNicIdentifier
@@ -6503,10 +6484,10 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
 
@@ -6539,13 +6520,13 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
             throw "Missing Zerto VPG Settings Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVmIdentifier)  ) {
             throw "Missing Zerto VM Identifier"
         }
-        if ( [string]::IsNullOrEmpty($ZertoVolumeIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoVolumeIdentifier)  ) {
             throw "Missing Zerto Volume Identifier"
         }
 
@@ -6606,7 +6587,7 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ( [string]::IsNullOrEmpty($ZertoOrgIdentifier)  ) {
+        if ([string]::IsNullOrEmpty($ZertoOrgIdentifier)  ) {
             throw "Missing Zerto Org Identifier"
         }
         

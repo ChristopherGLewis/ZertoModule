@@ -11,8 +11,8 @@
     <CmdletObject verb="Add" noun="ZertoVPG">
       <Name>Add-ZertoVPG</Name>
       <Syntax>
-        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -VPGName &lt;String&gt; -Priority &lt;ZertoVPGPriority&gt; -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] [-FailoverNetwork &lt;String&gt;] [-FailoverNetworkID &lt;String&gt;] [-TestNetwork &lt;String&gt;] [-TestNetworkID &lt;String&gt;] [-DatastoreName &lt;String&gt;] [-DatastoreClusterName &lt;String&gt;] [-JournalUseDefault &lt;Boolean&gt;] [-JournalDatastoreName &lt;String&gt;] [-JournalDatastoreClusterName &lt;String&gt;] [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] -Folder &lt;String&gt; -FolderID &lt;String&gt; -VmNames &lt;String[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
-        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -VPGName &lt;String&gt; -Priority &lt;ZertoVPGPriority&gt; -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] [-FailoverNetwork &lt;String&gt;] [-FailoverNetworkID &lt;String&gt;] [-TestNetwork &lt;String&gt;] [-TestNetworkID &lt;String&gt;] [-DatastoreName &lt;String&gt;] [-DatastoreClusterName &lt;String&gt;] [-JournalUseDefault &lt;Boolean&gt;] [-JournalDatastoreName &lt;String&gt;] [-JournalDatastoreClusterName &lt;String&gt;] [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] -Folder &lt;String&gt; -FolderID &lt;String&gt; -VPGVirtualMachines &lt;VPGVirtualMachine[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
+        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -VPGName &lt;String&gt; [-Priority &lt;ZertoVPGPriority&gt;] -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] [-FailoverNetwork &lt;String&gt;] [-FailoverNetworkID &lt;String&gt;] [-TestNetwork &lt;String&gt;] [-TestNetworkID &lt;String&gt;] [-DatastoreName &lt;String&gt;] [-DatastoreClusterName &lt;String&gt;] [-JournalUseDefault &lt;Boolean&gt;] [-JournalDatastoreName &lt;String&gt;] [-JournalDatastoreClusterName &lt;String&gt;] [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] [-Folder &lt;String&gt;] [-FolderID &lt;String&gt;] -VmNames &lt;String[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
+        <string>Add-ZertoVPG [-ZertoServer &lt;String&gt;] [-ZertoPort &lt;String&gt;] [-ZertoToken &lt;Hashtable&gt;] -VPGName &lt;String&gt; [-Priority &lt;ZertoVPGPriority&gt;] -RecoverySiteName &lt;String&gt; [-RPOAlertInSeconds &lt;Int32&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-ClusterName &lt;String&gt;] [-HostName &lt;String&gt;] [-FailoverNetwork &lt;String&gt;] [-FailoverNetworkID &lt;String&gt;] [-TestNetwork &lt;String&gt;] [-TestNetworkID &lt;String&gt;] [-DatastoreName &lt;String&gt;] [-DatastoreClusterName &lt;String&gt;] [-JournalUseDefault &lt;Boolean&gt;] [-JournalDatastoreName &lt;String&gt;] [-JournalDatastoreClusterName &lt;String&gt;] [-JournalHistoryInHours &lt;Int32&gt;] [-JournalHardLimitMB &lt;Int32&gt;] [-JournalWarningThresholdMB &lt;Int32&gt;] [-Folder &lt;String&gt;] [-FolderID &lt;String&gt;] -VPGVirtualMachines &lt;VPGVirtualMachine[]&gt; [-VPGCommit &lt;Boolean&gt;] [-DumpJson]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Adds a new Zerto VPG </Synopsis>
@@ -70,7 +70,7 @@
           <Description>VPG Name</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>Priority</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -195,7 +195,7 @@
           <Description>Journal Warning Threshold MB</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>Folder</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -205,7 +205,7 @@
           <Description>vCenter Folder</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>FolderID</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -454,6 +454,82 @@ Add-ZertoVPG -ZertoToken $ztoken -Priority Low -Verbose `
           <Output />
         </Example>
       </Examples>
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="Add" noun="ZertoVPGSettingVM">
+      <Name>Add-ZertoVPGSettingVM</Name>
+      <Syntax>
+        <string>Add-ZertoVPGSettingVM [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-ZertoVpgSettingsIdentifier] &lt;String&gt; [-ZertoVPGSettingVM] &lt;ZertoVPGSettingVM&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Adds a new ZertoVPG Settings VM to a VPG Settings</Synopsis>
+        <Description>Adds a new ZertoVPG Settings VM to a VPG Settings given a VPG Settings ID and a VPG Settings VM object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken ZertoVpgSettingsIdentifier ZertoVPGSettingVM Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+          <Name>ZertoServer</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+          <Name>ZertoPort</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Hashtable" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="true" pos="2" globbing="false">
+          <Name>ZertoToken</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+          <Name>ZertoVpgSettingsIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Settings Indentifier</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVM" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+          <Name>ZertoVPGSettingVM</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Settings VM Object</Description>
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
       <RelatedLinks />
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
       <Publish>false</Publish>
@@ -4881,7 +4957,7 @@ the end of the time sets the time to UTC.
     <CmdletObject verb="Get" noun="ZertoVMs">
       <Name>Get-ZertoVMs</Name>
       <Syntax>
-        <string>Get-ZertoVMs [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [[-VPGName] &lt;String&gt;] [[-VMName] &lt;String&gt;] [[-Status] &lt;ZertoVPGStatus&gt;] [[-SubStatus] &lt;ZertoVPGSubstatus&gt;] [[-SourceType] &lt;ZertoSourceType&gt;] [[-TargetType] &lt;ZertoTargetType&gt;] [[-SourceSite] &lt;String&gt;] [[-TargetSite] &lt;String&gt;] [[-OrganizationName] &lt;String&gt;] [[-Priority] &lt;ZertoVPGPriority&gt;]</string>
+        <string>Get-ZertoVMs [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [[-VPGName] &lt;String&gt;] [[-VMName] &lt;String&gt;] [[-Status] &lt;ZertoVPGStatus&gt;] [[-SubStatus] &lt;ZertoVPGSubstatus&gt;] [[-ProtectedSiteType] &lt;ZertoProtectedSiteType&gt;] [[-RecoverySiteType] &lt;ZertoRecoverySiteType&gt;] [[-ProtectedSiteIdentifier] &lt;String&gt;] [[-RecoverySiteIdentifier] &lt;String&gt;] [[-OrganizationName] &lt;String&gt;] [[-Priority] &lt;ZertoVPGPriority&gt;]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Returns all Zerto VMs</Synopsis>
@@ -4895,7 +4971,7 @@ the end of the time sets the time to UTC.
         <ReturnTypeDescription />
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName VMName Status SubStatus SourceType TargetType SourceSite TargetSite OrganizationName Priority Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName VMName Status SubStatus ProtectedSiteType RecoverySiteType ProtectedSiteIdentifier RecoverySiteIdentifier OrganizationName Priority Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
@@ -4968,44 +5044,44 @@ the end of the time sets the time to UTC.
           <Description>Zerto VPG Substatus</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoSourceType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
-          <Name>SourceType</Name>
+        <ParameterDescription type="ZertoProtectedSiteType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
+          <Name>ProtectedSiteType</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Zerto Source Type</Description>
+          <Description>Zerto Protected Site Type</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoTargetType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
-          <Name>TargetType</Name>
+        <ParameterDescription type="ZertoRecoverySiteType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="8" globbing="false">
+          <Name>RecoverySiteType</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Zerto Target Type</Description>
+          <Description>Zerto Recovery Site Type</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="9" globbing="false">
-          <Name>SourceSite</Name>
+          <Name>ProtectedSiteIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Zerto Source Site name</Description>
+          <Description>Zerto Protected Site identifier</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
-          <Name>TargetSite</Name>
+          <Name>RecoverySiteIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
             <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
           </Attributes>
           <Aliases />
-          <Description>Zerto Target Site Name</Description>
+          <Description>Zerto Recovery Site identifier</Description>
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
@@ -5781,7 +5857,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="Get" noun="ZertoVPGs">
       <Name>Get-ZertoVPGs</Name>
       <Syntax>
-        <string>Get-ZertoVPGs [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [[-VPGName] &lt;String&gt;] [[-Status] &lt;ZertoVPGStatus&gt;] [[-SubStatus] &lt;ZertoVPGSubstatus&gt;] [[-ProtectedSiteType] &lt;ZertoSourceType&gt;] [[-RecoverySiteType] &lt;ZertoSourceType&gt;] [[-ProtectedSiteIdentifier] &lt;String&gt;] [[-RecoverySiteIdentifier] &lt;String&gt;] [[-SourceSite] &lt;String&gt;] [[-TargetSite] &lt;String&gt;] [[-SourceType] &lt;ZertoSourceType&gt;] [[-TargetType] &lt;ZertoSourceType&gt;] [[-ZOrganizationName] &lt;String&gt;] [[-ZOrgIdentifier] &lt;String&gt;] [[-Priority] &lt;String&gt;] [[-ServiceProfileIdentifier] &lt;String&gt;] [[-BackupEnabled] &lt;Boolean&gt;]</string>
+        <string>Get-ZertoVPGs [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [[-VPGName] &lt;String&gt;] [[-Status] &lt;ZertoVPGStatus&gt;] [[-SubStatus] &lt;ZertoVPGSubstatus&gt;] [[-ProtectedSiteType] &lt;ZertoProtectedSiteType&gt;] [[-RecoverySiteType] &lt;ZertoRecoverySiteType&gt;] [[-ProtectedSiteIdentifier] &lt;String&gt;] [[-RecoverySiteIdentifier] &lt;String&gt;] [[-ZOrganizationName] &lt;String&gt;] [[-ZOrgIdentifier] &lt;String&gt;] [[-Priority] &lt;String&gt;] [[-ServiceProfileIdentifier] &lt;String&gt;] [[-BackupEnabled] &lt;Boolean&gt;]</string>
       </Syntax>
       <GeneralHelp>
         <Synopsis>Returns all Zerto VPGs</Synopsis>
@@ -5795,7 +5871,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <ReturnTypeDescription>ZertoVPG Custom Objects</ReturnTypeDescription>
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName Status SubStatus ProtectedSiteType RecoverySiteType ProtectedSiteIdentifier RecoverySiteIdentifier SourceSite TargetSite SourceType TargetType ZOrganizationName ZOrgIdentifier Priority ServiceProfileIdentifier BackupEnabled Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken VPGName Status SubStatus ProtectedSiteType RecoverySiteType ProtectedSiteIdentifier RecoverySiteIdentifier ZOrganizationName ZOrgIdentifier Priority ServiceProfileIdentifier BackupEnabled Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
@@ -5828,6 +5904,16 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</Description>
           <DefaultValue />
         </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+          <Name>VPGName</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Name </Description>
+          <DefaultValue />
+        </ParameterDescription>
         <ParameterDescription type="ZertoVPGStatus" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
           <Name>Status</Name>
           <Attributes>
@@ -5848,7 +5934,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Substatus</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoSourceType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
+        <ParameterDescription type="ZertoProtectedSiteType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="6" globbing="false">
           <Name>ProtectedSiteType</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5858,7 +5944,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Protected Site type</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoSourceType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
+        <ParameterDescription type="ZertoRecoverySiteType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="7" globbing="false">
           <Name>RecoverySiteType</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5889,46 +5975,6 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <DefaultValue />
         </ParameterDescription>
         <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="10" globbing="false">
-          <Name>SourceSite</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto Source Site Name </Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
-          <Name>TargetSite</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto Target Site Name</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="ZertoSourceType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
-          <Name>SourceType</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto Source Site Type</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="ZertoSourceType" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
-          <Name>TargetType</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto Target Site Type</Description>
-          <DefaultValue />
-        </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="14" globbing="false">
           <Name>ZOrganizationName</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5938,7 +5984,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Organization Name</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="15" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="11" globbing="false">
           <Name>ZOrgIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5948,7 +5994,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Organization Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="16" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="12" globbing="false">
           <Name>Priority</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5958,7 +6004,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Priority </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="17" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="13" globbing="false">
           <Name>ServiceProfileIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5968,7 +6014,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Zerto Service Profile Identifier</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="18" globbing="false">
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="14" globbing="false">
           <Name>BackupEnabled</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -5978,22 +6024,11 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>Is Backup Enabled? </Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
-          <Name>VPGName</Name>
-          <Attributes>
-            <string>System.Management.Automation.ParameterAttribute</string>
-            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
-          </Attributes>
-          <Aliases />
-          <Description>Zerto VPG Name </Description>
-          <DefaultValue />
-        </ParameterDescription>
       </Parameters>
       <Examples>
         <Example>
           <Name>Return all VPGs</Name>
-          <Cmd>$ZertoAuth = Get-ZertoAuthToken 
-Get-ZertoVPGs -ZertoToken $ZertoAuth</Cmd>
+          <Cmd>Get-ZertoVPGs </Cmd>
           <Description>Simple call to return all VPGs</Description>
           <Output>
 ActiveProcessesApi       : @{RunningFailOverTestApi=}
@@ -8999,7 +9034,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="New" noun="ZertoVPGSettingBasic">
       <Name>New-ZertoVPGSettingBasic</Name>
       <Syntax>
-        <string>New-ZertoVPGSettingBasic -JournalHistoryInHours &lt;Int32&gt; -Name &lt;String&gt; -Priority &lt;ZertoVPGPriority&gt; -ProtectedSiteIdentifier &lt;String&gt; -RecoverySiteIdentifier &lt;String&gt; -RpoInSeconds &lt;Int32&gt; -ServiceProfileIdentifier &lt;String&gt; -TestIntervalInMinutes &lt;Int32&gt; -UseWanCompression &lt;Boolean&gt; -ZorgIdentifier &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingBasic -Name &lt;String&gt; -ProtectedSiteIdentifier &lt;String&gt; -RecoverySiteIdentifier &lt;String&gt; [-JournalHistoryInHours &lt;Int32&gt;] [-Priority &lt;ZertoVPGPriority&gt;] [-RpoInSeconds &lt;Int32&gt;] [-ServiceProfileIdentifier &lt;String&gt;] [-TestIntervalInMinutes &lt;Int32&gt;] [-UseWanCompression &lt;Boolean&gt;] [-ZorgIdentifier &lt;String&gt;]</string>
         <string>New-ZertoVPGSettingBasic -VPGSettingBasic &lt;PSObject&gt;</string>
       </Syntax>
       <GeneralHelp>
@@ -9014,11 +9049,11 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <ReturnTypeDescription />
       </GeneralHelp>
       <ParamSets>
-        <CommandParameterSetInfo2 Name="Individual" Params="JournalHistoryInHours Name Priority ProtectedSiteIdentifier RecoverySiteIdentifier RpoInSeconds ServiceProfileIdentifier TestIntervalInMinutes UseWanCompression ZorgIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="Individual" Params="Name ProtectedSiteIdentifier RecoverySiteIdentifier JournalHistoryInHours Priority RpoInSeconds ServiceProfileIdentifier TestIntervalInMinutes UseWanCompression ZorgIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
         <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingBasic Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>JournalHistoryInHours</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9038,7 +9073,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="ZertoVPGPriority" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>Priority</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9068,7 +9103,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>RpoInSeconds</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9078,7 +9113,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ServiceProfileIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9088,7 +9123,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>TestIntervalInMinutes</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9098,7 +9133,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>UseWanCompression</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9108,7 +9143,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ZorgIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9273,7 +9308,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="New" noun="ZertoVPGSettingJournalLimitation">
       <Name>New-ZertoVPGSettingJournalLimitation</Name>
       <Syntax>
-        <string>New-ZertoVPGSettingJournalLimitation -HardLimitInMB &lt;Int32&gt; -HardLimitInPercent &lt;Int32&gt; -WarningThresholdInMB &lt;Int32&gt; -WarningThresholdInPercent &lt;Int32&gt;</string>
+        <string>New-ZertoVPGSettingJournalLimitation [-HardLimitInMB &lt;Int32&gt;] [-HardLimitInPercent &lt;Int32&gt;] [-WarningThresholdInMB &lt;Int32&gt;] [-WarningThresholdInPercent &lt;Int32&gt;]</string>
         <string>New-ZertoVPGSettingJournalLimitation -VPGSettingJournalLimitation &lt;PSObject&gt;</string>
       </Syntax>
       <GeneralHelp>
@@ -9292,7 +9327,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingJournalLimitation Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>HardLimitInMB</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9302,7 +9337,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>VPG Settings Journal Limitation Hard Limit in MB</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>HardLimitInPercent</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9312,7 +9347,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>VPG Settings Journal Limitation Hard Limit in %</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>WarningThresholdInMB</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9322,7 +9357,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description>VPG Settings Journal Limitation Warning Threshold in MB</Description>
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="Int32" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="Int32" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>WarningThresholdInPercent</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -9723,6 +9758,708 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           </Attributes>
           <Aliases />
           <Description>VPG Settings Scripting object</Description>
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVM">
+      <Name>New-ZertoVPGSettingVM</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVM -BootGroupIdentifier &lt;String&gt; -Nics &lt;ZertoVPGSettingVMNic[]&gt; -Recovery &lt;ZertoVPGSettingVMRecovery&gt; -VmIdentifier &lt;String&gt; -Volumes &lt;ZertoVPGSettingVMVolume[]&gt;</string>
+        <string>New-ZertoVPGSettingVM -VPGSettingVM &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="BootGroupIdentifier Nics Recovery VmIdentifier Volumes Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVM Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>BootGroupIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMNic[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Nics</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMRecovery" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Recovery</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VmIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMVolume[]" varLen="true" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Volumes</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVM</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMNic">
+      <Name>New-ZertoVPGSettingVMNic</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMNic -NicIdentifier &lt;String&gt; -VMNetworkFailover &lt;ZertoVPGSettingVMNicNetwork&gt; -VMNetworkTest &lt;ZertoVPGSettingVMNicNetwork&gt;</string>
+        <string>New-ZertoVPGSettingVMNic -VPGSettingVMNic &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM NIC object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM NIC object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="NicIdentifier VMNetworkFailover VMNetworkTest Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMNic Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>NicIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMNicNetwork" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VMNetworkFailover</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMNicNetwork" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VMNetworkTest</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMNic</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMNicNetwork">
+      <Name>New-ZertoVPGSettingVMNicNetwork</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMNicNetwork -Hypervisor &lt;ZertoVPGSettingVMNicNetworkHypervisor&gt;</string>
+        <string>New-ZertoVPGSettingVMNicNetwork -VPGSettingVMNicNetwork &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM NIC object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM NIC object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="Hypervisor Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMNicNetwork Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="ZertoVPGSettingVMNicNetworkHypervisor" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Hypervisor</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMNicNetwork</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMNicNetworkHypervisor">
+      <Name>New-ZertoVPGSettingVMNicNetworkHypervisor</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMNicNetworkHypervisor -DnsSuffix &lt;String&gt; -IpConfig &lt;ZertoVPGSettingVMNicNetworkHypervisorIpConfig&gt; -NetworkIdentifier &lt;String&gt; -ShouldReplaceMacAddress &lt;Boolean&gt;</string>
+        <string>New-ZertoVPGSettingVMNicNetworkHypervisor -VPGSettingVMNicNetworkHypervisor &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM NIC Hypervisor object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM NIC Hypervisor object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="DnsSuffix IpConfig NetworkIdentifier ShouldReplaceMacAddress Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMNicNetworkHypervisor Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DnsSuffix</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVMNicNetworkHypervisorIpConfig" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>IpConfig</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>NetworkIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ShouldReplaceMacAddress</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMNicNetworkHypervisor</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMNicNetworkHypervisorIpConfig">
+      <Name>New-ZertoVPGSettingVMNicNetworkHypervisorIpConfig</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMNicNetworkHypervisorIpConfig [-IsDhcp &lt;Boolean&gt;] -StaticIp &lt;String&gt; -SubnetMask &lt;String&gt; -Gateway &lt;String&gt; -PrimaryDNS &lt;String&gt; -SecondaryDns &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMNicNetworkHypervisorIpConfig -VPGSettingVMNicNetworkHypervisorIpConfig &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM NIC Hypervisor IpConfig object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM NIC Hypervisor IpConfig object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="IsDhcp StaticIp SubnetMask Gateway PrimaryDNS SecondaryDns Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMNicNetworkHypervisorIpConfig Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="Boolean" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>IsDhcp</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>StaticIp</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>SubnetMask</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Gateway</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>PrimaryDNS</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>SecondaryDns</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMNicNetworkHypervisorIpConfig</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMRecovery">
+      <Name>New-ZertoVPGSettingVMRecovery</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMRecovery -DatastoreClusterIdentifier &lt;String&gt; -DatastoreIdentifier &lt;String&gt; -FolderIdentifier &lt;String&gt; -HostClusterIdentifier &lt;String&gt; -HostIdentifier &lt;String&gt; -ResourcePoolIdentifier &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMRecovery -VPGSettingVMRecovery &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM Recovery object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM Recovery object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="DatastoreClusterIdentifier DatastoreIdentifier FolderIdentifier HostClusterIdentifier HostIdentifier ResourcePoolIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMRecovery Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DatastoreClusterIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DatastoreIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>FolderIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>HostClusterIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>HostIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ResourcePoolIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMRecovery</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMVolume">
+      <Name>New-ZertoVPGSettingVMVolume</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMVolume -IsSwap &lt;Boolean&gt; -VolumeIdentifier &lt;String&gt; -Datastore &lt;String&gt; -ExistingVolume &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMVolume -VPGSettingVMVolume &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM Volume object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM Volume object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="IsSwap VolumeIdentifier Datastore ExistingVolume Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMVolume Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>IsSwap</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VolumeIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Datastore</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ExistingVolume</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMVolume</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMVolumeDatastore">
+      <Name>New-ZertoVPGSettingVMVolumeDatastore</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMVolumeDatastore -IsThin &lt;Boolean&gt; -DatastoreClusterIdentifier &lt;String&gt; -DatastoreIdentifier &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMVolumeDatastore -VPGSettingVMVolumeDatastore &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM Volume Datastore object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM Volume Datastore object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="IsThin DatastoreClusterIdentifier DatastoreIdentifier Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMVolumeDatastore Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="Boolean" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>IsThin</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DatastoreClusterIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DatastoreIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMVolumeDatastore</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="New" noun="ZertoVPGSettingVMVolumeExistingVolume">
+      <Name>New-ZertoVPGSettingVMVolumeExistingVolume</Name>
+      <Syntax>
+        <string>New-ZertoVPGSettingVMVolumeExistingVolume -DatastoreIdentifier &lt;String&gt; -ExistingVmIdentifier &lt;String&gt; -Mode &lt;String&gt; -Path &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMVolumeExistingVolume -VPGSettingVMVolumeExistingVolume &lt;PSObject&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Creates a new Zerto VPG Setting VM Volume ExistingVolume object</Synopsis>
+        <Description>Creates a new Zerto VPG Setting VM Volume ExistingVolume object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="Individual" Params="DatastoreIdentifier ExistingVmIdentifier Mode Path Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+        <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMVolumeExistingVolume Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>DatastoreIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>ExistingVmIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Mode</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>Path</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="PSObject" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+          <Name>VPGSettingVMVolumeExistingVolume</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description />
           <DefaultValue />
         </ParameterDescription>
       </Parameters>
@@ -11267,8 +12004,8 @@ Version                    : 5.0.0</Cmd>
         <string>Set-ZertoVPGSettingRecovery [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-ZertoVpgSettingsIdentifier] &lt;String&gt; [-ZertoVPGSettingRecovery] &lt;ZertoVPGSettingRecovery&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis />
-        <Description />
+        <Synopsis>Sets a Zerto VPG Setting Recovery object </Synopsis>
+        <Description>Sets a Zerto VPG Setting Recovery object given a Zerto VPG Settings Identifier and a Zerto VPG Settings Recovery object</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -11405,6 +12142,92 @@ Version                    : 5.0.0</Cmd>
           </Attributes>
           <Aliases />
           <Description>Zerto VPG Settings Scripting object</Description>
+          <DefaultValue />
+        </ParameterDescription>
+      </Parameters>
+      <Examples />
+      <RelatedLinks />
+      <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
+      <Publish>false</Publish>
+    </CmdletObject>
+    <CmdletObject verb="Set" noun="ZertoVPGSettingVM">
+      <Name>Set-ZertoVPGSettingVM</Name>
+      <Syntax>
+        <string>Set-ZertoVPGSettingVM [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-ZertoVpgSettingsIdentifier] &lt;String&gt; [-ZertoVPGSettingVMID] &lt;String&gt; [-ZertoVPGSettingVM] &lt;ZertoVPGSettingVM&gt;</string>
+      </Syntax>
+      <GeneralHelp>
+        <Synopsis>Sets a Zerto VPG Setting VM object</Synopsis>
+        <Description>Sets a Zerto VPG Setting VM object given a Zerto VPG Settings Identifier and a Zerto VPG Settings VM object</Description>
+        <Notes />
+        <InputType />
+        <InputUrl />
+        <InputTypeDescription />
+        <ReturnType />
+        <ReturnUrl />
+        <ReturnTypeDescription />
+      </GeneralHelp>
+      <ParamSets>
+        <CommandParameterSetInfo2 Name="__AllParameterSets" Params="ZertoServer ZertoPort ZertoToken ZertoVpgSettingsIdentifier ZertoVPGSettingVMID ZertoVPGSettingVM Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
+      </ParamSets>
+      <Parameters>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="0" globbing="false">
+          <Name>ZertoServer</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto RestAPI URL server name. Can be read from $Env:ZertoServer.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="1" globbing="false">
+          <Name>ZertoPort</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto RestAPI URL Port. Can be read from $Env:ZertoPort.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="Hashtable" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="true" pipeProp="false" isPos="true" pos="2" globbing="false">
+          <Name>ZertoToken</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto token from Get-ZertoAuthToken. Can be read from $Env:ZertoToken.</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="3" globbing="false">
+          <Name>ZertoVpgSettingsIdentifier</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Settings Identifier</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="4" globbing="false">
+          <Name>ZertoVPGSettingVMID</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Settings VM ID</Description>
+          <DefaultValue />
+        </ParameterDescription>
+        <ParameterDescription type="ZertoVPGSettingVM" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="true" pos="5" globbing="false">
+          <Name>ZertoVPGSettingVM</Name>
+          <Attributes>
+            <string>System.Management.Automation.ParameterAttribute</string>
+            <string>System.Management.Automation.ArgumentTypeConverterAttribute</string>
+          </Attributes>
+          <Aliases />
+          <Description>Zerto VPG Settings VM object</Description>
           <DefaultValue />
         </ParameterDescription>
       </Parameters>

@@ -6705,7 +6705,7 @@
 $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `
                       'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
 
-$Functions = @( ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
+$Functions = @( ( Get-Content $MyInvocation.MyCommand.Path | ForEach-Object {$_.trim()} | `
                                          Where-Object { $_ -imatch "^Function *" } | Sort-Object | ForEach-Object {  ($_ -split "\s",3)[1] } | `
                                          Where-Object {$_ -notin $PrivateFunctions} ) )
 

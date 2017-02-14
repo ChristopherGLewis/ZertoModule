@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.9.8' 
-$ReleaseNotes = 'Updated several VPGSettings commands'
+﻿$ModuleVersion = '0.9.9' 
+$ReleaseNotes = 'Fixed issue with auto generating function list when module is installed via Install-Module'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

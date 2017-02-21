@@ -3,6 +3,7 @@
   <Name>ZertoModule</Name>
   <Version>1.0</Version>
   <Description>Zerto REST API Powershell Wrapping module</Description>
+  <ModulePath>C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1</ModulePath>
   <HasManifest>false</HasManifest>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />
@@ -10148,7 +10149,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
     <CmdletObject verb="New" noun="ZertoVPGSettingVMRecovery">
       <Name>New-ZertoVPGSettingVMRecovery</Name>
       <Syntax>
-        <string>New-ZertoVPGSettingVMRecovery -DatastoreClusterIdentifier &lt;String&gt; -DatastoreIdentifier &lt;String&gt; -FolderIdentifier &lt;String&gt; -HostClusterIdentifier &lt;String&gt; -HostIdentifier &lt;String&gt; -ResourcePoolIdentifier &lt;String&gt;</string>
+        <string>New-ZertoVPGSettingVMRecovery [-DatastoreClusterIdentifier &lt;String&gt;] [-DatastoreIdentifier &lt;String&gt;] [-FolderIdentifier &lt;String&gt;] [-HostClusterIdentifier &lt;String&gt;] [-HostIdentifier &lt;String&gt;] [-ResourcePoolIdentifier &lt;String&gt;]</string>
         <string>New-ZertoVPGSettingVMRecovery -VPGSettingVMRecovery &lt;PSObject&gt;</string>
       </Syntax>
       <GeneralHelp>
@@ -10167,7 +10168,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
         <CommandParameterSetInfo2 Name="PSObject" Params="VPGSettingVMRecovery Verbose Debug ErrorAction WarningAction InformationAction ErrorVariable WarningVariable InformationVariable OutVariable OutBuffer PipelineVariable" />
       </ParamSets>
       <Parameters>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DatastoreClusterIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -10177,7 +10178,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>DatastoreIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -10187,7 +10188,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>FolderIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -10197,7 +10198,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>HostClusterIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -10207,7 +10208,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>HostIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>
@@ -10217,7 +10218,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
           <Description />
           <DefaultValue />
         </ParameterDescription>
-        <ParameterDescription type="String" varLen="false" required="true" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
+        <ParameterDescription type="String" varLen="false" required="false" dynamic="false" pipeRemaining="false" pipe="false" pipeProp="false" isPos="false" pos="named" globbing="false">
           <Name>ResourcePoolIdentifier</Name>
           <Attributes>
             <string>System.Management.Automation.ParameterAttribute</string>

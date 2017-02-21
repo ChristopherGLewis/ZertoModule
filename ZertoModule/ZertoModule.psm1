@@ -4645,8 +4645,6 @@
             }
         }
 
-
-
         #Build up our json object
         $NewVPGHash = [ordered] @{}
         $NewVPGHash.Add('Backup' , $null)
@@ -4692,8 +4690,14 @@
                 }
             }
             $JournalLimit = [ordered] @{}
-            $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
-            $JournalLimit.Add( 'HardLimitInPercent', $null )
+            #This should allow the %, but currently not a parameter
+            if ($JournalHardLimitMB -gt 0) {
+                $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
+                $JournalLimit.Add( 'HardLimitInPercent', $null )
+            } else {
+                $JournalLimit.Add( 'HardLimitInMB', $JournalHardLimitMB )
+                $JournalLimit.Add( 'HardLimitInPercent', $null )
+            }
             $JournalLimit.Add( 'WarningThresholdInMB', $JournalWarningThresholdMB )
             $JournalLimit.Add( 'WarningThresholdInPercent', $null )
             $Journal.Add( 'Limitation', $JournalLimit)

@@ -8,24 +8,25 @@ designed for creating highly reliable BC/DR replicas.
 
 ## Basic Functionality
 This module wraps the  Zerto REST API calls into powershell-friendly cmdlets.  Typical GET requests
-return either individual or arrays of Zerto object.
+return either individual or arrays of Zerto object.  Wrapped PUT and POST commands use Powershell 5.0
+classes, which are converted into the appropriate json objects for the REST call.
 
 ### Setting up your Powershell environment
-Download the Zerto Module from the [Powershell Gallery](https://www.powershellgallery.com/) using
+Download the Zerto Module from the [Powershell Gallery](https://www.powershellgallery.com/packages/ZertoModule) 
+using
 
     Install-Module -Name ZertoModule 
 
-If you want, you can import the module using  
+Since Powershell doesn't auto import script modules, you will need to import the 
+module using 
 
     Import-Module ZertoModule
 
-However, it should be auto imported after its installed.
 
 Set the following Env vars to avoid having to pass them to each command:
 
     PS C:\Scripts\Zerto> Set-Item ENV:ZertoServer "il1zerto.test.com" 
     PS C:\Scripts\Zerto> Set-Item ENV:ZertoPort "9669" 
-
 
 
 ### Authentication
@@ -41,6 +42,11 @@ Or
     {"x-zerto-session":"527ffdec-4cb0-eb4c-2067-5488cba47134"}
 
 Both will prompt for a UserName/password.
+
+If you use Get-ZertoAuthToken, you will need to pass the returned variable to 
+each call:
+
+    Get-ZertoLocalSite -ZertoToken $ztoken
 
 ### Basic usage
 Once you've authenticated, any call can be made using the ENV vars.   

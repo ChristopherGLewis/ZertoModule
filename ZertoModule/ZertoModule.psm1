@@ -1127,7 +1127,7 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGSettingRecovery {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Individual')]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Datastore Identifier')] [string] $DefaultDatastoreIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Folder Identifier')] [string] $DefaultFolderIdentifier, 
@@ -1438,12 +1438,12 @@
     Function New-ZertoVPGSettingVMRecovery {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMRecovery
         )
 

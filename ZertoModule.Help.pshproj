@@ -3,7 +3,6 @@
   <Name>ZertoModule</Name>
   <Version>1.0</Version>
   <Description>Zerto REST API Powershell Wrapping module</Description>
-  <ModulePath>C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1</ModulePath>
   <HasManifest>false</HasManifest>
   <OverridePostCount>false</OverridePostCount>
   <FetchPostCount xsi:nil="true" />

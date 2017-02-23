@@ -21703,42 +21703,42 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 	<command:syntax>
 		<command:syntaxItem>
 			<maml:name>New-ZertoVPGVMRecovery</maml:name>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DatastoreClusterIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Datastore Cluster Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>DatastoreIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Datastore Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>FolderIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Folder Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>HostClusterIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Host Cluster Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>HostIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Jost Identifier</maml:para>
 				</maml:description>
 				<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 			</command:parameter>
-			<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+			<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 				<maml:name>ResourcePoolIdentifier</maml:name>
 				<maml:description>
 					<maml:para>VPG Settings VM Recovery Resource Pool Identifier</maml:para>
@@ -21758,7 +21758,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 		</command:syntaxItem>
 	</command:syntax>
 	<command:parameters>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DatastoreClusterIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Datastore Cluster Identifier</maml:para>
@@ -21770,7 +21770,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>DatastoreIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Datastore Identifier</maml:para>
@@ -21782,7 +21782,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>FolderIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Folder Identifier</maml:para>
@@ -21794,7 +21794,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>HostClusterIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Host Cluster Identifier</maml:para>
@@ -21806,7 +21806,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>HostIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Jost Identifier</maml:para>
@@ -21818,7 +21818,7 @@ Zorg                     : @{href=https://10.77.181.34:9669/v1/zorgs/00000000-00
 			</dev:type>
 			<dev:defaultValue></dev:defaultValue>
 		</command:parameter>
-		<command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="named">
+		<command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="named">
 			<maml:name>ResourcePoolIdentifier</maml:name>
 			<maml:description>
 				<maml:para>VPG Settings VM Recovery Resource Pool Identifier</maml:para>

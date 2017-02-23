@@ -553,24 +553,24 @@
         VPGVMRecovery ([string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [string] $FolderIdentifier, `
                         [string] $HostClusterIdentifier, [string] $HostIdentifier, [string] $ResourcePoolIdentifier) {
             $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;
-            $this.$DatastoreIdentifier = $DatastoreIdentifier;     
-            $this.$FolderIdentifier = $FolderIdentifier;
-            $this.$HostClusterIdentifier = $HostClusterIdentifier;
-            $this.$HostIdentifier = $HostIdentifier;
-            $this.$ResourcePoolIdentifier = $ResourcePoolIdentifier;
+            $this.DatastoreIdentifier = $DatastoreIdentifier;     
+            $this.FolderIdentifier = $FolderIdentifier;
+            $this.HostClusterIdentifier = $HostClusterIdentifier;
+            $this.HostIdentifier = $HostIdentifier;
+            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier;
         }        
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function New-ZertoVPGVMRecovery {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Individual')]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier , 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier , 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier , 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier , 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier , 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier , 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier , 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGVMRecovery ')] [PSCustomObject] $VPGVMRecovery 
         )
         
@@ -4787,11 +4787,7 @@
                                                 $NicFailHyperIP.Add("SubnetMask", $_.SubnetMask)
                                             }
                                         $NicFailHyper.Add("IpConfig", $NicFailHyperIP)
-                                        if ($_.NetworkID) {
-                                            $NicFailHyper.Add( "NetworkIdentifier" , $_.NetworkID)
-                                        } else {
-                                            $NicFailHyper.Add( "NetworkIdentifier" , $null)
-                                        }
+                                        if ($_.NetworkID) { $NicFailHyper.Add( "NetworkIdentifier" , $_.NetworkID) }
                                         $NicFailHyper.Add("ShouldReplaceMacAddress" , $_.ReplaceMAC)
                                     $NicFail.Add( "Hypervisor", $NicFailHyper)
                                 #Add Failover to NIC
@@ -4817,11 +4813,7 @@
                                                 $NicTestHyperIP.Add("SubnetMask", $_.TestSubnetMask)
                                             }
                                         $NicTestHyper.Add("IpConfig", $NicTestHyperIP)
-                                        if ($_.TestNetworkID) {
-                                            $NicTestHyper.Add( "NetworkIdentifier" , $_.TestNetworkID)
-                                        } else {
-                                            $NicTestHyper.Add( "NetworkIdentifier" , $null)
-                                        }
+                                        if ($_.TestNetworkID) { $NicTestHyper.Add( "NetworkIdentifier" , $_.TestNetworkID) }
                                         $NicTestHyper.Add( "ShouldReplaceMacAddress" , $_.TestReplaceMAC)
                                     $NicTest.Add("Hypervisor", $NicTestHyper)
                                 #Add Failover Test to NIC
@@ -4831,19 +4823,17 @@
                             $AllNics += $Nic
                         }  #end of foreach $_.VPGFailoverIPAddresses 
                         $NewVmHash.Add('Nics', $AllNics )
-                        #Recovery block if DatastoreClusterID - deals with VPG Recovery Block not supporting a default DatastoreClusterID
-                        if ($DatastoreClusterID) {
-                            #Need to find all volumes for this VM
-                            $AllVMVolumes = @()
-                                $VMVolume = [ordered] @{}
-                                    $VMVolDatastore = [ordered] @{}
-                                        $VMVolDatastore.Add( 'DatastoreClusterIdentifier', $DatastoreClusterID)
-                                        $VMVolDatastore.Add( 'DatastoreIdentifier', $null)
-                                        $VMVolDatastore.Add( 'IsThin', $true)
-                                    $VMVolume.Add('Datastore', $VMVolDatastore)
-                                    $VMVolume.Add('VolumeIdentifier', $null)
-                                $AllVMVolumes += $VMVolume
-                            $NewVmHash.Add('Volumes', $AllVMVolumes )
+                        #Add recovery block if needed
+                        If ($_.VPGVMRecovery) {
+                            $VMRecovery = [ordered] @{}
+                                #Don't send blanks
+                                if ($_.VPGVMRecovery.DatastoreClusterIdentifier) { $VMRecovery.Add( 'DatastoreClusterIdentifier', $_.VPGVMRecovery.DatastoreClusterIdentifier) }
+                                if ($_.VPGVMRecovery.DatastoreIdentifier) { $VMRecovery.Add( 'DatastoreIdentifier', $_.VPGVMRecovery.DatastoreIdentifier) }
+                                if ($_.VPGVMRecovery.FolderIdentifier) { $VMRecovery.Add( 'FolderIdentifier', $_.VPGVMRecovery.FolderIdentifier) }
+                                if ($_.VPGVMRecovery.HostClusterIdentifier) { $VMRecovery.Add( 'HostClusterIdentifier', $_.VPGVMRecovery.HostClusterIdentifier) }
+                                if ($_.VPGVMRecovery.HostIdentifier) { $VMRecovery.Add( 'HostIdentifier', $_.VPGVMRecovery.HostIdentifier) }
+                                if ($_.VPGVMRecovery.ResourcePoolIdentifier) { $VMRecovery.Add( 'ResourcePoolIdentifier', $_.VPGVMRecovery.ResourcePoolIdentifier) }
+                            $NewVmHash.Add('Recovery', $VMRecovery)
                         }
                     #Add this VM Hash to the VMArray
                     $VMArray += $NewVmHash

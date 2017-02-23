@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.9.10' 
-$ReleaseNotes = 'Fixed issue with New-ZertoVPGVMRecovery requiring all parameters'
+﻿$ModuleVersion = '0.9.13' 
+$ReleaseNotes = 'Fixed issues with Add-ZertoVPG and VPGVMRecovery block'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

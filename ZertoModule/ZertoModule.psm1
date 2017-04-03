@@ -989,9 +989,9 @@
     Function New-ZertoVPGSettingJournal {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Limitation')] [ZertoVPGSettingJournalLimitation] $Limitation, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Setting Journal Limitation object')] [ZertoVPGSettingJournalLimitation] $Limitation, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Journal ')] [PSCustomObject] $VPGSettingJournal
         )
         
@@ -1023,7 +1023,7 @@
     Function New-ZertoVPGSettingNetworksNetworkHypervisor {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DefaultNetworkIdentifier')] [AllowEmptyString()]  [string] $DefaultNetworkIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DefaultNetworkIdentifier')]   [string] $DefaultNetworkIdentifier = $null,
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Networking Network Hypervisor object')] [PSCustomObject] $VPGSettingNetworkingNetworkHypervisor
         )
         
@@ -1117,11 +1117,25 @@
         }    
         ZertoVPGSettingRecovery ([string] $DefaultDatastoreIdentifier, [string] $DefaultFolderIdentifier, [string] $DefaultHostClusterIdentifier, `
                             [string] $DefaultHostIdentifier, [string] $ResourcePoolIdentifier ) {
-            $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier;                                                
-            $this.DefaultFolderIdentifier = $DefaultFolderIdentifier;                   
-            $this.DefaultHostClusterIdentifier = $DefaultHostClusterIdentifier; 
-            $this.DefaultHostIdentifier = $DefaultHostIdentifier; 
-            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier;
+            $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier;
+            $this.DefaultFolderIdentifier = $DefaultFolderIdentifier;
+            #Handle the nulls.  PS converts a $null in a [string] as a string.empty. 
+            if ([String]::IsNullOrEmpty($DefaultHostClusterIdentifier) ) { 
+                $this.DefaultHostClusterIdentifier = [NullString]::Value ; 
+            } else {
+                $this.DefaultHostClusterIdentifier = $DefaultHostClusterIdentifier; 
+            }
+            if ([String]::IsNullOrEmpty($DefaultHostIdentifier) ) { 
+                $this.DefaultHostIdentifier = [NullString]::Value ; 
+            } else {
+                $this.DefaultHostIdentifier = $DefaultHostIdentifier; 
+            }
+            if ([String]::IsNullOrEmpty($ResourcePoolIdentifier) ) { 
+                $this.ResourcePoolIdentifier = [NullString]::Value ; 
+            } else {
+                $this.ResourcePoolIdentifier = $ResourcePoolIdentifier; 
+            }
+
         }                 
     }
 
@@ -1131,9 +1145,9 @@
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Datastore Identifier')] [string] $DefaultDatastoreIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Folder Identifier')] [string] $DefaultFolderIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Cluster Identifier')] [string] $DefaultHostClusterIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Identifier')] [string] $DefaultHostIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Resource Pool Identifier')] [string] $ResourcePoolIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Cluster Identifier')] [string] $DefaultHostClusterIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Zerto Host Identifier')] [string] $DefaultHostIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Zerto Resource Pool Identifier')] [string] $ResourcePoolIdentifier = $null, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Recovery')] [PSCustomObject] $VPGSettingRecovery
         )
         
@@ -1438,12 +1452,12 @@
     Function New-ZertoVPGSettingVMRecovery {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'FolderIdentifier')] [string] $FolderIdentifier = $null,
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostClusterIdentifier')] [string] $HostClusterIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'HostIdentifier')] [string] $HostIdentifier = $null, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'ResourcePoolIdentifier')] [string] $ResourcePoolIdentifier = $null, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMRecovery
         )
 
@@ -1487,7 +1501,7 @@
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'IsSwap')] [bool] $IsThin, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreClusterIdentifier')] [string] $DatastoreClusterIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'DatastoreIdentifier')] [string] $DatastoreIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMVolumeDatastore
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Volume Datastore object')] [PSCustomObject] $VPGSettingVMVolumeDatastore
         )
 
         if (-not $VPGSettingVMVolumeDatastore) {
@@ -1532,7 +1546,7 @@
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ExistingVmIdentifier')] [string] $ExistingVmIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Mode')] [string] $Mode, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Path')] [string] $Path, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMVolumeExistingVolume
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM existing Volume object')] [PSCustomObject] $VPGSettingVMVolumeExistingVolume
         )
 
         if (-not $VPGSettingVMVolumeExistingVolume) {
@@ -1578,7 +1592,7 @@
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VolumeIdentifier')] [string] $VolumeIdentifier, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeDatastore')] [string] $Datastore, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingVMVolumeExistingVolume')] [string] $ExistingVolume, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Recovery object')] [PSCustomObject] $VPGSettingVMVolume
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPG Setting VM Volume object')] [PSCustomObject] $VPGSettingVMVolume
         )
 
         if (-not $VPGSettingVMVolume) {
@@ -1599,8 +1613,7 @@
         [ZertoVPGSettingVMNic[]] $NICs;
         [ZertoVPGSettingVMRecovery] $Recovery;
         [string] $VmIdentifier;
-        [ZertoVPGSettingVMVolume[]] $Volumes;
-  
+        [ZertoVPGSettingVMVolume[]] $Volumes; 
  
         ZertoVPGSettingVM ([PSCustomObject] $Value) {
             $this.BootGroupIdentifier = $Value.BootGroupIdentifier; 
@@ -1628,11 +1641,11 @@
     Function New-ZertoVPGSettingVM {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostBackup script object')] [string] $BootGroupIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PostRecovery script object')] [ZertoVPGSettingVMNic[]] $Nics, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PreRecovery script object')] [ZertoVPGSettingVMRecovery] $Recovery, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PreRecovery script object')] [string] $VmIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'PreRecovery script object')] [ZertoVPGSettingVMVolume[]] $Volumes, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootGroup Identifier')] [string] $BootGroupIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Setting VM Nic objects')] [ZertoVPGSettingVMNic[]] $Nics, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Setting VM Recovery object')] [ZertoVPGSettingVMRecovery] $Recovery, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VM Identifier')] [string] $VmIdentifier, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Setting VM Volume objects')] [ZertoVPGSettingVMVolume[]] $Volumes, 
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSettingVM
         )
         
@@ -1645,6 +1658,70 @@
 
         Return $NewObj
     }
+
+    class ZertoVPGSetting {
+        [ZertoVPGSettingBackup] $Backup;
+        [ZertoVPGSettingBasic] $Basic;
+        [ZertoVPGSettingBootGroup[]] $BootGroups;
+        [ZertoVPGSettingJournal] $Journal;
+        [ZertoVPGSettingNetworks] $Networks;
+        [ZertoVPGSettingRecovery] $Recovery;
+        [ZertoVPGSettingScripting] $Scripting;
+        [ZertoVPGSettingVM[]] $Vms;
+
+        ZertoVPGSetting ([PSCustomObject] $Value) {
+            $this.Backup = $Value.Backup;
+            $this.Basic = $Value.Basic;
+            $this.BootGroups = @();
+            $Value.BootGroups | ForEach-Object { $this.BootGroups += $_};
+            $this.Journal = $Value.Journal;
+            $this.Networks = $Value.Networks;
+            $this.Recovery = $Value.Recovery;
+            $this.Scripting = $Value.Scripting;
+            $this.Vms = @();
+            $Value.Vms | ForEach-Object { $this.Vms += $_};
+        }    
+        ZertoVPGSetting ([ZertoVPGSettingBackup] $Backup,  [ZertoVPGSettingBasic] $Basic, [ZertoVPGSettingBootGroup[]] $BootGroups, `
+                           [ZertoVPGSettingJournal] $Journal, [ZertoVPGSettingNetworks] $Networks, [ZertoVPGSettingRecovery] $Recovery, `
+                           [ZertoVPGSettingScripting] $Scripting, [ZertoVPGSettingVM[]] $Vms
+        ) {
+            $this.Backup = $Backup;
+            $this.Basic = $Basic;
+            $this.BootGroups = $BootGroups;
+            $this.Journal = $Journal;
+            $this.Networks = $Networks;
+            $this.Recovery = $Recovery;
+            $this.Scripting = $Scripting;
+            $this.Vms = $Vms;
+        }  
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSetting {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Backup  object')] [ZertoVPGSettingBackup] $Backup, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Basics  object')] [ZertoVPGSettingBasic] $Basic, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings BootGroups  objects')] [ZertoVPGSettingBootGroup[]] $BootGroups, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Journal object')] [ZertoVPGSettingJournal] $Journal,
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Networks object')] [ZertoVPGSettingNetworks] $Networks, 
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Recovery object')] [ZertoVPGSettingRecovery] $Recovery, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Scripting object')] [ZertoVPGSettingNetworks] $Scripting, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings Vms objects')] [ZertoVPGSettingVM[]] $Vms, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSettinM
+        )
+
+        if (-not $VPGSettingVM) {
+            #Check for bad values
+            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($Backup, $Basic, $BootGroups, $Journal, $Networks, $Recovery, $Scripting, $Vms);
+        } else {
+            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($VPGSettingVM)
+        }
+
+        Return $NewObj
+    }
+
+
 
 #endregion
 
@@ -1813,9 +1890,9 @@
         Write-Verbose $FullURL
 
         if ([String]::IsNullOrEmpty($ZertoUser) ) {
-            $cred = Get-Credential -Message "Enter your Zerto credentials"
+            $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'"
         } else {
-            $cred = Get-Credential -Message "Enter your Zerto credentials" -UserName $ZertoUser
+            $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'" -UserName $ZertoUser
         }
 
         If ($cred -NE $null) {
@@ -1892,7 +1969,7 @@
 #region Zerto Rest API
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoRESTAPIs {
+    Function Get-ZertoRESTAPI {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -1917,75 +1994,58 @@
 #region Zerto Alerts
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoAlerts {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZORG Identifier')] [string] $ZORGIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Level')] [ZertoAlertLevel] $Level, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Entity')] [ZertoAlertEntity] $Entity, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert HelpIdentifier')] [ZertoAlertHelpIdentifier] $HelpIdentifier
-        )
-        
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "alerts" 
-        if ($StartDate -or $EndDate -or $VPGIdentifier -or $ZORGIdentifier -or $SiteIdentifier -or $Level -ne $null  -or $Entity -ne $null -or $HelpIdentifier -ne $null) {
-            $qs = [ordered] @{}
-            if ($StartDate)        { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
-            if ($EndDate)          { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
-            if ($VPGIdentifier)    { $qs.Add("VPGIdentifier", $VPGIdentifier) }
-            if ($ZORGIdentifier)   { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
-            if ($SiteIdentifier)   { $qs.Add("SiteIdentifier", $SiteIdentifier) }
-            if ($Level -ne $null)     { $qs.Add("Level", $Level) }
-            if ($Entity -ne $null)     { $qs.Add("Entity", $Entity) }
-            if ($HelpIdentifier -ne $null) { $qs.Add("HelpIdentifier", $HelpIdentifier) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoAlert {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto ZORG Identifier')] [string] $ZORGIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Level')] [ZertoAlertLevel] $Level, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Entity')] [ZertoAlertEntity] $Entity, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert HelpIdentifier')] [ZertoAlertHelpIdentifier] $HelpIdentifier,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
         $TypeJSON = "application/json"
+
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
-            throw "Missing Zerto VPG Identifier"
-        }
+
+        switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoAlertIdentifier)  ) {
+                    throw "Missing Zerto Alert Identifier"
+                }
             
-        $FullURL = $baseURL + "alerts/" + $ZertoAlertIdentifier
-        Write-Verbose $FullURL
-        
+                $FullURL = $baseURL + "alerts/" + $ZertoAlertIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "alerts" 
+                if ($StartDate -or $EndDate -or $VPGIdentifier -or $ZORGIdentifier -or $SiteIdentifier -or $Level -ne $null  -or $Entity -ne $null -or $HelpIdentifier -ne $null) {
+                    $qs = [ordered] @{}
+                    if ($StartDate)        { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
+                    if ($EndDate)          { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
+                    if ($VPGIdentifier)    { $qs.Add("VPGIdentifier", $VPGIdentifier) }
+                    if ($ZORGIdentifier)   { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
+                    if ($SiteIdentifier)   { $qs.Add("SiteIdentifier", $SiteIdentifier) }
+                    if ($Level -ne $null)     { $qs.Add("Level", $Level) }
+                    if ($Entity -ne $null)     { $qs.Add("Entity", $Entity) }
+                    if ($HelpIdentifier -ne $null) { $qs.Add("HelpIdentifier", $HelpIdentifier) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
+        }
+
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
         } catch {
@@ -2202,7 +2262,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoAlertEntities {
+    Function Get-ZertoAlertEntity {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2229,7 +2289,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoAlertHelpIdentifiers {
+    Function Get-ZertoAlertHelpIdentifier {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2256,7 +2316,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoAlertLevels {
+    Function Get-ZertoAlertLevel {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2286,82 +2346,65 @@
 #region Zerto Events
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoEvents {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Event Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Event End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Entity')] [ZertoEventType] $EventType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Name')] [string] $SiteName,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZORG Identifier')] [ZertoEventType] $ZORGIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Entity Type')] [ZertoAlertEntity] $EntityType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto User Name')] [string] $UserName,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Event Category')] [ZertoEventCategory] $EventCategory,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
-        )
-        
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "events" 
-        if ($StartDate -or $EndDate -or $VPGIdentifier -or $EventType -ne $null -or $SiteName -or $SiteIdentifier -or $ZORGIdentifier `
-            -or $EntityType  -ne $null -or $UserName -or $EventCategory -ne $null -or $ZertoAlertIdentifier) {
-            $qs = [ordered] @{}
-            if ($StartDate)                { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
-            if ($EndDate)                  { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
-            if ($VPGIdentifier)            { $qs.Add("VPGIdentifier", $VPGIdentifier) }
-            if ($EventType -ne $null)      { $qs.Add("EventType", $EventType) }
-            if ($SiteName)                 { $qs.Add("SiteName", $SiteName) }
-            if ($SiteIdentifier)           { $qs.Add("SiteIdentifier", $SiteIdentifier) }
-            if ($EntityType -ne $null)     { $qs.Add("EntityType", $EntityType) }
-            if ($ZORGIdentifier)           { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
-            if ($UserName)                 { $qs.Add("UserName", $UserName) }
-            if ($EventCategory -ne $null)  { $qs.Add("EventCategory", $EventCategory) }
-            if ($ZertoAlertIdentifier)     { $qs.Add("ZertoAlertIdentifier", $ZertoAlertIdentifier) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoEvent {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Event Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Event End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Identifier')] [string] $VPGIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Entity')] [ZertoEventType] $EventType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Site Name')] [string] $SiteName,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Site Identifier')] [string] $SiteIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto ZORG Identifier')] [ZertoEventType] $ZORGIdentifier,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Entity Type')] [ZertoAlertEntity] $EntityType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto User Name')] [string] $UserName,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Event Category')] [ZertoEventCategory] $EventCategory,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Alert Identifier')] [string] $ZertoAlertIdentifier,
+            [Parameter(Mandatory=$true,  ParameterSetName="ID", HelpMessage = 'Zerto Event Identifier')] [string] $ZertoEventIdentifier
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
         $TypeJSON = "application/json"
+
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
-            throw "Missing Zerto VPG Identifier"
+
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoEventIdentifier)  ) {
+                    throw "Missing Zerto Event Identifier"
+                }
+                    
+                $FullURL = $baseURL + "events/" + $ZertoEventIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "events" 
+                if ($StartDate -or $EndDate -or $VPGIdentifier -or $EventType -ne $null -or $SiteName -or $SiteIdentifier -or $ZORGIdentifier `
+                    -or $EntityType  -ne $null -or $UserName -or $EventCategory -ne $null -or $ZertoAlertIdentifier) {
+                    $qs = [ordered] @{}
+                    if ($StartDate)                { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
+                    if ($EndDate)                  { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
+                    if ($VPGIdentifier)            { $qs.Add("VPGIdentifier", $VPGIdentifier) }
+                    if ($EventType -ne $null)      { $qs.Add("EventType", $EventType) }
+                    if ($SiteName)                 { $qs.Add("siteName", $SiteName) }
+                    if ($SiteIdentifier)           { $qs.Add("SiteIdentifier", $SiteIdentifier) }
+                    if ($EntityType -ne $null)     { $qs.Add("EntityType", $EntityType) }
+                    if ($ZORGIdentifier)           { $qs.Add("ZORGIdentifier", $ZORGIdentifier) }
+                    if ($UserName)                 { $qs.Add("UserName", $UserName) }
+                    if ($EventCategory -ne $null)  { $qs.Add("EventCategory", $EventCategory) }
+                    if ($ZertoAlertIdentifier)     { $qs.Add("ZertoAlertIdentifier", $ZertoAlertIdentifier) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
         }
-            
-        $FullURL = $baseURL + "alerts/" + $ZertoAlertIdentifier
-        Write-Verbose $FullURL
-        
+
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
         } catch {
@@ -2371,7 +2414,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoEventCategories {
+    Function Get-ZertoEventCategory {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2398,7 +2441,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoEventEntities {
+    Function Get-ZertoEventEntity {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2425,7 +2468,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoEventTypes {
+    Function Get-ZertoEventType {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2496,7 +2539,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoLocalSitePairingStatuses {
+    Function Get-ZertoLocalSitePairingStatus {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2526,17 +2569,18 @@
 #region Zerto Peer Sites
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoPeerSites {
+    Function Get-ZertoPeerSite {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site name')] [string] $PeerName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site pairing status')] [ZertoPairingStatus] $ParingStatus, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site location')] [string] $Location, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site host name')] [string] $HostName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Peer Site port')] [string] $Port
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Peer Site name')] [string] $PeerName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Peer Site pairing status')] [ZertoPairingStatus] $ParingStatus, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Peer Site location')] [string] $Location, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Peer Site host name')] [string] $HostName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Peer Site port')] [string] $Port,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
         
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2546,49 +2590,30 @@
             throw "Missing Zerto Authentication Token"
         }
 
-        $FullURL = $baseURL + "peersites"
-        if ($PeerName -or $ParingStatus -ne $null -or $Location -or $HostName -or $Port) {
-            $qs = [ordered] @{}
-            if ($PeerName)               { $qs.Add("peerName", $PeerName) }
-            if ($ParingStatus -ne $null) { $qs.Add("paringStatus", $ParingStatus) }
-            if ($Location)               { $qs.Add("location", $Location) }
-            if ($HostName)               { $qs.Add("hostName", $HostName) }
-            if ($Port)                   { $qs.Add("port", $Port) }
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+                    throw "Missing Zerto Site Identifier"
+                }
+                    
+                $FullURL = $baseURL + "peersites/" + $ZertoSiteIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "peersites"
+                if ($PeerName -or $ParingStatus -ne $null -or $Location -or $HostName -or $Port) {
+                    $qs = [ordered] @{}
+                    if ($PeerName)               { $qs.Add("peerName", $PeerName) }
+                    if ($ParingStatus -ne $null) { $qs.Add("paringStatus", $ParingStatus) }
+                    if ($Location)               { $qs.Add("location", $Location) }
+                    if ($HostName)               { $qs.Add("hostName", $HostName) }
+                    if ($Port)                   { $qs.Add("port", $Port) }
 
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
         }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoPeerSite {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
-            throw "Missing Zerto Site Identifier"
-        }
-
-        $FullURL = $baseURL + "peersites/" + $ZertoSiteIdentifier
-        Write-Verbose $FullURL
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -2608,7 +2633,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto PeerSite Name')] [string] $ZertoPeerSiteName
         )
         
-        $ID = Get-ZertoPeerSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoPeerSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.PeerSiteName -eq $ZertoPeerSiteName} | `
                             Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
@@ -2621,47 +2646,14 @@
 
 #region Zerto Service Profiles
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoServiceProfiles {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "serviceprofiles"
-        if ($Site) {
-            $qs = [ordered] @{}
-            if ($SiteIdentifier) { $qs.Add("Site", $ZertoSiteIdentifier) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoServiceProfile {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Service Profile Identifier')] [string] $ZertoServiceProfile
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Service Profile Identifier')] [string] $ZertoServiceProfileIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2670,12 +2662,26 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoServiceProfile)  ) {
-            throw "Missing Zerto ServciceProfile"
-        }
 
-        $FullURL = $baseURL + "serviceprofiles/" + $ZertoServiceProfile
-        Write-Verbose $FullURL
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoServiceProfileIdentifier)  ) {
+                    throw "Missing Zerto Service Profile Identifier"
+                }
+                $FullURL = $baseURL + "serviceprofiles/" + $ZertoServiceProfileIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "serviceprofiles"
+                if ($ZertoSiteIdentifier) {
+                    $qs = [ordered] @{}
+                    if ($SiteIdentifier) { $qs.Add("Site", $ZertoSiteIdentifier) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -2696,7 +2702,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Service Profile Name')] [string] $ZertoServiceProfileName
         )
         
-        $ID = Get-ZertoServiceProfiles -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -SiteIdentifier $SiteIdentifier | `
+        $ID = Get-ZertoServiceProfile -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -SiteIdentifier $SiteIdentifier | `
                             Where-Object {$_.ServiceProfileName -eq $ZertoServiceProfileName} | `
                             Select-Object ServiceProfileIdentifier -ExpandProperty ServiceProfileIdentifier
 
@@ -2710,28 +2716,27 @@
 #region Zerto Virtualization Sites
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSites {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
-        )
-        
-        Return Get-ZertoVirtualizationSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSite {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="ID", HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
-        
-        Return Get-ZertoVirtualizationSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                Return Get-ZertoVirtualizationSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier
+            }
+            Default {
+                Return Get-ZertoVirtualizationSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
+            }
+        }
+
+        if ($ZertoSiteIdentifier) {
+        } else {
+            Return Get-ZertoVirtualizationSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken
+        }
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -2748,40 +2753,13 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVirtualizationSites {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "virtualizationsites"
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVirtualizationSite {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="ID", HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -2790,12 +2768,20 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
-            throw "Missing Zerto Site Identifier"
-        }
 
-        $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier
-        Write-Verbose $FullURL
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
+                    throw "Missing Zerto Site Identifier"
+                }
+                $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "virtualizationsites"
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -2815,7 +2801,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Name')] [string] $ZertoSiteName
         )
         
-        $ID = Get-ZertoVirtualizationSites -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoVirtualizationSite -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VirtualizationSiteName -eq $ZertoSiteName} | `
                             Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
@@ -2830,7 +2816,7 @@
 #region Zerto Site Secondarys
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteDatastoreClusters {
+    Function Get-ZertoSiteDatastoreCluster {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2872,7 +2858,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Datastore Cluster Name')] [string] $DatastoreClusterName
         )
 
-        $ID =  Get-ZertoSiteDatastoreClusters -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
+        $ID =  Get-ZertoSiteDatastoreCluster -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
                             Where-Object {$_.DatastoreClusterName -eq $DatastoreClusterName} | `
                             Select-Object DatastoreClusterIdentifier -ExpandProperty DatastoreClusterIdentifier
 
@@ -2883,7 +2869,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteDatastores {
+    Function Get-ZertoSiteDatastore {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2925,7 +2911,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Datastore Name')] [string] $DatastoreName
         )
 
-        $ID = Get-ZertoSiteDatastores -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
+        $ID = Get-ZertoSiteDatastore -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
                             Where-Object {$_.DatastoreName -eq $DatastoreName} | `
                             Select-Object DatastoreIdentifier -ExpandProperty DatastoreIdentifier
 
@@ -2936,7 +2922,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteFolders {
+    Function Get-ZertoSiteFolder {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -2978,7 +2964,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto vCenter Folder Name')] [string] $FolderName
         )
         
-        $ID = Get-ZertoSiteFolders -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
+        $ID = Get-ZertoSiteFolder -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier  | `
                             Where-Object {$_.FolderName -eq  $FolderName } | `
                             Select-Object FolderIdentifier -ExpandProperty FolderIdentifier
 
@@ -2989,7 +2975,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteHostClusters {
+    Function Get-ZertoSiteHostCluster {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3031,7 +3017,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Host Cluster Name')] [string] $HostClusterName
         )
         
-        $ID = Get-ZertoSiteHostClusters -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+        $ID = Get-ZertoSiteHostCluster -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
                                 Where-Object {$_.VirtualizationClusterName -eq $HostClusterName} | `
                                 Select ClusterIdentifier -ExpandProperty ClusterIdentifier
 
@@ -3042,38 +3028,6 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteHosts {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        
-        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
-            throw "Missing Zerto Site Identifier"
-        }
-
-        $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier + "/hosts"
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoSiteHost {
         [CmdletBinding()]
         param(
@@ -3081,7 +3035,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Site Identifier')] [string] $ZertoSiteIdentifier,
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Host Identifier')] [string] $ZertoHostIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="ID", HelpMessage = 'Zerto Host Identifier')] [string] $ZertoHostIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3094,12 +3048,21 @@
         if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
             throw "Missing Zerto Site Identifier"
         }
-        if ([string]::IsNullOrEmpty($ZertoHostIdentifier)  ) {
-            throw "Missing Zerto Host Identifier"
-        }
 
-        $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier + "/hosts/" + $ZertoHostIdentifier
-        Write-Verbose $FullURL
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoHostIdentifier)  ) {
+                    throw "Missing Zerto Host Identifier"
+                }
+
+                $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier + "/hosts/" + $ZertoHostIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "virtualizationsites/" + $ZertoSiteIdentifier + "/hosts"
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -3120,7 +3083,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Host Name')] [string] $HostName
         )
         
-        $ID = Get-ZertoSiteHosts -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+        $ID = Get-ZertoSiteHost -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
                                 Where-Object {$_.VirtualizationHostName -eq $HostName} | `
                                 Select HostIdentifier -ExpandProperty HostIdentifier
 
@@ -3131,7 +3094,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteNetworks {
+    Function Get-ZertoSiteNetwork {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3173,7 +3136,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'vCenter Network Name')] [string] $NetworkName
         )
         
-        $ID = Get-ZertoSiteNetworks -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+        $ID = Get-ZertoSiteNetwork -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
                 Where-Object {$_.VirtualizationNetworkName -eq $NetworkName} | `
                 Select-Object   NetworkIdentifier -ExpandProperty NetworkIdentifier
 
@@ -3184,7 +3147,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteOrgVCDs {
+    Function Get-ZertoSiteOrgVCD {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3216,7 +3179,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteResourcePools {
+    Function Get-ZertoSiteResourcePool {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3247,7 +3210,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteVApps {
+    Function Get-ZertoSiteVApp {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3278,7 +3241,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteVcdVapps {
+    Function Get-ZertoSiteVcdVapp {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3309,7 +3272,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteVMs {
+    Function Get-ZertoSiteVM {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3350,7 +3313,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Virtual Machine Name')] [string] $VMName
         )
         
-        $ID = Get-ZertoSiteVMs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+        $ID = Get-ZertoSiteVM -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
                     Where-Object {$_.VmName -eq $VMName } | `
                     Select-Object VmIdentifier -ExpandProperty VmIdentifier
 
@@ -3361,7 +3324,7 @@
     }
     
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoSiteRepositories {
+    Function Get-ZertoSiteRepository {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3402,7 +3365,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Backup Repository Name')] [string] $RepositoryName
         )
         
-        $ID = Get-ZertoSiteRepositories -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
+        $ID = Get-ZertoSiteRepository -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoSiteIdentifier $ZertoSiteIdentifier | `
                     Where-Object {$_.DisplayName -eq $RepositoryName } | `
                     Select-Object ID  -ExpandProperty ID
 
@@ -3416,57 +3379,19 @@
 #region Zerto Tasks
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoTasks {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Started Before Date (YYYY-MM-DD)')] [string] $StartedBeforeDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Started After Date')] [string] $StartedAfterDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Completed Before Date (YYYY-MM-DD)')] [string] $CompletedBeforeDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Completed After Date')] [string] $CompletedAfterDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Type')] [ZertoTaskTypes] $TaskType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Task Status')] [string] $Status
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "tasks"
-        if ($StartedBeforeDate -or $StartedAfterDate -or $CompletedBeforeDate -or $CompletedAfterDate -or $TaskType -ne $null -or $Status) {
-            $qs = [ordered] @{}
-            if ($StartedBeforeDate)   { if (Parse-ZertoDate($StartedBeforeDate))    { $qs.Add("startedBeforeDate",   $StartedBeforeDate)   } else { throw "Invalid StartedBeforeDate: '$StartedBeforeDate'" } }
-            if ($StartedAfterDate)    { if (Parse-ZertoDate($StartedAfterDate))     { $qs.Add("startedAfterDate",    $StartedAfterDate)    } else { throw "Invalid StartedAfterDate: '$StartedAfterDate'" } }
-            if ($CompletedBeforeDate) { if (Parse-ZertoDate($CompletedBeforeDate))  { $qs.Add("completedBeforeDate", $CompletedBeforeDate) } else { throw "Invalid CompletedBeforeDate: '$CompletedBeforeDate'" } }
-            if ($CompletedAfterDate)  { if (Parse-ZertoDate($CompletedAfterDate))   { $qs.Add("completedAfterDate",  $CompletedAfterDate)  } else { throw "Invalid CompletedAfterDate: '$CompletedAfterDate'" } }
-            if ($TaskType -ne $null)  { $qs.Add("type", $TaskType) }
-            if ($Status)              { $qs.Add("status", $Status) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoTask {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto Task Identifier')] [string] $ZertoTaskIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Started Before Date (YYYY-MM-DD)')] [string] $StartedBeforeDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Started After Date')] [string] $StartedAfterDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Completed Before Date (YYYY-MM-DD)')] [string] $CompletedBeforeDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Completed After Date')] [string] $CompletedAfterDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Type')] [ZertoTaskTypes] $TaskType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Task Status')] [string] $Status,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Task Identifier')] [string] $ZertoTaskIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3475,12 +3400,32 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoTaskIdentifier)  ) {
-            throw "Missing Zerto Task Identifier"
-        }
 
-        $FullURL = $baseURL + "tasks/" + $ZertoTaskIdentifier
-        Write-Verbose $FullURL
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoTaskIdentifier)  ) {
+                    throw "Missing Zerto Task Identifier"
+                }
+
+                $FullURL = $baseURL + "tasks/" + $ZertoTaskIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "tasks"
+                if ($StartedBeforeDate -or $StartedAfterDate -or $CompletedBeforeDate -or $CompletedAfterDate -or $TaskType -ne $null -or $Status) {
+                    $qs = [ordered] @{}
+                    if ($StartedBeforeDate)   { if (Parse-ZertoDate($StartedBeforeDate))    { $qs.Add("startedBeforeDate",   $StartedBeforeDate)   } else { throw "Invalid StartedBeforeDate: '$StartedBeforeDate'" } }
+                    if ($StartedAfterDate)    { if (Parse-ZertoDate($StartedAfterDate))     { $qs.Add("startedAfterDate",    $StartedAfterDate)    } else { throw "Invalid StartedAfterDate: '$StartedAfterDate'" } }
+                    if ($CompletedBeforeDate) { if (Parse-ZertoDate($CompletedBeforeDate))  { $qs.Add("completedBeforeDate", $CompletedBeforeDate) } else { throw "Invalid CompletedBeforeDate: '$CompletedBeforeDate'" } }
+                    if ($CompletedAfterDate)  { if (Parse-ZertoDate($CompletedAfterDate))   { $qs.Add("completedAfterDate",  $CompletedAfterDate)  } else { throw "Invalid CompletedAfterDate: '$CompletedAfterDate'" } }
+                    if ($TaskType -ne $null)  { $qs.Add("type", $TaskType) }
+                    if ($Status)              { $qs.Add("status", $Status) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -3491,7 +3436,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoTasksTypes {
+    Function Get-ZertoTasksType {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3522,66 +3467,23 @@
 #region Zerto Virtual Machines
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVMs {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG name')] [string] $VPGName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM name')] [string] $VMName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Status')] [ZertoVPGStatus] $Status, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Substatus')] [ZertoVPGSubstatus] $SubStatus, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Organization Name')] [string] $OrganizationName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VM Priority')] [ZertoVPGPriority] $Priority
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        $FullURL = $baseURL + "vms"
-        if ($VPGName -or $VMName -or $Status -ne $null -or $Substatus -ne $null -or `
-                $ProtectedSiteType -ne $null -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or $RecoverySiteIdentifier -or $OrganizationName `
-                -or $Priority -ne $null) {
-            $qs = [ordered] @{}
-            if ($VPGName)                     { $qs.Add("vpgName", $VPGName) }
-            if ($VMName)                      { $qs.Add("vmName", $VMName) }
-            if ($Status -ne $null)            { $qs.Add("status", $Status) }
-            if ($Substatus -ne $null)         { $qs.Add("substatus", $Substatus) }
-            if ($ProtectedSiteType -ne $null) { $qs.Add("protectedSiteType", $ProtectedSiteType) }
-            if ($RecoverySiteType -ne $null)  { $qs.Add("recoverySiteType", $RecoverySiteType) }
-            if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
-            if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
-            if ($OrganizationName)            { $qs.Add("organizationName", $OrganizationName) }
-            if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVM {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVMIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG name')] [string] $VPGName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VM name')] [string] $VMName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VM Status')] [ZertoVPGStatus] $Status, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VM Substatus')] [ZertoVPGSubstatus] $SubStatus, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VM Organization Name')] [string] $OrganizationName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VM Priority')] [ZertoVPGPriority] $Priority,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto VM Identifier')] [string] $ZertoVMIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -3590,12 +3492,38 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoVMIdentifier)  ) {
-            throw "Missing Zerto VM Identifier"
-        }
 
-        $FullURL = $baseURL + "vms/" + $ZertoVMIdentifier
-        Write-Verbose $FullURL
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoVMIdentifier)  ) {
+                    throw "Missing Zerto VM Identifier"
+                }
+
+                $FullURL = $baseURL + "vms/" + $ZertoVMIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "vms"
+                if ($VPGName -or $VMName -or $Status -ne $null -or $Substatus -ne $null -or `
+                        $ProtectedSiteType -ne $null -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or $RecoverySiteIdentifier -or $OrganizationName `
+                        -or $Priority -ne $null) {
+                    $qs = [ordered] @{}
+                    if ($VPGName)                     { $qs.Add("vpgName", $VPGName) }
+                    if ($VMName)                      { $qs.Add("vmName", $VMName) }
+                    if ($Status -ne $null)            { $qs.Add("status", $Status) }
+                    if ($Substatus -ne $null)         { $qs.Add("substatus", $Substatus) }
+                    if ($ProtectedSiteType -ne $null) { $qs.Add("protectedSiteType", $ProtectedSiteType) }
+                    if ($RecoverySiteType -ne $null)  { $qs.Add("recoverySiteType", $RecoverySiteType) }
+                    if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
+                    if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
+                    if ($OrganizationName)            { $qs.Add("organizationName", $OrganizationName) }
+                    if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -3615,7 +3543,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VM Name')] [string] $VmName
         )
         
-        $ID = Get-ZertoVMs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID = Get-ZertoVM -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VmName -eq $VmName} | `
                             Select-Object VmIdentifier -ExpandProperty VmIdentifier
 
@@ -3629,78 +3557,61 @@
 #region Zerto VRAs
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVRAs {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Name')] [string] $VRAName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Status')] [ZertoVRAStatus] $VRAStatus,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Version')] [string] $VRAVersion, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Host Version')] [string] $HostVersion, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA IP Address')] [string] $IPAddress, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Group')] [string] $VRAGroup, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Datastore Name')] [string] $DatastoreName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Datastore Cluster Name')] [string] $DatastoreClusterName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VRA Network Name')] [string] $NetworkName 
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-
-        $FullURL = $baseURL + "vras" 
-        if ($VRAName -or $VRAStatus -ne $null -or $VRAVersion -or $HostVersion -or $IPAddress `
-                -or $VRAGroup -or $DatastoreName -or $DatastoreClusterName -or $NetworkName ) {
-            $qs = [ordered] @{}
-            if ($VRAName)              { $qs.Add("VRAName", $VRAName) }
-            if ($VRAStatus -ne $null)  { $qs.Add("Status", $VRAStatus) }
-            if ($VRAVersion)           { $qs.Add("VRAVersion", $VRAVersion) }
-            if ($HostVersion)          { $qs.Add("HostVersion", $HostVersion) }
-            if ($IPAddress)            { $qs.Add("IPAddress", $IPAddress) }
-            if ($VRAGroup)             { $qs.Add("VRAGroup", $VRAGroup) }
-            if ($DatastoreName)        { $qs.Add("DatastoreName", $DatastoreName) }
-            if ($DatastoreClusterName) { $qs.Add("DatastoreClusterName", $DatastoreClusterName) }
-            if ($NetworkName)          { $qs.Add("type", $NetworkName) }
-
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
-        }
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVRA {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Name')] [string] $VRAName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Status')] [ZertoVRAStatus] $VRAStatus,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Version')] [string] $VRAVersion, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Host Version')] [string] $HostVersion, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA IP Address')] [string] $IPAddress, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Group')] [string] $VRAGroup, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Datastore Name')] [string] $DatastoreName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Datastore Cluster Name')] [string] $DatastoreClusterName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VRA Network Name')] [string] $NetworkName,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto VRA Identifier')] [string] $ZertoVraIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
         $TypeJSON = "application/json"
+
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
-            throw "Missing Zerto VRA Identifier"
+
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoVraIdentifier)  ) {
+                    throw "Missing Zerto VRA Identifier"
+                }
+                    
+                $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "vras" 
+                if ($VRAName -or $VRAStatus -ne $null -or $VRAVersion -or $HostVersion -or $IPAddress `
+                        -or $VRAGroup -or $DatastoreName -or $DatastoreClusterName -or $NetworkName ) {
+                    $qs = [ordered] @{}
+                    if ($VRAName)              { $qs.Add("VRAName", $VRAName) }
+                    if ($VRAStatus -ne $null)  { $qs.Add("Status", $VRAStatus) }
+                    if ($VRAVersion)           { $qs.Add("VRAVersion", $VRAVersion) }
+                    if ($HostVersion)          { $qs.Add("HostVersion", $HostVersion) }
+                    if ($IPAddress)            { $qs.Add("IPAddress", $IPAddress) }
+                    if ($VRAGroup)             { $qs.Add("VRAGroup", $VRAGroup) }
+                    if ($DatastoreName)        { $qs.Add("DatastoreName", $DatastoreName) }
+                    if ($DatastoreClusterName) { $qs.Add("DatastoreClusterName", $DatastoreClusterName) }
+                    if ($NetworkName)          { $qs.Add("type", $NetworkName) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
         }
-            
-        $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier
-        Write-Verbose $FullURL
-        
+
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
         } catch {
@@ -3719,7 +3630,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VRA Name')] [string] $VraName
         )
 
-        $ID =  Get-ZertoVRAs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID =  Get-ZertoVRA -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VraName -eq $VraName} | `
                             Select-Object VraIdentifier -ExpandProperty VraIdentifier
 
@@ -3730,7 +3641,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVRAIPConfigurationTypes {
+    Function Get-ZertoVRAIPConfigurationType {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3757,7 +3668,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVRAStatuses {
+    Function Get-ZertoVRAStatus {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4012,24 +3923,25 @@
 #region Zerto VPGs
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGs {
+    Function Get-ZertoVPG {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Name')] [string] $VPGName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGStatus] $Status,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Status')] [ZertoVPGSubStatus] $SubStatus,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZOrg Name')] [string] $ZOrganizationName, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto ZOrg Identifier')] [string] $ZOrgIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Priority')] [string] $Priority, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Service Profile Identifier')] [string] $ServiceProfileIdentifier, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Backup Enabled ')] [boolean] $BackupEnabled 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Name')] [string] $VPGName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Status')] [ZertoVPGStatus] $Status,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Status')] [ZertoVPGSubStatus] $SubStatus,
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Protected Site Type')] [ZertoProtectedSiteType] $ProtectedSiteType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Recovery Site Type')] [ZertoRecoverySiteType] $RecoverySiteType, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Protected Site Identifier')] [string] $ProtectedSiteIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Recovery Site Identifier')] [string] $RecoverySiteIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto ZOrg Name')] [string] $ZOrganizationName, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto ZOrg Identifier')] [string] $ZOrgIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Priority')] [string] $Priority, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Service Profile Identifier')] [string] $ServiceProfileIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto VPG Backup Enabled ')] [boolean] $BackupEnabled,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4038,29 +3950,41 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        
-        $FullURL = $baseURL + "vpgs"
-        if ($VPGName -or $Status -ne $null -or $SubStatus -ne $null -or $ProtectedSiteType -ne $null `
-                -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or `
-                $RecoverySiteIdentifier -or $ZOrganizationName -or $ZOrgIdentifier `
-                -or $priority -ne $null -or $serviceProfileIdentifier -or $backupEnabled ) {
-            $qs = [ordered] @{}
-            if ($VPGName)                     { $qs.Add("Name", $VPGName) }
-            if ($Status -ne $null)            { $qs.Add("Status", $Status) }
-            if ($SubStatus -ne $null)         { $qs.Add("SubStatus", $SubStatus) }
-            if ($ProtectedSiteType -ne $null) { $qs.Add("ProtectedSiteType", $ProtectedSiteType) }
-            if ($RecoverySiteType -ne $null)  { $qs.Add("RecoverySiteType", $RecoverySiteType) }
-            if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
-            if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
-            if ($ZOrganizationName)           { $qs.Add("ZOrganizationName", $ZOrganizationName) }
-            if ($ZOrgIdentifier)              { $qs.Add("ZOrgIdentifier", $ZOrgIdentifier) }
-            if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
-            if ($ServiceProfileIdentifier)    { $qs.Add("ServiceProfileIdentifier", $ServiceProfileIdentifier) }
-            if ($BackupEnabled)               { $qs.Add("BackupEnabled", $BackupEnabled) }
 
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+                    throw "Missing Zerto VPG Identifier"
+                }
+
+                $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {        
+                $FullURL = $baseURL + "vpgs"
+                if ($VPGName -or $Status -ne $null -or $SubStatus -ne $null -or $ProtectedSiteType -ne $null `
+                        -or $RecoverySiteType -ne $null -or $ProtectedSiteIdentifier -or `
+                        $RecoverySiteIdentifier -or $ZOrganizationName -or $ZOrgIdentifier `
+                        -or $priority -ne $null -or $serviceProfileIdentifier -or $backupEnabled ) {
+                    $qs = [ordered] @{}
+                    if ($VPGName)                     { $qs.Add("Name", $VPGName) }
+                    if ($Status -ne $null)            { $qs.Add("Status", $Status) }
+                    if ($SubStatus -ne $null)         { $qs.Add("SubStatus", $SubStatus) }
+                    if ($ProtectedSiteType -ne $null) { $qs.Add("ProtectedSiteType", $ProtectedSiteType) }
+                    if ($RecoverySiteType -ne $null)  { $qs.Add("RecoverySiteType", $RecoverySiteType) }
+                    if ($ProtectedSiteIdentifier)     { $qs.Add("ProtectedSiteIdentifier", $ProtectedSiteIdentifier) }
+                    if ($RecoverySiteIdentifier)      { $qs.Add("RecoverySiteIdentifier", $RecoverySiteIdentifier) }
+                    if ($ZOrganizationName)           { $qs.Add("ZOrganizationName", $ZOrganizationName) }
+                    if ($ZOrgIdentifier)              { $qs.Add("ZOrgIdentifier", $ZOrgIdentifier) }
+                    if ($Priority -ne $null)          { $qs.Add("priority", $Priority) }
+                    if ($ServiceProfileIdentifier)    { $qs.Add("ServiceProfileIdentifier", $ServiceProfileIdentifier) }
+                    if ($BackupEnabled)               { $qs.Add("BackupEnabled", $BackupEnabled) }
+
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
         }
-        Write-Verbose $FullURL
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -4068,37 +3992,6 @@
             Test-RESTError -err $_
         }
         return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPG {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
-            throw "Missing Zerto VPG Identifier"
-        }
-
-        $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result 
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -4147,7 +4040,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Name')] [string] $VpgName
         )
 
-        $ID =  Get-ZertoVPGs -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID =  Get-ZertoVPG -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.VpgName -eq $VpgName} | `
                             Select-Object VpgIdentifier -ExpandProperty VpgIdentifier
 
@@ -4158,15 +4051,15 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGCheckpoints {
+    Function Get-ZertoVPGCheckpoint {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Checkpoint Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Checkpoint End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Checkpoint Start Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $StartDate, 
+            [Parameter(Mandatory=$false, ParameterSetName="Filter", HelpMessage = 'Zerto Checkpoint End Date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)')] [string] $EndDate
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4179,15 +4072,26 @@
             throw "Missing Zerto VPG Identifier"
         }
 
-        $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/checkpoints"
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                #if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
+                #    throw "Missing Zerto VPG Identifier"
+                #}
+                $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/checkpoints"
+                Write-Verbose $FullURL
+            }
+            Default {
+                $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/checkpoints"
 
-        if ($StartDate -or $EndDate ) {
-            $qs = [ordered] @{}
-            if ($StartDate)      { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
-            if ($EndDate)        { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
-            $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                if ($StartDate -or $EndDate ) {
+                    $qs = [ordered] @{}
+                    if ($StartDate)      { if (Parse-ZertoDate($StartDate)) { $qs.Add("StartDate", $StartDate) } else { throw "Invalid StartDate: '$StartDate'" } }
+                    if ($EndDate)        { if (Parse-ZertoDate($EndDate))   { $qs.Add("EndDate",   $EndDate)   } else { throw "Invalid EndDate: '$EndDate'" } }
+                    $FullURL += Get-QueryStringFromHashTable -QueryStringHash $QS
+                }
+                Write-Verbose $FullURL
+            }
         }
-        Write-Verbose $FullURL
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -4205,21 +4109,20 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
-            #[Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Checkpoint ID')] [string] $ZertoVpgCheckpointIdentifier,
             [Parameter(Mandatory=$true, ParameterSetName="Tag", HelpMessage = 'Zerto Checkpoint Tag')] [string] $ZertoVpgCheckpointTag
         )
         
         #if ($ZertoVpgCheckpointIdentifier) {
-        #    $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
+        #    $ID =  Get-ZertoVPGCheckpoint -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
         #                        Where-Object {$_.CheckpointIdentifier -eq $ZertoVpgCheckpointIdentifier} | `
         #                        Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
         #} elseif ($ZertoVpgCheckpointTag) {
-        #    $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
+        #    $ID =  Get-ZertoVPGCheckpoint -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
         #                        Where-Object {$_.Tag -eq $ZertoVpgCheckpointTag} | `
         #                        Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
         #}
 
-        $ID =  Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
+        $ID =  Get-ZertoVPGCheckpoint -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier | `
                             Where-Object {$_.Tag -eq $ZertoVpgCheckpointTag} | `
                             Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
 
@@ -4239,7 +4142,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
         )
         
-        $ID = (Get-ZertoVPGCheckpoints -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier)[-1] | 
+        $ID = (Get-ZertoVPGCheckpoint -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgIdentifier $ZertoVpgIdentifier)[-1] | 
                             Select-Object CheckpointIdentifier -ExpandProperty CheckpointIdentifier
 
         return $ID.ToString()
@@ -4277,7 +4180,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGEntityTypes {
+    Function Get-ZertoVPGEntityType {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4303,7 +4206,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGFailoverCommitPolicies {
+    Function Get-ZertoVPGFailoverCommitPolicy {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4329,7 +4232,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGFailoverShutdownPolicies {
+    Function Get-ZertoVPGFailoverShutdownPolicy {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4355,7 +4258,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGPriorities {
+    Function Get-ZertoVPGPriority {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4381,7 +4284,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGRetentionPolicies {
+    Function Get-ZertoVPGRetentionPolicy {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4407,7 +4310,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGStatuses {
+    Function Get-ZertoVPGStatus {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4433,7 +4336,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSubstatuses {
+    Function Get-ZertoVPGSubstatus {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -4566,7 +4469,7 @@
         }
 
         #BROKEN
-        #$ServiceProfileID = Get-ZertoServiceProfiles -ZertoToken $ZertoToken  | `
+        #$ServiceProfileID = Get-ZertoServiceProfile -ZertoToken $ZertoToken  | `
         #                    Where-Object {$_.Description -eq  $ServiceProfile} | `
         #                    Select-Object SiteIdentifier -ExpandProperty SiteIdentifier
 
@@ -4870,13 +4773,13 @@
 
         if (-not $VPGCommit) {
             Write-Host "VPG Setting $VPGSettingsID created.  Commit with '" -NoNewline -ForegroundColor Red
-            write-host "Commit-ZertoVPGSetting -ZertoVpgSettingsIdentifier $VPGSettingsID" -ForegroundColor Cyan -NoNewline
+            write-host "Submit-ZertoVPGSetting -ZertoVpgSettingsIdentifier $VPGSettingsID" -ForegroundColor Cyan -NoNewline
             Write-Host "'" -ForegroundColor Red
             return $VPGSettingsID 
         }
 
         #Returns VPG Task ID
-        $Result = Commit-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgSettingsIdentifier $VPGSettingsID
+        $Result = Submit-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken -ZertoVpgSettingsIdentifier $VPGSettingsID
         return $Result 
 
     }
@@ -5277,12 +5180,13 @@
 #region Zerto VPG Settings
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSettings {
+    Function Get-ZertoVPGSetting {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$false, ParameterSetName="ID", HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -5291,8 +5195,21 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        $FullURL = $baseURL + "vpgSettings"
-        Write-Verbose $FullURL
+
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
+                    throw "Missing Zerto VPG Settings Identifier"
+                }
+
+                $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {        
+                $FullURL = $baseURL + "vpgSettings"
+                Write-Verbose $FullURL
+            }
+        }
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -5300,37 +5217,6 @@
             Test-RESTError -err $_
         }
         return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSetting {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ([string]::IsNullOrEmpty($ZertoVpgSettingsIdentifier)  ) {
-            throw "Missing Zerto VPG Settings Identifier"
-        }
-
-        $FullURL = $baseURL + "vpgSettings/" + $ZertoVpgSettingsIdentifier
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result 
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -5343,7 +5229,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Setting Name')] [string] $VpgSettingName
         )
 
-        $ID =  Get-ZertoVPGSettings -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
+        $ID =  Get-ZertoVPGSetting -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken | `
                             Where-Object {$_.Basic.Name -eq $VpgSettingName} | `
                             Select-Object VpgSettingsIdentifier -ExpandProperty VpgSettingsIdentifier
 
@@ -5354,7 +5240,37 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Commit-ZertoVPGSetting {
+    Function Set-ZertoVPGSetting {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings obejct')] [ZertoVPGSetting] $ZertoVPGSetting
+        )
+
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        $TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+
+        $FullURL = $baseURL + "vpgSettings"
+        Write-Verbose $FullURL
+        $Body = $ZertoVPGSetting | ConvertTo-Json -Depth 99
+        Write-Verbose $Body
+
+        try {
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method POST -Body $Body 
+        } catch {
+            Test-RESTError -err $_
+        }
+        return $Result 
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Submit-ZertoVPGSetting {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6181,7 +6097,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSettingVMs {
+    Function Get-ZertoVPGSettingVM {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6351,7 +6267,7 @@
     }    
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSettingVMNICs {
+    Function Get-ZertoVPGSettingVMNIC {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6462,7 +6378,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGSettingVMVolumes {
+    Function Get-ZertoVPGSettingVMVolume {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6540,39 +6456,13 @@
 #region Zerto ZOrgs
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoZOrgs {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        $FullURL = $baseURL + "zorgs"
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoZOrg {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoOrgIdentifier
+            [Parameter(Mandatory=$false, ParameterSetName="ID", HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoOrgIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -6581,12 +6471,21 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        if ([string]::IsNullOrEmpty($ZertoOrgIdentifier)  ) {
-            throw "Missing Zerto Org Identifier"
+
+       switch ($PsCmdlet.ParameterSetName) {
+            "ID" {
+                if ([string]::IsNullOrEmpty($ZertoOrgIdentifier)  ) {
+                    throw "Missing Zerto Org Identifier"
+                }
+                
+                $FullURL = $baseURL + "zorgs/" + $ZertoOrgIdentifier
+                Write-Verbose $FullURL
+            }
+            Default {        
+                $FullURL = $baseURL + "zorgs"
+                Write-Verbose $FullURL
+            }
         }
-        
-        $FullURL = $baseURL + "zorgs/" + $ZertoOrgIdentifier
-        Write-Verbose $FullURL
 
         try {
             $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
@@ -6595,6 +6494,7 @@
         }
         return $Result
     }
+
 #endregion
 
 #region Zerto Resoure Report

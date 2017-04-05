@@ -181,7 +181,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Cleaned up Singular/Plural commands'
+        ReleaseNotes = 'Consolidated get/gets into single commands'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

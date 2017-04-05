@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '0.9.14' 
-$ReleaseNotes = 'Cleaned up Singular/Plural commands'
+﻿$ModuleVersion = '1.0.0' 
+$ReleaseNotes = 'Consolidated get/gets into single commands'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '1.0.1' 
-$ReleaseNotes = 'Added Connect-ZertoZVM and Disconnect-ZertoZVM.'
+﻿$ModuleVersion = '1.0.2' 
+$ReleaseNotes = 'Updated for Zerto 5.0u2 release.'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

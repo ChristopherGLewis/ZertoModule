@@ -1910,9 +1910,7 @@
                 $xZertoSessionResponse = $_.Exception.Response
             }
 
-            if ($xZertoSessionResponse -eq $null  ) {
-                Throw "Zerto Server ${ZertoServer}:${ZertoPort} not responding."
-            } elseif ($xZertoSessionResponse.StatusCode -eq "200") {
+            if ($xZertoSessionResponse.StatusCode -eq "200") {
                 $xZertoSession = $xZertoSessionResponse.headers.get_item("x-zerto-session")
                 $ZertoSessionHeader = @{"x-zerto-session"=$xZertoSession}
                 return $ZertoSessionHeader 
@@ -2664,108 +2662,6 @@
 
         return $ID.ToString()
     }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Connect-ZertoPeerSite {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, ParameterSetName="Post", HelpMessage = 'Address or DNS name of new site')] [string] $HostName,
-            [Parameter(Mandatory=$false, ParameterSetName="Post", HelpMessage = 'The default port used for communication between paired Zerto Virtual Managers. The default port is 9081.')] [int] $Port = 9081
-            ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
-        )
-        
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ( $HostName -eq $null) {
-            throw "Missing new site HostName"
-        }
-        if ( $Port -eq $null) {
-            throw "Missing new site Port"
-        }
-        If (-Not (Test-Connection $HostName -Count 1 -Quiet) ) {
-            throw "Could not ping '$hostname'"
-        }
-        $testport = 0
-        If ( -Not ([int]::TryParse($port, [ref] $testport) ) ) {
-            throw "Invaild port '$port'. Must be a postive integer."
-        }
-        If ( ($port -le 0) -or ($Port -gt [math]::Pow(2,16) )  ) {
-            throw ("Invaild port '$port'. Must be > 0 and < " + ([math]::Pow(2,16)))
-        }
-
-        $FullURL = $baseURL + "peersites"
-        Write-Verbose $FullURL
-
-        $BodyHash = [ordered] @{}
-        $BodyHash.Add("HostName", $HostName)
-        $BodyHash.Add("Port", $Port)
-        $BodyJson = $BodyHash | ConvertTo-Json -Depth 20
-
-        if ($DumpJson ) {
-            #Display JSON, and exit
-            Write-host $BodyJson
-            return
-        }
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $BodyJson
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-    # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Disconnect-ZertoPeerSite {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true,  HelpMessage = 'Zerto Site Identifier of Peersite to disconnect')] [string] $ZertoSiteIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Keep Target Disks in Peer site')] [boolean] $KeepTargetDisks = $false
-            ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
-        )
-        
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ([string]::IsNullOrEmpty($ZertoSiteIdentifier)  ) {
-            throw "Missing Zerto Site Identifier"
-        }
-
-        $FullURL = $baseURL + "peersites/" + $ZertoSiteIdentifier
-        Write-Verbose $FullURL
-        
-        $BodyHash = [ordered] @{}
-        $BodyHash.Add("IsKeepTargetDisks", $KeepTargetDisks)
-        $BodyJson = $BodyHash | ConvertTo-Json -Depth 20
-
-        if ($DumpJson ) {
-            #Display JSON, and exit
-            Write-host $BodyJson
-            return
-        }
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Delete -Body $BodyJson
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
-    }
-
-
 #endregion
 
 #region Zerto Service Profiles
@@ -4011,40 +3907,40 @@
         $FullURL = $baseURL + "vras"  
         Write-Verbose $FullURL
 
-        $BodyHash = [ordered] @{}
-        $BodyHash.Add("DatastoreIdentifier", $DatastoreID)
-        $BodyHash.Add("GroupName", $VRAGroupName)
-        $BodyHash.Add("HostIdentifier", $HostID)
+        $NewVRAHash = [ordered] @{}
+        $NewVRAHash.Add("DatastoreIdentifier", $DatastoreID)
+        $NewVRAHash.Add("GroupName", $VRAGroupName)
+        $NewVRAHash.Add("HostIdentifier", $HostID)
         If ($HostRootPassword) {
-            $BodyHash.Add("HostRootPassword", $HostRootPassword)
-            $BodyHash.Add("UsePublicKeyInsteadOfCredentials", $false)
+            $NewVRAHash.Add("HostRootPassword", $HostRootPassword)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
         } else {
-            $BodyHash.Add("HostRootPassword", $null)
-            $BodyHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
+            $NewVRAHash.Add("HostRootPassword", $null)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
         }
 
-        $BodyHash.Add("MemoryInGb", $MemoryInGB)
-        $BodyHash.Add("NetworkIdentifier", $NetworkID)
+        $NewVRAHash.Add("MemoryInGb", $MemoryInGB)
+        $NewVRAHash.Add("NetworkIdentifier", $NetworkID)
         $NewVRAIPInfo = [ordered] @{}
             $NewVRAIPInfo.Add("DefaultGateway", $VRAIPConfiguration.Gateway )
             $NewVRAIPInfo.Add("SubnetMask", $VRAIPConfiguration.SubnetMask )
             $NewVRAIPInfo.Add("VraIPAddress", $VRAIPConfiguration.IPAddress )
             $NewVRAIPInfo.Add("VraIPConfigurationTypeApi", $VRAIPConfiguration.VRAIPType.ToString() )
-        $BodyHash.Add("VraNetworkDataApi", $NewVRAIPInfo)
+            $NewVRAHash.Add("VraNetworkDataApi", $NewVRAIPInfo)
 
         #Convert VPG Hash to JSON - Remember DEPTH!!!
-        $BodyJson = $BodyHash | ConvertTo-Json -Depth 20
+        $NewVRAJson = $NewVRAHash | ConvertTo-Json -Depth 20
 
         Write-Verbose $NewVRAJson
 
         if ($DumpJson ) {
             #Display JSON, and exit
-            Write-host $BodyJson
+            Write-host $NewVRAJson
             return
         }
 
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $BodyJson
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $NewVRAJson
         } catch {
             Test-RESTError -err $_
         }
@@ -4063,6 +3959,7 @@
             [Parameter(Mandatory=$true, ParameterSetName="Password", HelpMessage = 'Zerto Host Root Password')] [string] $HostRootPassword,
             [Parameter(Mandatory=$true, ParameterSetName="PublicKey", HelpMessage = 'Use vCenter PublicKey instead of Password')] [bool] $UseVCenterPublicKey = $true,
             [Parameter(Mandatory=$true, HelpMessage = 'VRA IP Configuration')] [VRAIPAddressConfig] $VRAIPConfiguration
+
             ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
         )
         
@@ -4084,15 +3981,15 @@
         $FullURL = $baseURL + "vras/" + $ZertoVraIdentifier
         Write-Verbose $FullURL
 
-        $BodyHash = [ordered] @{}
+        $NewVRAHash = [ordered] @{}
 
-        $BodyHash.Add("GroupName", $VRAGroupName)
+        $NewVRAHash.Add("GroupName", $VRAGroupName)
         If ($HostRootPassword) {
-            $BodyHash.Add("HostRootPassword", $HostRootPassword)
-            $BodyHash.Add("UsePublicKeyInsteadOfCredentials", $false)
+            $NewVRAHash.Add("HostRootPassword", $HostRootPassword)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $false)
         } else {
-            $BodyHash.Add("HostRootPassword", $null)
-            $BodyHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
+            $NewVRAHash.Add("HostRootPassword", $null)
+            $NewVRAHash.Add("UsePublicKeyInsteadOfCredentials", $UseVCenterPublicKey)
         }
 
         $NewVRAIPInfo = [ordered] @{}
@@ -4100,24 +3997,26 @@
             $NewVRAIPInfo.Add("SubnetMask", $VRAIPConfiguration.SubnetMask )
             $NewVRAIPInfo.Add("VraIPAddress", $VRAIPConfiguration.IPAddress )
             $NewVRAIPInfo.Add("VraIPConfigurationTypeApi", $VRAIPConfiguration.VRAIPType.ToString() )
-        $BodyHash.Add("VraNetworkDataApi", $NewVRAIPInfo)        
+            $NewVRAHash.Add("VraNetworkDataApi", $NewVRAIPInfo)        
 
         #Convert VPG Hash to JSON - Remember DEPTH!!!
-        $BodyJson = $BodyHash | ConvertTo-Json -Depth 20
+        $NewVRAJson = $NewVRAHash | ConvertTo-Json -Depth 20
 
-        Write-Verbose $BodyJson
+        Write-Verbose $NewVRAJson
+
         if ($DumpJson ) {
             #Display JSON, and exit
-            Write-host $BodyJson
+            Write-host $NewVRAJson
             return
         }
 
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $BodyJson
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Put -Body $NewVRAJson
         } catch {
             Test-RESTError -err $_
         }
         return $Result
+
     }
 
 
@@ -4204,7 +4103,6 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
-            ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson   
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4216,22 +4114,17 @@
         if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
             throw "Missing Zerto VPG Identifier"
         }
+        
+        $VpgHash = @{}
+        $VpgHash.Add("VpgIdentifier", $ZertoVpgIdentifier )
+        $VpgHashJson = $VpgHash | ConvertTo-Json
+
 
         $FullURL = $baseURL + "vpgSettings" 
         Write-Verbose $FullURL
 
-        $BodyHash = @{}
-        $BodyHash.Add("VpgIdentifier", $ZertoVpgIdentifier )
-        $BodyJson = $BodyHash | ConvertTo-Json
-        Write-Verbose $BodyJson
-        if ($DumpJson ) {
-            #Display JSON, and exit
-            Write-host $BodyJson
-            return
-        }
-
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Body $BodyJson -Method Post
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Body $VpgHashJson -Method Post
         } catch {
             Test-RESTError -err $_
         }
@@ -4387,38 +4280,6 @@
         }
 
         $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/checkpoints/Summary"
-        Write-Verbose $FullURL
-
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        Write-Warning "Get-ZertoVPGCheckpointSummary is depricated as of Zerto 5.0u2.  Use Get-Get-ZertoVPGCheckpointStats."
-        return $Result 
-    }
-
-        # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoVPGCheckpointStats {
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier
-        )
-
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
-        $TypeJSON = "application/json"
-
-        if ( $ZertoToken -eq $null) {
-            throw "Missing Zerto Authentication Token"
-        }
-        if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
-            throw "Missing Zerto VPG Identifier"
-        }
-
-        $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/checkpoints/stats"
         Write-Verbose $FullURL
 
         try {
@@ -4799,8 +4660,8 @@
         }
 
         #Build up our json object
-        $NewBodyHash = [ordered] @{}
-        $NewBodyHash.Add('Backup' , $null)
+        $NewVPGHash = [ordered] @{}
+        $NewVPGHash.Add('Backup' , $null)
         $Basic = [ordered] @{}
             $Basic.Add( 'JournalHistoryInHours', $JournalHistoryInHours)
             $Basic.Add( 'Name', $VPGName)
@@ -4812,7 +4673,7 @@
             $Basic.Add( 'TestIntervalInMinutes', $TestIntervalInMinutes )
             $Basic.Add( 'UseWanCompression', $true )
             $Basic.Add( 'ZorgIdentifier', $null )
-            $NewBodyHash.Add('Basic' , $Basic)
+            $NewVPGHash.Add('Basic' , $Basic)
         $BootGroupsItem = [ordered] @{}
             $BootGroupsItem.Add( 'BootDelayInSeconds', 0)
             $BootGroupsItem.Add( 'BootGroupIdentifier', '00000000-0000-0000-0000-000000000000')
@@ -4820,7 +4681,7 @@
             $BootGroupsArray = @()
             $BootGroupsArray += $BootGroupsItem
             $BootGroups= @{'BootGroups' = $BootGroupsArray }
-            $NewBodyHash.Add('BootGroups' , $BootGroups )
+            $NewVPGHash.Add('BootGroups' , $BootGroups )
         $Journal = [ordered] @{}
             if ($JournalUseDefault) {
                 #Use the defaults
@@ -4854,7 +4715,7 @@
             $JournalLimit.Add( 'WarningThresholdInMB', $JournalWarningThresholdMB )
             $JournalLimit.Add( 'WarningThresholdInPercent', $null )
             $Journal.Add( 'Limitation', $JournalLimit)
-            $NewBodyHash.Add('Journal' , $Journal )
+            $NewVPGHash.Add('Journal' , $Journal )
         $Networks = [ordered] @{}
                 $Failover = [ordered] @{}
                     $DefaultNetworkIdentifier = [ordered] @{}
@@ -4866,7 +4727,7 @@
                     $DefaultNetworkIdentifier.Add('DefaultNetworkIdentifier', $TestNetworkID)
                 $FailoverTest.Add( 'Hypervisor', $DefaultNetworkIdentifier )
             $Networks.Add( 'FailoverTest', $FailoverTest)
-            $NewBodyHash.Add('Networks' , $Networks )
+            $NewVPGHash.Add('Networks' , $Networks )
         $Recovery = [ordered] @{}
             if ($DatastoreID) {
                 #$Recovery.Add( 'DefaultDatastoreClusterIdentifier', $null)
@@ -4886,7 +4747,7 @@
                 $Recovery.Add( 'DefaultHostIdentifier', $HostID)
             }
             $Recovery.Add( 'ResourcePoolIdentifier', $null)
-            $NewBodyHash.Add( 'Recovery' , $Recovery )
+            $NewVPGHash.Add( 'Recovery' , $Recovery )
         $Scripting = [ordered] @{}
             $Scripting.Add( 'PostBackup', $null)
                 $PostRecovery = [ordered] @{}
@@ -4899,7 +4760,7 @@
                 $PreRecovery.Add( 'Parameters', $null)
                 $PreRecovery.Add( 'TimeoutInSeconds', 0)
             $Scripting.Add( 'PreRecovery', $PreRecovery)               
-            $NewBodyHash.Add( 'Scripting' , $Scripting )
+            $NewVPGHash.Add( 'Scripting' , $Scripting )
         $VMArray= @()
             if ($VmNames) {
                 #This section is VM + ID only
@@ -4995,11 +4856,11 @@
             } else {
                 throw "No VM's specified"
             }
-            $NewBodyHash.Add( 'Vms' , $VMArray)
+            $NewVPGHash.Add( 'Vms' , $VMArray)
         
         #
         #Convert VPG Hash to JSON - Remember DEPTH!!!
-        $NewVPGJson = $NewBodyHash | ConvertTo-Json -Depth 20
+        $NewVPGJson = $NewVPGHash | ConvertTo-Json -Depth 20
 
         $FullURL = $baseURL + "vpgsettings"
         Write-Verbose $FullURL
@@ -5112,9 +4973,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Checkpoint Identifier (default is latest)')] [string] $ZertoVpgCheckpointIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'DatastoreIdentifier')] [string] $DatastoreIdentifier
-            ,[Parameter(Mandatory=$false, HelpMessage = 'Dump Json without posting for debug')] [switch] $DumpJson
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto VPG Checkpoint Identifier (default is latest)')] [string] $ZertoVpgCheckpointIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -5130,28 +4989,18 @@
         $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/Clonestart"
         Write-Verbose $FullURL
         
-        #Both parameters are optional
-        $BodyHash = [ordered] @{}
-        if (-not ( [string]::IsNullOrEmpty($ZertoVpgCheckpointIdentifier) )  ) {
-            $BodyHash.Add("CheckpointIdentifier", $ZertoVpgCheckpointIdentifier)
-        }
-        if (-not ( [string]::IsNullOrEmpty($DatastoreIdentifier) )  ) {
-            $BodyHash.Add("DatastoreIdentifier", $DatastoreIdentifier)
+        if ($ZertoVpgCheckpointIdentifier) {
+            $BodyHash = [ordered] @{}
+            $BodyHash.Add("checkpointIdentifier", $ZertoVpgCheckpointIdentifier)
+            $Body = $BodyHash | ConvertTo-Json
+            Write-Verbose $Body
         }
 
-        $BodyJson = $BodyHash | ConvertTo-Json
-        Write-Verbose $BodyJson
-        if ($DumpJson ) {
-            #Display JSON, and exit
-            Write-host $BodyJson
-            return
-        }
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $BodyJson
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $Body
         } catch {
             Test-RESTError -err $_
         }
-
         return $Result 
     }
 
@@ -5198,8 +5047,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Commit Policy')] [ZertoCommitPolicy] $CommitPolicy = "Commit",
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Commit Value in seconds')] [string] $CommitInSeconds,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Shutdown Policy')] [ZertoShutdownPolicy] $ShutdownPolicy = "Shutdown",
-            [Parameter(Mandatory=$true, HelpMessage = 'Time to wait before shutdown in seconds')] [string] $TimeToWaitBeforeShutdownInSec,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Reverse Protection')] [bool] $ReverseProtection = $true
+            [Parameter(Mandatory=$true, HelpMessage = 'Time to wait before shutdown in seconds')] [string] $TimeToWaitBeforeShutdownInSec
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -5225,12 +5073,11 @@
         #$Failover.Add("CommitValue", $CommitInSeconds)
         $BodyHash.Add("ShutdownPolicy", $ShutdownPolicy )
         $BodyHash.Add("TimeToWaitBeforeShutdownInSec", $TimeToWaitBeforeShutdownInSec )
-        $BodyHash.Add("IsReverseProtection", $ReverseProtection )
-        $BodyJson = $BodyHash | ConvertTo-Json
-        Write-Verbose $BodyJson
+        $Body = $BodyHash | ConvertTo-Json
+        Write-Verbose $Body
 
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $BodyJson
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method Post -Body $Body
         } catch {
             Test-RESTError -err $_
         }
@@ -5244,8 +5091,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Identifier')] [string] $ZertoVpgIdentifier,
-            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Reverse Protection')] [bool] $ReverseProtection = $true
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG  Identifier')] [string] $ZertoVpgIdentifier
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -5255,25 +5101,14 @@
             throw "Missing Zerto Authentication Token"
         }
         if ([string]::IsNullOrEmpty($ZertoVpgIdentifier)  ) {
-            throw "Missing Zerto VPG Identifier"
+            throw "Missing Zerto VPG  Identifier"
         }
 
         $FullURL = $baseURL + "vpgs/" + $ZertoVpgIdentifier + "/failovercommit" 
         Write-Verbose $FullURL
 
-        $BodyHash = [ordered] @{}
-        $BodyHash.Add("IsReverseProtection", $ReverseProtection)
-        $BodyJson = $BodyHash | ConvertTo-Json -Depth 20
-
-        Write-Verbose $BodyJson
-        if ($DumpJson ) {
-            #Display JSON, and exit
-            Write-host $BodyJson
-            return
-        }
-
         try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method POST -Body $BodyJson
+            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON -Method POST
         } catch {
             Test-RESTError -err $_
         }

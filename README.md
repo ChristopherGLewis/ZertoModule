@@ -22,69 +22,84 @@ module using
 
     Import-Module ZertoModule
 
-
-Set the following Env vars to avoid having to pass them to each command:
-
-    PS C:\Scripts\Zerto> Set-Item ENV:ZertoServer "il1zerto.test.com" 
-    PS C:\Scripts\Zerto> Set-Item ENV:ZertoPort "9669" 
-
-
 ### Authentication
-Zerto's REST API uses a Zerto session header for the REST calls.  You can establish a session with either:
+Zerto's REST API uses a Zerto session header for the REST calls.  Connect to the ZertoZVM using:
+
+    Connect-ZertoZVM -ZertoServer "il1zerto.test.com"  -ZertoUser Test\Account
+
+This sets the following Env vars to avoid having to pass them to each command:
+
+    ENV:ZertoServer "il1zerto.test.com" 
+    ENV:ZertoPort "9669"
+    ENV:ZertoToken {"x-zerto-session":"52a723dd-c288-afbd-b6eb-1e8d299e0c40"} 
+
+You can also connect directly to a Zerto ZVM using `Get-ZertoAuthToken`:
 
     PS C:\Scripts\Zerto> $ztoken = Get-ZertoAuthToken
-Or 
 
-    # Auth with User Name
-    PS C:\Scripts\Zerto> Set-ZertoAuthToken -ZertoUser Test\Account
+This will prompt for a UserName/password.
 
-    PS C:\Scripts\Zerto> $Env:ZertoToken
-    {"x-zerto-session":"527ffdec-4cb0-eb4c-2067-5488cba47134"}
-
-Both will prompt for a UserName/password.
-
-If you use Get-ZertoAuthToken, you will need to pass the returned variable to 
+If you use `Get-ZertoAuthToken`, you will need to pass the returned variable to 
 each call:
 
-    Get-ZertoLocalSite -ZertoToken $ztoken
+    Get-ZertoLocalSite -ZertoServer "nc1zerto.test.com" -ZertoPort 9669  -ZertoToken $ztoken
+
+This is useful if you are connecting to multiple ZVMs.
 
 ### Basic usage
-Once you've authenticated, any call can be made using the ENV vars.   
+Once you've used `Connect-ZertoZVM`, any call can be made without specifying the credentials.   
     
     PS C:\Scripts\Zerto> Get-ZertoLocalSite
     
     ContactEmail               : noc@test.com
     ContactName                : NOC
     ContactPhone               : 847-555-1212
-    IpAddress                  : 10.77.199.10
+    IpAddress                  : 10.75.0.10
     IsReplicationToSelfEnabled : True
-    Link                       : @{href=https://10.77.199.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
+    Link                       : @{href=https://10.75.0.10:9669/v1/localsite; identifier=d492497e-6793-4ec8-b44b-f60a43aef445; rel=; type=LocalSiteApi}
     Location                   : Chicago, IL
     SiteIdentifier             : d492497e-6793-4ec8-b44b-f60a43aef445
     SiteName                   : Zerto-IL1
     SiteType                   : VCenter
     UtcOffsetInMinutes         : -360
-    Version                    : 5.0.0
+    Version                    : 5.0.02
+
+You can also specify authentication parameters in your calls:
     
+    PS C:\Scripts\Zerto> Get-ZertoLocalSite -ZertoServer "nc1zerto.test.com" -ZertoPort 9669 -ZertoToken (Get-ZertoAuthToken -ZertoServer "nc1zerto.test.com" -ZertoPort 9669 -ZertoUser 'Test\Account')
+
+    ContactEmail               : noc@test.com
+    ContactName                : NOC
+    ContactPhone               : 847-555-1212
+    IpAddress                  : 10.76.0.10
+    IsReplicationToSelfEnabled : True
+    Link                       : @{href=https://10.76.0.10:9669/v1/localsite; identifier=258fcb39-d6a3-4547-8797-3605da6d372b; rel=; type=LocalSiteApi}
+    Location                   : Charlotte, NC
+    SiteIdentifier             : 258fcb39-d6a3-4547-8797-3605da6d372b
+    SiteName                   : Zerto-NC1
+    SiteType                   : VCenter
+    UtcOffsetInMinutes         : -240
+    Version                    : 5.0.12
+
 ### Expired Sessions
 Zerto Authentication sessions expire after 30 minutes of no usage.  The error you will see if you try 
 to use an expired session looks like this:
 
     PS C:\Scripts\Zerto> Get-ZertoLocalSite
-    Exception occured in API : Invalid session
+    Exception occurred in API : Invalid session
     At C:\Scripts\Zerto\ZertoModule\ZertoModule.psm1:871 char:21
     +                     throw $obj.Message
     +                     ~~~~~~~~~~~~~~~~~~
         + CategoryInfo          : OperationStopped: (Exception occur...Invalid session:String) [], RuntimeException
-        + FullyQualifiedErrorId : Exception occured in API : Invalid session
-  
+        + FullyQualifiedErrorId : Exception occurred in API : Invalid session
 
 ## Supported Zerto Versions
 
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
-
 ## Release Notes
+**1.0.1** - Added Connect-ZertoZVM and Disconnect-ZertoZVM.
+
 **1.0.0** - Updated Get/Gets commands.  For example Get-ZertoVPGs and Get-ZertoVPG have been combined 
 into Get-ZertoVPG with an ID parameter set.
 
@@ -97,9 +112,9 @@ updated the Failover IP class, so check your New-ZertoFailoverIPAddress calls
 
 **0.8.7** - Fixed some issues with Add-ZertoVRA
 
-**0.8.6** - Fixed some isssues with passing ZertoServer/Port/Token to sub-calls'
+**0.8.6** - Fixed some issues with passing ZertoServer/Port/Token to sub-calls'
 
 **0.8.5** - Updated to remove some company information'
 
-**0.8.0** - Initital release to Powershell Gallery.  Note that some functionality, 
+**0.8.0** - Initial release to Powershell Gallery.  Note that some functionality, 
 specifically around editing VPG settings, has not been implemented.

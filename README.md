@@ -98,6 +98,8 @@ to use an expired session looks like this:
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 ## Release Notes
+**1.0.2** - Updated for Zerto 5.0u2 release.
+
 **1.0.1** - Added Connect-ZertoZVM and Disconnect-ZertoZVM.
 
 **1.0.0** - Updated Get/Gets commands.  For example Get-ZertoVPGs and Get-ZertoVPG have been combined 

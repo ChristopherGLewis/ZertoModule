@@ -1896,6 +1896,10 @@
         }
 
         If ($cred -NE $null) {
+            #Remove  our Zerto Version
+            Remove-Item ENV:ZertoToken -Force -ErrorAction Ignore
+            Remove-Item ENV:ZertoVersion -Force -ErrorAction Ignore
+
             # Authenticating with Zerto APIs - Basic AUTH over SSL
             $authInfo = ("{0}\{1}:{2}" -f  $cred.GetNetworkCredential().domain ,  $cred.GetNetworkCredential().UserName,  $cred.GetNetworkCredential().Password )
             $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
@@ -1937,6 +1941,8 @@
         )
         
         Set-Item ENV:ZertoToken ( (Get-ZertoAuthToken -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoUser $ZertoUser) | ConvertTo-Json -Compress) 
+        #Set our Zerto Version
+        Set-Item ENV:ZertoVersion (Get-ZertoLocalSite).version
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -1963,6 +1969,9 @@
         } catch {
             Test-RESTError -err $_
         }
+        #Remove Zerto Vars
+        Remove-Item ENV:ZertoVersion -Force -ErrorAction Ignore
+        Remove-Item ENV:ZertoToken -Force -ErrorAction Ignore
         return $Result
     }
 
@@ -1977,15 +1986,17 @@
         
         Set-Item ENV:ZertoServer $ZertoServer
         Set-Item ENV:ZertoPort  $ZertoPort 
-        Set-Item ENV:ZertoToken ( (Get-ZertoAuthToken -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoUser $ZertoUser) | ConvertTo-Json -Compress) 
+        Set-Item ENV:ZertoToken ((Get-ZertoAuthToken -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoUser $ZertoUser) | ConvertTo-Json -Compress) 
+        Set-Item ENV:ZertoVersion (Get-ZertoLocalSite).version
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Disconnect-ZertoZVM {
-        Remove-ZertoAuthToken 
-        Remove-Item ENV:ZertoServer -Force 
-        Remove-Item ENV:ZertoPort -Force 
-        Remove-Item ENV:ZertoToken -Force 
+        Remove-ZertoAuthToken
+        Remove-Item ENV:ZertoVersion -Force -ErrorAction Ignore
+        Remove-Item ENV:ZertoServer -Force -ErrorAction Ignore
+        Remove-Item ENV:ZertoPort -Force -ErrorAction Ignore
+        Remove-Item ENV:ZertoToken -Force -ErrorAction Ignore
     }
 
 #endregion
@@ -4394,11 +4405,22 @@
         } catch {
             Test-RESTError -err $_
         }
-        Write-Warning "Get-ZertoVPGCheckpointSummary is depricated as of Zerto 5.0u2.  Use Get-Get-ZertoVPGCheckpointStats."
+        #Show depricated if 5.0u2 or higher
+        try {
+            switch ( [Version] $env:ZertoVersion) {
+                { $_ -ge [Version]::new("5.0.21") }     #5.0u2
+                  {         Write-Warning "Get-ZertoVPGCheckpointSummary is depricated as of Zerto 5.0u2.  Use Get-Get-ZertoVPGCheckpointStats."  }
+                5.0.12 {  }   #5.0u1
+                Default {}
+            }
+        } catch {
+            Write-Warning "Invalid ZertoVersion: $env:ZertoVersion "
+        }
         return $Result 
     }
 
-        # .ExternalHelp ZertoModule.psm1-help.xml
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpointStats {
         [CmdletBinding()]
         param(
@@ -6694,7 +6716,7 @@
 #region Zerto Resoure Report
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoResoureReport {
+    Function Get-ZertoResouresReport {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6706,7 +6728,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Report Records to retrieve 1 to 500')] [string] $Count = 500
         )
 
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/ZvmService/ResourceReport/"
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/ZvmService/ResourcesReport/"
         $TypeJSON = "application/json"
 
         if ( $ZertoToken -eq $null) {
@@ -6737,7 +6759,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoResoureReportAdvFilter {
+    Function Get-ZertoResourcesReportAdvFilter {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -6750,7 +6772,7 @@
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto Report Records Advanced Filter')] [string] $Filter
         )
 
-        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/ZvmService/ResourceReport/"
+        $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/ZvmService/ResourcesReport/"
         $TypeJSON = "application/json"
 
         if ( $ZertoToken -eq $null) {

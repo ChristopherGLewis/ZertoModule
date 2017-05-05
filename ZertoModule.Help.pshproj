@@ -1906,14 +1906,14 @@ Version                    : 5.0.0
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
       <Publish>false</Publish>
     </CmdletObject>
-    <CmdletObject verb="Get" noun="ZertoResoureReport">
-      <Name>Get-ZertoResoureReport</Name>
+    <CmdletObject verb="Get" noun="ZertoResouresReport">
+      <Name>Get-ZertoResouresReport</Name>
       <Syntax>
-        <string>Get-ZertoResoureReport [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-FromTime] &lt;String&gt; [-ToTime] &lt;String&gt; [[-StartIndex] &lt;String&gt;] [[-Count] &lt;String&gt;]</string>
+        <string>Get-ZertoResouresReport [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-FromTime] &lt;String&gt; [-ToTime] &lt;String&gt; [[-StartIndex] &lt;String&gt;] [[-Count] &lt;String&gt;]</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis>Returns a Zerto Resource Report</Synopsis>
-        <Description>Returns a Zerto Resource Report</Description>
+        <Synopsis>Returns a Zerto Resources Report</Synopsis>
+        <Description>Returns a Zerto Resources Report</Description>
         <Notes />
         <InputType />
         <InputUrl />
@@ -2002,14 +2002,14 @@ Version                    : 5.0.0
       <SupportInformation ad="false" rsat="false" ps2="false" ps3="false" ps4="false" ps5="false" wxp="false" wv="false" w7="false" w8="false" w81="false" w10="false" w2k3s="false" w2k3e="false" w2k3d="false" w2k8s="false" w2k8e="false" w2k8d="false" w2k8r2s="false" w2k8r2e="false" w2k8r2d="false" w2k12s="false" w2k12d="false" w2k12r2s="false" w2k12r2d="false" />
       <Publish>false</Publish>
     </CmdletObject>
-    <CmdletObject verb="Get" noun="ZertoResoureReportAdvFilter">
-      <Name>Get-ZertoResoureReportAdvFilter</Name>
+    <CmdletObject verb="Get" noun="ZertoResouresReportAdvFilter">
+      <Name>Get-ZertoResouresReportAdvFilter</Name>
       <Syntax>
-        <string>Get-ZertoResoureReportAdvFilter [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-FromTime] &lt;String&gt; [-ToTime] &lt;String&gt; [[-StartIndex] &lt;String&gt;] [-Count] &lt;String&gt; [-Filter] &lt;String&gt;</string>
+        <string>Get-ZertoResouresReportAdvFilter [[-ZertoServer] &lt;String&gt;] [[-ZertoPort] &lt;String&gt;] [[-ZertoToken] &lt;Hashtable&gt;] [-FromTime] &lt;String&gt; [-ToTime] &lt;String&gt; [[-StartIndex] &lt;String&gt;] [-Count] &lt;String&gt; [-Filter] &lt;String&gt;</string>
       </Syntax>
       <GeneralHelp>
-        <Synopsis>Returns a Zerto Resource Report using Advanced Filtering</Synopsis>
-        <Description>Returns a Zerto Resource Report using Advanced Filtering</Description>
+        <Synopsis>Returns a Zerto Resources Report using Advanced Filtering</Synopsis>
+        <Description>Returns a Zerto Resources Report using Advanced Filtering</Description>
         <Notes>Enables advanced filtering of the results according to specific criteria. For example:
 
 filter=(SourceSite='Las Vegas')

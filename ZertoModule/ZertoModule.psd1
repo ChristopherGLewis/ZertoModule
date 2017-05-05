@@ -78,13 +78,13 @@ FunctionsToExport = 'Add-ZertoVPG', 'Add-ZertoVPGSettingVM', 'Add-ZertoVRA',
                'Get-ZertoAuthToken', 'Get-ZertoEvent', 'Get-ZertoEventCategory', 
                'Get-ZertoEventEntity', 'Get-ZertoEventType', 'Get-ZertoLocalSite', 
                'Get-ZertoLocalSiteID', 'Get-ZertoLocalSitePairingStatus', 
-               'Get-ZertoPeerSite', 'Get-ZertoPeerSiteID', 'Get-ZertoResoureReport', 
-               'Get-ZertoResoureReportAdvFilter', 'Get-ZertoRESTAPI', 
-               'Get-ZertoServiceProfile', 'Get-ZertoServiceProfileID', 
-               'Get-ZertoSite', 'Get-ZertoSiteDatastore', 
-               'Get-ZertoSiteDatastoreCluster', 'Get-ZertoSiteDatastoreClusterID', 
-               'Get-ZertoSiteDatastoreID', 'Get-ZertoSiteFolder', 
-               'Get-ZertoSiteFolderID', 'Get-ZertoSiteHost', 
+               'Get-ZertoPeerSite', 'Get-ZertoPeerSiteID', 
+               'Get-ZertoResourcesReportAdvFilter', 'Get-ZertoResouresReport', 
+               'Get-ZertoRESTAPI', 'Get-ZertoServiceProfile', 
+               'Get-ZertoServiceProfileID', 'Get-ZertoSite', 
+               'Get-ZertoSiteDatastore', 'Get-ZertoSiteDatastoreCluster', 
+               'Get-ZertoSiteDatastoreClusterID', 'Get-ZertoSiteDatastoreID', 
+               'Get-ZertoSiteFolder', 'Get-ZertoSiteFolderID', 'Get-ZertoSiteHost', 
                'Get-ZertoSiteHostCluster', 'Get-ZertoSiteHostClusterID', 
                'Get-ZertoSiteHostID', 'Get-ZertoSiteID', 'Get-ZertoSiteNetwork', 
                'Get-ZertoSiteNetworkID', 'Get-ZertoSiteOrgVCD', 
@@ -184,7 +184,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Added $env:ZertoVersion for deprication/new features.'
+        ReleaseNotes = 'Added $env:ZertoVersion for deprication/new features.  Fixed ResourceReport API.'
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

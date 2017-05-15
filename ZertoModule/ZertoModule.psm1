@@ -3617,6 +3617,11 @@
                     throw "Missing Zerto Task Identifier"
                 }
 
+                #Zerto Returns TASK id's using a ':' as a separator - this needs to be a '.' for the API
+                if ($ZertoTaskIdentifier -match ':') {
+                    $ZertoTaskIdentifier = $ZertoTaskIdentifier -replace ':','.'
+                }
+
                 $FullURL = $baseURL + "tasks/" + $ZertoTaskIdentifier
             }
             Default {

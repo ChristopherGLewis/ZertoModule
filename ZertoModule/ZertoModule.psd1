@@ -12,7 +12,7 @@
 RootModule = 'ZertoModule.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.4'
+ModuleVersion = '1.0.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -91,9 +91,10 @@ FunctionsToExport = 'Add-ZertoVPG', 'Add-ZertoVPGSettingVM', 'Add-ZertoVRA',
                'Get-ZertoSiteRepository', 'Get-ZertoSiteRepositoryID', 
                'Get-ZertoSiteResourcePool', 'Get-ZertoSiteVApp', 
                'Get-ZertoSiteVcdVapp', 'Get-ZertoSiteVM', 'Get-ZertoSiteVMID', 
-               'Get-ZertoTask', 'Get-ZertoTasksType', 'Get-ZertoVirtualizationSite', 
-               'Get-ZertoVirtualizationSiteID', 'Get-ZertoVM', 'Get-ZertoVMID', 
-               'Get-ZertoVPG', 'Get-ZertoVPGCheckpoint', 'Get-ZertoVPGCheckpointID', 
+               'Get-ZertoTask', 'Get-ZertoTaskState', 'Get-ZertoTaskType', 
+               'Get-ZertoVirtualizationSite', 'Get-ZertoVirtualizationSiteID', 
+               'Get-ZertoVM', 'Get-ZertoVMID', 'Get-ZertoVPG', 
+               'Get-ZertoVPGCheckpoint', 'Get-ZertoVPGCheckpointID', 
                'Get-ZertoVPGCheckpointLastID', 'Get-ZertoVPGCheckpointStats', 
                'Get-ZertoVPGCheckpointSummary', 'Get-ZertoVPGEntityType', 
                'Get-ZertoVPGFailoverCommitPolicy', 
@@ -184,7 +185,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Added $env:ZertoVersion for deprication/new features.  Fixed ResourceReport API.'
+        ReleaseNotes = 'Added ZertoTaskStates enum, Get-ZertoTaskState.  Need to dupe this code for othe enums.   '
 
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

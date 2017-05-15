@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '1.0.4' 
-$ReleaseNotes = 'Added a ":" to "." replace for ZertoTask api.  Tasks returned by Zerto can contain a ":", but the API only uses "."  '
+﻿$ModuleVersion = '1.0.5' 
+$ReleaseNotes = 'Added ZertoTaskStates enum, Get-ZertoTaskState.  Need to dupe this code for othe enums.   '
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

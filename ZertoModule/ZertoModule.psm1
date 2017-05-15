@@ -386,6 +386,17 @@
 
     }
 
+    enum ZertoTaskStates {
+        FirstUnusedValue = 0
+        InProgress = 1
+        WaitingForUserInput = 2
+        Paused  = 3
+        Failed = 4
+        Stopped = 5
+        Completed = 6
+        Cancelling = 7
+    }
+
     enum ZertoVPGSettingsBackupRetentionPeriod  {
         OneWeek     = 0
         OneMonth    = 1
@@ -3650,7 +3661,7 @@
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function Get-ZertoTasksType {
+    Function Get-ZertoTaskType {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
@@ -3674,6 +3685,40 @@
             Test-RESTError -err $_
         }
         return $Result
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function Get-ZertoTaskState {
+        [CmdletBinding(DefaultParameterSetName = 'default')]
+        param(
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
+            [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, ParameterSetName="State", HelpMessage = 'Zerto Task State')] [string] $ZertoTaskState,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto Task State ID')] [ZertoTaskStates] $ZertoTaskStateID
+        )
+
+        #$baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
+        #$TypeJSON = "application/json"
+
+        if ( $ZertoToken -eq $null) {
+            throw "Missing Zerto Authentication Token"
+        }
+
+       switch ($PsCmdlet.ParameterSetName) {
+            "State" {
+                if ([string]::IsNullOrEmpty($ZertoTaskState)  ) {
+                    throw "Missing Zerto Task State"
+                }
+                Return [ZertoTaskStates]::$ZertoTaskState.value__
+            }
+            "ID" {
+                Return [ZertoTaskStates]$ZertoTaskStateID
+            }
+            Default {
+                return [System.Enum]::GetNames([ZertoTaskStates])
+            }
+        }        
     }
 
 #endregion

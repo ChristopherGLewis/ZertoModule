@@ -18,6 +18,7 @@
         Recovered             = 8
     }
 
+    
     enum ZertoVPGSubstatus {
         None                                 = 0
         InitialSync                          = 1
@@ -3720,7 +3721,7 @@
             }
         }        
     }
-
+    
 #endregion
 
 #region Zerto Virtual Machines
@@ -4469,7 +4470,6 @@
         return $Result 
     }
 
-
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGCheckpointStats {
         [CmdletBinding()]
@@ -4633,11 +4633,13 @@
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPGStatus {
-        [CmdletBinding()]
+        [CmdletBinding(DefaultParameterSetName = 'Default')]
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer )  ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken )
+            [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
+            [Parameter(Mandatory=$true, ParameterSetName="Status", HelpMessage = 'Zerto VPG Status')] [string] $ZertoVPGStatus,
+            [Parameter(Mandatory=$true, ParameterSetName="ID", HelpMessage = 'Zerto VPG Status ID')] [ZertoVPGStatus] $ZertoVPGStatusID
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"
@@ -4646,15 +4648,30 @@
         if ( $ZertoToken -eq $null) {
             throw "Missing Zerto Authentication Token"
         }
-        $FullURL = $baseURL + "vpgs/statuses"
-        Write-Verbose $FullURL
 
-        try {
-            $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
-        } catch {
-            Test-RESTError -err $_
-        }
-        return $Result
+       switch ($PsCmdlet.ParameterSetName) {
+            "Status" {
+                if ([string]::IsNullOrEmpty($ZertoVPGStatus)  ) {
+                    throw "Missing Zerto VPG Status"
+                }
+                Return [ZertoVPGStatus]::$ZertoVPGStatus.value__
+            }
+            "ID" {
+                Return [ZertoVPGStatus]$ZertoVPGStatusID
+            }
+            Default {
+                #return [System.Enum]::GetNames([ZertoVPGStatus])
+                $FullURL = $baseURL + "vpgs/statuses"
+                Write-Verbose $FullURL
+
+                try {
+                    $Result = Invoke-RestMethod -Uri $FullURL -TimeoutSec 100 -Headers $ZertoToken -ContentType $TypeJSON
+                } catch {
+                    Test-RESTError -err $_
+                }
+                return $Result
+            }
+        }    
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
@@ -4704,7 +4721,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Test Network ID')] [string] $TestNetworkID, 
             [Parameter(Mandatory=$false, HelpMessage = 'Datastore Name')] [string] $DatastoreName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Datastore Cluster Name')] [string] $DatastoreClusterName,
-            [Parameter(Mandatory=$false, HelpMessage = 'Use Default for Journal Datastore')] [bool] $JournalUseDefault, 
+            [Parameter(Mandatory=$false, HelpMessage = 'Use Default for Journal Datastore')] [switch] $JournalUseDefault, 
             [Parameter(Mandatory=$false, HelpMessage = 'Journal Datastore Name')] [string] $JournalDatastoreName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Journal Datastore Cluster Name')] [string] $JournalDatastoreClusterName, 
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Journal History In Hours')] [ValidateRange(0,9999)] [int] $JournalHistoryInHours = 24, 
@@ -4837,7 +4854,7 @@
                 $VMID =  Get-ZertoSiteVMID -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoToken $ZertoToken `
                                                      -ZertoSiteIdentifier $LocalSiteID -VMName $_ 
                 $VMNameAndIDHash.Add($_, $VMID)
-        }
+            }
         } elseif ($VPGVirtualMachines) {
             $VPGVirtualMachines | ForEach-Object  {
                 #VM's are always from LocalSite
@@ -4903,8 +4920,8 @@
                 #    $Journal.Add( 'DatastoreClusterIdentifier', $DatastoreClusterID)
                 #    $Journal.Add( 'DatastoreIdentifier', $null)
                 #}
-                $Journal.Add( 'DatastoreClusterIdentifier', $null)
-                $Journal.Add( 'DatastoreIdentifier', $null)
+                #$Journal.Add( 'DatastoreClusterIdentifier', $null)
+                #$Journal.Add( 'DatastoreIdentifier', $null)
             } else {
                 if ($JournalDatastoreID) {
                     $Journal.Add( 'DatastoreClusterIdentifier', $null)

@@ -98,6 +98,12 @@ to use an expired session looks like this:
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 ## Release Notes
+**1.0.5** - Added ZertoTaskStates enum, Get-ZertoTaskState.  Need to dupe this code for othe enums.
+
+**1.0.4** - Added a ":" to "." replace for ZertoTask api.  Tasks returned by Zerto can contain a ":", but the API only uses "."
+
+**1.0.3** - Added $env:ZertoVersion for deprication/new features.  Fixed ResourceReport API.
+
 **1.0.2** - Updated for Zerto 5.0u2 release.
 
 **1.0.1** - Added Connect-ZertoZVM and Disconnect-ZertoZVM.

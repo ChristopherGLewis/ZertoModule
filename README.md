@@ -98,6 +98,8 @@ to use an expired session looks like this:
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 ## Release Notes
+**1.0.6** - Updated Get-ZertoVPGStatus to return enum values.
+
 **1.0.5** - Added ZertoTaskStates enum, Get-ZertoTaskState.  Need to dupe this code for othe enums.
 
 **1.0.4** - Added a ":" to "." replace for ZertoTask api.  Tasks returned by Zerto can contain a ":", but the API only uses "."

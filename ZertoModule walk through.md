@@ -22,7 +22,7 @@ PS C:\Scripts\Zerto> Import-Module ZertoModule
 Authentication is simple:
 
 ```PowerShell
-PS C:\Scripts\Zerto> Connect-ZertoZVM -ZertoServer "il1zerto.test.com" -ZertoUser "Test\\ZertoUser"
+PS C:\Scripts\Zerto> Connect-ZertoZVM -ZertoServer "il1zerto.test.com" -ZertoUser "Test\ZertoUser"
 ```
 
 You will need to enter your password:
@@ -34,7 +34,7 @@ You can verify your connection using:
 
 ```PowerShell
 PS C:\Scripts\Zerto> Get-ZertoLocalSite
-    
+ 
 ContactEmail : noc@Test.com
 ContactName : NOC
 ContactPhone : 847-555-1212
@@ -57,7 +57,7 @@ Retrieving VRA information is simple:
 
 ```PowerShell
 PS C:\Scripts\Zerto> Get-ZertoVRA | Select-Object VraGroup, VraName,VraVersion, IpAddress, NetworkName, MemoryInGB | Format-Table
-    
+ 
 VraGroup VraName                    VraVersion IpAddress     NetworkName MemoryInGB
 -------- -------                    ---------- ---------    ----------- ----------
 IL1-VRA Z-VRA-il1ep0426esx.test.com 5.0        10.77.199.19 vlan99rpl           16
@@ -85,14 +85,14 @@ IL1-VRA Z-VRA-il1ep0441esx.test.com 5.0        10.77.199.24 vlan99rpl           
 Upgrading VRAs uses a single command:
 
 ```PowerShell
-PS C:\Scripts\Zerto> Invoke-ZertoVRAUpgrade -ZertoVraIdentifier (Get-ZertoVRAID -VraName Z-VRA-il1ep0426esx.test.com)
+PS C:\Scripts\Zerto> Invoke-ZertoVRAUpgrade -ZertoVraIdentifier (Get-ZertoVRAID -VraName 'Z-VRA-il1ep0426esx.test.com')
 
 c2a7af90-5782-4001-abf6-6c547579fb93:d492497e-6793-4ec8-b44b-f60a43aef445
 ```
 
 This api returns a Zerto TaskID that can be viewed:
 
-```PowerShell
+```
 PS C:\Scripts\Zerto> Get-ZertoTask -ZertoTaskIdentifier c2a7af90-5782-4001-abf6-6c547579fb93:d492497e-6793-4ec8-b44b-f60a43aef445
 
 CompleteReason  :
@@ -126,30 +126,31 @@ VPG Information
 
 Retrieving VPG Information is equally simple
 
-    PS C:\Scripts\Zerto> Get-ZertoVPG | Select-object VpgName,SourceSite, TargetSite, ActualRPO, VmsCount,@{n='Status';e={Get-ZertoVPGStatus -ZertoVPGStatusID $_.Status}} | ft
-    
-    VpgName                                   SourceSite TargetSite ActualRPO VmsCount       Status
-    -------                                   ---------- ---------- --------- --------       ------
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0271APP Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0272DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0685APP Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0692WEB Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0561DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0861APP Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0773DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0860APP Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0883APP Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0884WEB Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0936APP Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0885DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0937APP Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD1029APP Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0939DB  Zerto-IL1 DENPDB            16       1    MeetingSLA
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0938DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    ZertoMIGGROUP03DEV_FP-DENPDB-ND872APP     Zerto-IL1 DENPDB            16       1    MeetingSLA 
-    ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD1026DB  Zerto-IL1 DENPDB            -1       1  Initializing
-    COMMCORE-FAILBACK                          DENPDB   Zerto-IL1          11       3    MeetingSLA
+```PowerShell
+PS C:\Scripts\Zerto> Get-ZertoVPG | Select-object VpgName,SourceSite, TargetSite, ActualRPO, VmsCount,@{n='Status';e={Get-ZertoVPGStatus -ZertoVPGStatusID $_.Status}} | ft
 
+VpgName                                   SourceSite TargetSite ActualRPO VmsCount       Status
+-------                                   ---------- ---------- --------- --------       ------
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0271APP Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0272DB  Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0685APP Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0692WEB Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0561DB  Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0861APP Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0773DB  Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0860APP Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0883APP Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0884WEB Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0936APP Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0885DB  Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0937APP Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD1029APP Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0939DB  Zerto-IL1 DENPDB            16       1    MeetingSLA
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD0938DB  Zerto-IL1 DENPDB            -1       1  Initializing
+ZertoMIGGROUP03DEV_FP-DENPDB-ND872APP     Zerto-IL1 DENPDB            16       1    MeetingSLA 
+ZertoMIGGROUP03DEV_FP-DENPDB-IL1WD1026DB  Zerto-IL1 DENPDB            -1       1  Initializing
+COMMCORE-FAILBACK                         DENPDB   Zerto-IL1          11       3    MeetingSLA
+```
 VPG Creation
 ============
 
@@ -158,14 +159,14 @@ Creating a simple VPG – no IP reassignment
 ```PowerShell
 PS C:\Scripts\Zerto> Add-ZertoVPG -Priority Low `
                             -VPGName "ChrisLewisVPG" `
-                            -RecoverySiteName CHAPDA `
-                            -ClusterName CHAPDA3ZMNA01 `
-                            -FailoverNetwork PD3Z_Test_367 `
-                            -TestNetwork PD3Z_Test_367 `
-                            -DatastoreName CHAPDA3Z_MNA01 `
+                            -RecoverySiteName 'CHAPDA' `
+                            -ClusterName 'CHAPDA3ZMNA01' `
+                            -FailoverNetwork 'PD3Z_Test_367' `
+                            -TestNetwork 'PD3Z_Test_367' `
+                            -DatastoreName 'CHAPDA3Z_MNA01' `
                             -JournalUseDefault $True `
-                            -Folder ZertoRecoveryFolder `
-                            -VmNames WATERMELON-V
+                            -Folder 'ZertoRecoveryFolder' `
+                            -VmNames 'WATERMELON-V'
 
 28842f79-7c15-40cd-bb88-431869baa125.258fcb39-d6a3-4547-8797-3605da6d372b
 ```
@@ -194,7 +195,7 @@ This just creates a VPG with a single VM. Adding additional VM's is
 easy, just change the line
 
 ```PowerShell
-    -VmNames WATERMELON-V
+    -VmNames 'WATERMELON-V'
 ```
 to use an array of VM names
 

@@ -837,10 +837,11 @@
             $this.ProtectedSiteIdentifier = $Value.ProtectedSiteIdentifier; 
             $this.RecoverySiteIdentifier = $Value.RecoverySiteIdentifier; 
             $this.RpoInSeconds = $Value.RpoInSeconds;                 
-            $this.ServiceProfileIdentifier = $Value.ServiceProfileIdentifier; 
+            $this.ServiceProfileIdentifier = $Value.ServiceProfileIdentifier | StringOrNull; 
+
             $this.TestIntervalInMinutes = $Value.TestIntervalInMinutes;        
             $this.UseWanCompression = $Value.UseWanCompression;    
-            $this.ZorgIdentifier = $Value.ZorgIdentifier; 
+            $this.ZorgIdentifier = $Value.ZorgIdentifier | StringOrNull; 
         }    
         ZertoVPGSettingBasic ([int] $JournalHistoryInHours, [string] $Name, [ZertoVPGPriority] $Priority, [string] $ProtectedSiteIdentifier, `
                             [string] $RecoverySiteIdentifier, [int] $RpoInSeconds, [string] $ServiceProfileIdentifier, `
@@ -851,10 +852,10 @@
             $this.ProtectedSiteIdentifier = $ProtectedSiteIdentifier;
             $this.RecoverySiteIdentifier = $RecoverySiteIdentifier;
             $this.RpoInSeconds = $RpoInSeconds;
-            $this.ServiceProfileIdentifier = $ServiceProfileIdentifier;
+            $this.ServiceProfileIdentifier = $ServiceProfileIdentifier | StringOrNull; 
             $this.TestIntervalInMinutes = $TestIntervalInMinutes;
             $this.UseWanCompression = $UseWanCompression;
-            $this.ZorgIdentifier = $ZorgIdentifier; 
+            $this.ZorgIdentifier = $ZorgIdentifier | StringOrNull; 
         }                 
     }
 
@@ -894,39 +895,67 @@
         Return $NewObj       
     }
 
-    Class ZertoVPGSettingBootgroup {
+    Class ZertoVPGSettingBootGroupsBootGroups {
         [int] $BootDelayInSeconds; 
         [string] $BootGroupIdentifier; 
-        [string] $BootGroupName;
+        [string] $Name;
 
-        ZertoVPGSettingBootgroup ([PSCustomObject] $Value) {
-            $this.BootDelayInSeconds = $Value.BootDelayInSeconds;                                                
-            $this.BootGroupIdentifier = $Value.BootGroupIdentifier;
-            $this.BootGroupName = $Value.BootGroupName;                   
+        ZertoVPGSettingBootGroupsBootGroups ([PSCustomObject] $Value) {
+            $this.BootDelayInSeconds = $Value.BootDelayInSeconds;
+            $this.BootGroupIdentifier = $Value.BootGroupIdentifier | StringOrNull; ;
+            $this.Name = $Value.Name;
         }    
-        ZertoVPGSettingBootgroup ([int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $BootGroupName ) {
-            $this.BootDelayInSeconds = $BootDelayInSeconds;                                                
-            $this.BootGroupIdentifier = $BootGroupIdentifier; 
-            $this.BootGroupName = $BootGroupName;                   
+        ZertoVPGSettingBootGroupsBootGroups ([int] $BootDelayInSeconds, [string] $BootGroupIdentifier, [string] $Name ) {
+            $this.BootDelayInSeconds = $BootDelayInSeconds;
+            $this.BootGroupIdentifier = $BootGroupIdentifier | StringOrNull; ; 
+            $this.Name = $Name;
         }                 
     }
 
     # .ExternalHelp ZertoModule.psm1-help.xml
-    Function New-ZertoVPGSettingBootgroup {
+    Function New-ZertoVPGSettingBootGroupsBootGroups {
         [CmdletBinding()]
         param (
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'BootDelayInSeconds')] [int] $BootDelayInSeconds, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Identifier')] [string] $BootGroupIdentifier, 
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Name')] [string] $BootGroupName, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroup')] [PSCustomObject] $VPGSettingBootgroup
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'Zerto Boot Group Name')] [string] $Name, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroups Bootgroups')] [PSCustomObject] $VPGSettingBootgroupsBootGroups
         )
         
-        if (-not $VPGSettingBootgroup) {
+        if (-not $VPGSettingBootgroupsBootgroups) {
             if ( $BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$BootDelayInSeconds'"}
-            [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($BootDelayInSeconds, $BootGroupIdentifier, $BootGroupName );
+            [ZertoVPGSettingBootGroupsBootGroups] $NewObj = [ZertoVPGSettingBootGroupsBootGroups]::New($BootDelayInSeconds, $BootGroupIdentifier, $Name );
         } else {
             if ( $VPGSettingBootgroup.BootDelayInSeconds -lt 1 ) { throw "BootDelayInSeconds must be greather then 0 - '$VPGSettingBootgroup.BootDelayInSeconds'"}
-            [ZertoVPGSettingBootgroup] $NewObj = [ZertoVPGSettingBootgroup]::New($VPGSettingBootgroup)
+            [ZertoVPGSettingBootGroupsBootGroups] $NewObj = [ZertoVPGSettingBootGroupsBootGroups]::New($VPGSettingBootgroupsBootGroups)
+        }
+
+        Return $NewObj
+    }
+
+    Class ZertoVPGSettingBootGroups {
+        [ZertoVPGSettingBootGroupsBootGroups[]] $BootGroups; 
+
+        ZertoVPGSettingBootGroups ([PSCustomObject] $Value) {
+            $this.BootGroups = $Value.BootGroups;
+        }    
+        ZertoVPGSettingBootGroups ([ZertoVPGSettingBootGroupsBootGroups[]] $BootGroups ) {
+            $this.BootGroups = $BootGroups;
+        }
+    }
+
+    # .ExternalHelp ZertoModule.psm1-help.xml
+    Function New-ZertoVPGSettingBootGroups {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingBootgroup')] [ZertoVPGSettingBootgroup[]] $Bootgroups,
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroup')] [PSCustomObject] $VPGSettingBootGroups
+        )
+        
+        if (-not $VPGSettingBootGroups) {
+            [ZertoVPGSettingBootGroups] $NewObj = [ZertoVPGSettingBootGroups]::New( $Bootgroups );
+        } else {
+            [ZertoVPGSettingBootGroups] $NewObj = [ZertoVPGSettingBootGroups]::New($VPGSettingBootGroups)
         }
 
         Return $NewObj
@@ -986,13 +1015,13 @@
         [ZertoVPGSettingJournalLimitation] $Limitation;
 
         ZertoVPGSettingJournal ([PSCustomObject] $Value) {
-            $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier;                                                
-            $this.DatastoreIdentifier = $Value.DatastoreIdentifier;
+            $this.DatastoreClusterIdentifier = $Value.DatastoreClusterIdentifier | StringOrNull;                                                 
+            $this.DatastoreIdentifier = $Value.DatastoreIdentifier | StringOrNull; 
             $this.Limitation = $Value.Limitation;                   
         }    
         ZertoVPGSettingJournal ([string] $DatastoreClusterIdentifier, [string] $DatastoreIdentifier, [ZertoVPGSettingJournalLimitation] $Limitation) {
-            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;                                                
-            $this.DatastoreIdentifier = $DatastoreIdentifier; 
+            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier | StringOrNull;                                                 
+            $this.DatastoreIdentifier = $DatastoreIdentifier | StringOrNull; 
             $this.Limitation = $Limitation;                   
         }                 
     }
@@ -1020,14 +1049,10 @@
         [String] $DefaultNetworkIdentifier;
 
         ZertoVPGSettingNetworksNetworkHypervisor ([PSCustomObject] $Value) {
-            $this.DefaultNetworkIdentifier = $Value.DefaultNetworkIdentifier; 
+            $this.DefaultNetworkIdentifier = $Value.DefaultNetworkIdentifier | StringOrNull; ; 
         }    
         ZertoVPGSettingNetworksNetworkHypervisor ([string] $DefaultNetworkIdentifier) {
-            if ([String]::IsNullOrEmpty($DefaultNetworkIdentifier) ) { 
-                $this.DefaultNetworkIdentifier = [NullString]::Value ; 
-            } else {
-                $this.DefaultNetworkIdentifier = $DefaultNetworkIdentifier; 
-            }
+            $this.DefaultNetworkIdentifier = $DefaultNetworkIdentifier | StringOrNull; ; 
         }
     }
 
@@ -1121,33 +1146,20 @@
         [string] $ResourcePoolIdentifier; 
 
         ZertoVPGSettingRecovery ([PSCustomObject] $Value) {
-            $this.DefaultDatastoreIdentifier = $Value.DefaultDatastoreIdentifier;                                                
-            $this.DefaultFolderIdentifier = $Value.DefaultFolderIdentifier;                   
-            $this.DefaultHostClusterIdentifier = $Value.DefaultHostClusterIdentifier; 
-            $this.DefaultHostIdentifier = $Value.DefaultHostIdentifier; 
-            $this.ResourcePoolIdentifier = $Value.ResourcePoolIdentifier;
+            $this.DefaultDatastoreIdentifier = $Value.DefaultDatastoreIdentifier | StringOrNull;
+            $this.DefaultFolderIdentifier = $Value.DefaultFolderIdentifier | StringOrNull; 
+            $this.DefaultHostClusterIdentifier = $Value.DefaultHostClusterIdentifier | StringOrNull;  
+            $this.DefaultHostIdentifier = $Value.DefaultHostIdentifier | StringOrNull; 
+            $this.ResourcePoolIdentifier = $Value.ResourcePoolIdentifier | StringOrNull; 
         }    
         ZertoVPGSettingRecovery ([string] $DefaultDatastoreIdentifier, [string] $DefaultFolderIdentifier, [string] $DefaultHostClusterIdentifier, `
                             [string] $DefaultHostIdentifier, [string] $ResourcePoolIdentifier ) {
-            $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier;
-            $this.DefaultFolderIdentifier = $DefaultFolderIdentifier;
             #Handle the nulls.  PS converts a $null in a [string] as a string.empty. 
-            if ([String]::IsNullOrEmpty($DefaultHostClusterIdentifier) ) { 
-                $this.DefaultHostClusterIdentifier = [NullString]::Value ; 
-            } else {
-                $this.DefaultHostClusterIdentifier = $DefaultHostClusterIdentifier; 
-            }
-            if ([String]::IsNullOrEmpty($DefaultHostIdentifier) ) { 
-                $this.DefaultHostIdentifier = [NullString]::Value ; 
-            } else {
-                $this.DefaultHostIdentifier = $DefaultHostIdentifier; 
-            }
-            if ([String]::IsNullOrEmpty($ResourcePoolIdentifier) ) { 
-                $this.ResourcePoolIdentifier = [NullString]::Value ; 
-            } else {
-                $this.ResourcePoolIdentifier = $ResourcePoolIdentifier; 
-            }
-
+            $this.DefaultDatastoreIdentifier = $DefaultDatastoreIdentifier | StringOrNull; 
+            $this.DefaultFolderIdentifier = $DefaultFolderIdentifier | StringOrNull; 
+            $this.DefaultHostClusterIdentifier = $DefaultHostClusterIdentifier | StringOrNull; 
+            $this.DefaultHostIdentifier = $DefaultHostIdentifier | StringOrNull; 
+            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier | StringOrNull; 
         }                 
     }
 
@@ -1181,21 +1193,13 @@
         [int] $TimeoutInSeconds;
 
         ZertoVPGSettingScript ([PSCustomObject] $Value) {
-            $this.Command = $Value.Command; 
-            $this.Parameters = $Value.Parameters; 
-            $this.TimeoutInSeconds = $Value.TimeoutInSeconds; 
+            $this.Command = $Value.Command | StringOrNull; 
+            $this.Parameters = $Value.Parameters | StringOrNull;
+            $this.TimeoutInSeconds = $Value.TimeoutInSeconds;  
         }    
         ZertoVPGSettingScript ([string] $Command, [string] $Parameters, [int] $TimeoutInSeconds ) {
-            if ([String]::IsNullOrEmpty($Command) ) { 
-                $this.Command = [NullString]::Value ; 
-            } else {
-                $this.Command = $Command; 
-            }
-            if ([String]::IsNullOrEmpty($Parameters) ) { 
-                $this.Parameters = [NullString]::Value ; 
-            } else {
-                $this.Parameters = $Parameters; 
-            }
+            $this.Command = $Command | StringOrNull; 
+            $this.Parameters = $Parameters | StringOrNull; 
             $this.TimeoutInSeconds = $TimeoutInSeconds; 
         }  
 
@@ -1264,12 +1268,12 @@
     }
 
     class ZertoVPGSettingVMNicNetworkHypervisorIpConfig {
+        [string] $Gateway;
         [bool] $IsDhcp; 
-        [string] $StaticIp; 
-        [string] $SubnetMask; 
-        [string] $Gateway; 
         [string] $PrimaryDns; 
         [string] $SecondaryDns;
+        [string] $StaticIp; 
+        [string] $SubnetMask; 
 
         ZertoVPGSettingVMNicNetworkHypervisorIpConfig ([PSCustomObject] $Value) {
             $this.Gateway = $value.Gateway;
@@ -1328,18 +1332,18 @@
         [bool] $ShouldReplaceMacAddress;
 
         ZertoVPGSettingVMNicNetworkHypervisor ([PSCustomObject] $Value) {
-            $this.DnsSuffix = $Value.DnsSuffix; 
+            $this.DnsSuffix = $Value.DnsSuffix | StringOrNull; 
             $this.IpConfig = $Value.IpConfig; 
-            $this.NetworkIdentifier = $Value.NetworkIdentifier; 
+            $this.NetworkIdentifier = $Value.NetworkIdentifier | StringOrNull; ; 
             $this.ShouldReplaceMacAddress = $Value.ShouldReplaceMacAddress; 
         }
         ZertoVPGSettingVMNicNetworkHypervisor ([string] $DnsSuffix, 
                                     [ZertoVPGSettingVMNicNetworkHypervisorIpConfig] $IpConfig, 
                                     [string] $NetworkIdentifier, 
                                     [bool] $ShouldReplaceMacAddress) {
-            $this.DnsSuffix = $DnsSuffix; 
+            $this.DnsSuffix = $DnsSuffix | StringOrNull; 
             $this.IpConfig = $IpConfig; 
-            $this.NetworkIdentifier = $NetworkIdentifier; 
+            $this.NetworkIdentifier = $NetworkIdentifier | StringOrNull; ; 
             $this.ShouldReplaceMacAddress = $ShouldReplaceMacAddress; 
         }
     }
@@ -1393,9 +1397,9 @@
     }    
 
     class ZertoVPGSettingVMNic {
-        [string] $NicIdentifier;
         [ZertoVPGSettingVMNicNetwork] $Failover;
         [ZertoVPGSettingVMNicNetwork] $FailoverTest;
+        [string] $NicIdentifier;
 
 
         ZertoVPGSettingVMNic ([PSCustomObject] $Value) {
@@ -1438,12 +1442,12 @@
         [string] $ResourcePoolIdentifier;
 
         ZertoVPGSettingVMRecovery ([PSCustomObject] $Value) {
-            $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier;    
-            $this.DatastoreIdentifier = $value.DatastoreIdentifier;
-            $this.FolderIdentifier = $value.FolderIdentifier;
-            $this.HostClusterIdentifier = $value.HostClusterIdentifier;
-            $this.HostIdentifier = $value.HostIdentifier;
-            $this.ResourcePoolIdentifier = $value.ResourcePoolIdentifier;            
+            $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier | StringOrNull; 
+            $this.DatastoreIdentifier = $value.DatastoreIdentifier | StringOrNull; 
+            $this.FolderIdentifier = $value.FolderIdentifier | StringOrNull; 
+            $this.HostClusterIdentifier = $value.HostClusterIdentifier | StringOrNull; 
+            $this.HostIdentifier = $value.HostIdentifier | StringOrNull; 
+            $this.ResourcePoolIdentifier = $value.ResourcePoolIdentifier | StringOrNull;             
         }
         ZertoVPGSettingVMRecovery ([string] $DatastoreClusterIdentifier,
                                 [string] $DatastoreIdentifier,
@@ -1451,12 +1455,12 @@
                                 [string] $HostClusterIdentifier,
                                 [string] $HostIdentifier,
                                 [string] $ResourcePoolIdentifier) {
-            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;    
-            $this.DatastoreIdentifier = $DatastoreIdentifier;
-            $this.FolderIdentifier = $FolderIdentifier;
-            $this.HostClusterIdentifier = $HostClusterIdentifier;
-            $this.HostIdentifier = $HostIdentifier;
-            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier;   
+            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier | StringOrNull; 
+            $this.DatastoreIdentifier = $DatastoreIdentifier | StringOrNull; 
+            $this.FolderIdentifier = $FolderIdentifier | StringOrNull; 
+            $this.HostClusterIdentifier = $HostClusterIdentifier | StringOrNull; 
+            $this.HostIdentifier = $HostIdentifier | StringOrNull; 
+            $this.ResourcePoolIdentifier = $ResourcePoolIdentifier | StringOrNull;    
         }
     }
 
@@ -1494,15 +1498,15 @@
 
         ZertoVPGSettingVMVolumeDatastore ([PSCustomObject] $Value) {
             $this.IsThin = $value.IsThin;    
-            $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier;
-            $this.DatastoreIdentifier = $value.DatastoreIdentifier;
+            $this.DatastoreClusterIdentifier = $value.DatastoreClusterIdentifier | StringOrNull; 
+            $this.DatastoreIdentifier = $value.DatastoreIdentifier | StringOrNull; 
         }
         ZertoVPGSettingVMVolumeDatastore ([bool] $IsThin,
                                 [string] $DatastoreClusterIdentifier,
                                 [string] $DatastoreIdentifier) {
             $this.IsThin = $IsThin;    
-            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier;
-            $this.DatastoreIdentifier = $DatastoreIdentifier;
+            $this.DatastoreClusterIdentifier = $DatastoreClusterIdentifier | StringOrNull; 
+            $this.DatastoreIdentifier = $DatastoreIdentifier | StringOrNull; 
         }
     }
 
@@ -1534,7 +1538,7 @@
         [string] $Path;
 
         ZertoVPGSettingVMVolumeExistingVolume ([PSCustomObject] $Value) {
-            $this.DatastoreIdentifier = $value.DatastoreIdentifier;    
+            $this.DatastoreIdentifier = $value.DatastoreIdentifier | StringOrNull; 
             $this.ExistingVmIdentifier = $value.ExistingVmIdentifier;
             $this.Mode = $value.Mode;
             $this.Path = $value.Path;
@@ -1543,7 +1547,7 @@
                                 [string] $ExistingVmIdentifier,
                                 [string] $Mode,
                                 [string] $Path) {
-            $this.DatastoreIdentifier = $DatastoreIdentifier;
+            $this.DatastoreIdentifier = $DatastoreIdentifier | StringOrNull; 
             $this.ExistingVmIdentifier = $ExistingVmIdentifier;
             $this.Mode = $Mode;
             $this.Path = $Path;
@@ -1574,10 +1578,10 @@
     }
 
     class ZertoVPGSettingVMVolume {
-        [bool] $IsSwap;
-        [string] $VolumeIdentifier;
         [ZertoVPGSettingVMVolumeDatastore] $Datastore;
         [ZertoVPGSettingVMVolumeExistingVolume] $ExistingVolume;
+        [bool] $IsSwap;
+        [string] $VolumeIdentifier;
 
         ZertoVPGSettingVMVolume ([PSCustomObject] $Value) {
             $this.IsSwap = $value.IsSwap;    
@@ -1674,28 +1678,31 @@
     class ZertoVPGSetting {
         [ZertoVPGSettingBackup] $Backup;
         [ZertoVPGSettingBasic] $Basic;
-        [ZertoVPGSettingBootGroup[]] $BootGroups;
+        [ZertoVPGSettingBootGroups] $BootGroups;
         [ZertoVPGSettingJournal] $Journal;
         [ZertoVPGSettingNetworks] $Networks;
         [ZertoVPGSettingRecovery] $Recovery;
         [ZertoVPGSettingScripting] $Scripting;
         [ZertoVPGSettingVM[]] $Vms;
+        [string] $VpgIdentifier;
+        [string] $VpgSettingsIdentifier;
 
         ZertoVPGSetting ([PSCustomObject] $Value) {
             $this.Backup = $Value.Backup;
             $this.Basic = $Value.Basic;
-            $this.BootGroups = @();
-            $Value.BootGroups | ForEach-Object { $this.BootGroups += $_};
+            $this.BootGroups = $Value.BootGroups            
             $this.Journal = $Value.Journal;
             $this.Networks = $Value.Networks;
             $this.Recovery = $Value.Recovery;
             $this.Scripting = $Value.Scripting;
             $this.Vms = @();
             $Value.Vms | ForEach-Object { $this.Vms += $_};
+            $this.VpgIdentifier = $Value.VpgIdentifier;
+            $this.VpgSettingsIdentifier = $Value.VpgSettingsIdentifier;
         }    
-        ZertoVPGSetting ([ZertoVPGSettingBackup] $Backup,  [ZertoVPGSettingBasic] $Basic, [ZertoVPGSettingBootGroup[]] $BootGroups, `
+        ZertoVPGSetting ([ZertoVPGSettingBackup] $Backup,  [ZertoVPGSettingBasic] $Basic, [ZertoVPGSettingBootGroups] $BootGroups, `
                            [ZertoVPGSettingJournal] $Journal, [ZertoVPGSettingNetworks] $Networks, [ZertoVPGSettingRecovery] $Recovery, `
-                           [ZertoVPGSettingScripting] $Scripting, [ZertoVPGSettingVM[]] $Vms
+                           [ZertoVPGSettingScripting] $Scripting, [ZertoVPGSettingVM[]] $Vms, [string] $VpgIdentifier, [string] $VpgSettingsIdentifier
         ) {
             $this.Backup = $Backup;
             $this.Basic = $Basic;
@@ -1705,6 +1712,8 @@
             $this.Recovery = $Recovery;
             $this.Scripting = $Scripting;
             $this.Vms = $Vms;
+            $this.VpgIdentifier = $VpgIdentifier;
+            $this.VpgSettingsIdentifier = $VpgSettingsIdentifier;
         }  
     }
 
@@ -1720,14 +1729,17 @@
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Recovery object')] [ZertoVPGSettingRecovery] $Recovery, 
             [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Scripting object')] [ZertoVPGSettingNetworks] $Scripting, 
             [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings Vms objects')] [ZertoVPGSettingVM[]] $Vms, 
-            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSettinM
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings VPG Identifier')] [string] $VpgIdentifier, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings VPG Settings Identifier')] [string] $VpgSettingsIdentifierVms, 
+            [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting VM Object')] [PSCustomObject] $VPGSetting
         )
 
-        if (-not $VPGSettingVM) {
+        if (-not $VPGSetting) {
             #Check for bad values
-            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($Backup, $Basic, $BootGroups, $Journal, $Networks, $Recovery, $Scripting, $Vms);
+            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($Backup, $Basic, $BootGroups, $Journal, $Networks, $Recovery, $Scripting, `
+                                                                $Vms, $VpgIdentifier, $VpgSettingsIdentifierVms );
         } else {
-            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($VPGSettingVM)
+            [ZertoVPGSetting] $NewObj = [ZertoVPGSetting]::New($VPGSetting)
         }
 
         Return $NewObj
@@ -1876,6 +1888,18 @@
         } 
     }
     
+
+    Function StringOrNull {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true, ValueFromPipeline=$true, HelpMessage = 'String')][AllowEmptyString()] [string] $ThisString
+        )
+        if ([String]::IsNullOrEmpty($ThisString) ) { 
+            Return  [NullString]::Value ; 
+        } else { 
+            Return $ThisString;
+        }
+    }
 
 #endregion
 
@@ -4185,7 +4209,7 @@
 
 #endregion
 
-#region Zerto VPGs
+#region Zerto VPGs  
 
     # .ExternalHelp ZertoModule.psm1-help.xml
     Function Get-ZertoVPG {

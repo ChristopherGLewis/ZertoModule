@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '1.0.6' 
-$ReleaseNotes = 'Updated Get-ZertoVPGStatus to return enum values.'
+﻿$ModuleVersion = '1.0.7' 
+$ReleaseNotes = 'Fixed the Zerto VPGSettings classes to better handle nulls.'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `
@@ -19,7 +19,8 @@ New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
         #        -ScriptsToProcess @('ZertoModule.psm1') `
 
 $PrivateFunctions = @('Set-SSLCertByPass', 'Get-QueryStringFromHashTable', 'Parse-ZertoDate', `
-                      'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', 'Get-EnvZertoPort', 'Get-EnvZertoToken' )
+                      'Test-RESTError', 'Convert-ZertoTokenHash', 'Get-EnvZertoServer', `
+                      'Get-EnvZertoPort', 'Get-EnvZertoToken', 'StringOrNull' )
 
 $Functions = @( ( Get-Content .\ZertoModule\ZertoModule.psm1 | ForEach-Object {$_.trim()} | `
                         Where-Object { $_ -imatch "^Function *" } | Sort-Object | ForEach-Object {  ($_ -split "\s",3)[1] } | `

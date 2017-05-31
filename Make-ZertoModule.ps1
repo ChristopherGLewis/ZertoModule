@@ -1,5 +1,5 @@
-﻿$ModuleVersion = '1.0.7' 
-$ReleaseNotes = 'Fixed the Zerto VPGSettings classes to better handle nulls. Added SET VPGSettings VM Nic/Volume.'
+﻿$ModuleVersion = '1.0.8' 
+$ReleaseNotes = 'Fixed a typo in the ZertoVPGSettingsBootGroup code.'
  
 New-ModuleManifest  -Path .\ZertoModule\ZertoModule.psd1 `
                 -Guid "a7c23e30-0879-42f4-9e1c-bffbe723b02b" `

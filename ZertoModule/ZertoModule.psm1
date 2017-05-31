@@ -948,7 +948,7 @@
     Function New-ZertoVPGSettingBootGroups {
         [CmdletBinding()]
         param (
-            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingBootgroup')] [ZertoVPGSettingBootgroup[]] $Bootgroups,
+            [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'ZertoVPGSettingBootgroup')] [ZertoVPGSettingBootGroups[]] $BootGroups,
             [Parameter(Mandatory=$true, ParameterSetName="PSObject", HelpMessage  = 'VPGSetting Bootgroup')] [PSCustomObject] $VPGSettingBootGroups
         )
         
@@ -1723,7 +1723,7 @@
         param (
             [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Backup  object')] [ZertoVPGSettingBackup] $Backup, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Basics  object')] [ZertoVPGSettingBasic] $Basic, 
-            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings BootGroups  objects')] [ZertoVPGSettingBootGroup[]] $BootGroups, 
+            [Parameter(Mandatory=$false, ParameterSetName="Individual", HelpMessage  = 'Array of VPG Settings BootGroups  objects')] [ZertoVPGSettingBootGroups[]] $BootGroups, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Journal object')] [ZertoVPGSettingJournal] $Journal,
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Networks object')] [ZertoVPGSettingNetworks] $Networks, 
             [Parameter(Mandatory=$true, ParameterSetName="Individual", HelpMessage  = 'VPG Settings Recovery object')] [ZertoVPGSettingRecovery] $Recovery, 
@@ -6076,7 +6076,7 @@
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
             [Parameter(Mandatory=$false, ValueFromPipeline=$true, HelpMessage = 'Zerto authentication token from Get-ZertoAuthToken or ENV:\ZertoToken')] [Hashtable] $ZertoToken = ( Get-EnvZertoToken ),
             [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings Identifier')] [string] $ZertoVpgSettingsIdentifier,
-            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings BootGroup object')] [ZertoVpgSettingBootGroup] $ZertoVpgSettingBootGroup
+            [Parameter(Mandatory=$true, HelpMessage = 'Zerto VPG Settings BootGroup object')] [ZertoVpgSettingBootGroups] $ZertoVpgSettingBootGroup
         )
 
         $baseURL = "https://" + $ZertoServer + ":"+$ZertoPort+"/v1/"

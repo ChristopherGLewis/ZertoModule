@@ -98,6 +98,8 @@ to use an expired session looks like this:
 Currently this module support Zerto Virtual Replication 4.5 and 5.0
 
 ## Release Notes
+**1.0.8** - Fixed a typo in the ZertoVPGSettingsBootGroup code.
+
 **1.0.7** - Fixed the Zerto VPGSettings classes to better handle nulls. Added SET VPGSettings VM Nic/Volume.
 
 **1.0.6** - Updated Get-ZertoVPGStatus to return enum values.

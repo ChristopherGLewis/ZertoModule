@@ -1911,7 +1911,8 @@
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer ) ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser
+            [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser,
+            [Parameter( Mandatory = $false, HelpMessage = 'Hypervisor manager based authentication')] [switch] $HypervisorAuth
         )
         
         Set-SSLCertByPass
@@ -1937,15 +1938,22 @@
             Remove-Item ENV:ZertoVersion -Force -ErrorAction Ignore
 
             # Authenticating with Zerto APIs - Basic AUTH over SSL
-            $authInfo = ("{0}\{1}:{2}" -f  $cred.GetNetworkCredential().domain ,  $cred.GetNetworkCredential().UserName,  $cred.GetNetworkCredential().Password )
+            $authInfo = ("{0}:{1}" -f  $cred.UserName,  $cred.GetNetworkCredential().Password )
             $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
             $authInfo = [System.Convert]::ToBase64String($authInfo)
             $headers = @{Authorization=("Basic {0}" -f $authInfo)}
             $sessionBody = '{"AuthenticationMethod": "1"}'
 
             #Need to check our Response.
-            try { 
-                $xZertoSessionResponse = Invoke-WebRequest -Uri $FullURL -Headers $headers -Method POST -Body $sessionBody -ContentType $TypeJSON             
+            try {
+                if ($HypervisorAuth.IsPresent) {
+                    # Hypervisor manager based authentication
+                    $xZertoSessionResponse = Invoke-WebRequest -Uri $FullURL -Headers $headers -Method POST -Body $sessionBody -ContentType $TypeJSON
+                }
+                else {
+                    # Windows based authentication (default)
+                    $xZertoSessionResponse = Invoke-WebRequest -Uri $FullURL -Headers $headers -Method POST
+                }          
             } catch {
                 $xZertoSessionResponse = $_.Exception.Response
             }

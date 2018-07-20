@@ -1911,7 +1911,8 @@
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer ) ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser
+            [Parameter(ParameterSetName='Username', HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser,
+            [Parameter(ParameterSetName='Credential', HelpMessage  = 'Credential used to connect to Zerto')][pscredential]$Cred
         )
         
         Set-SSLCertByPass
@@ -1925,10 +1926,12 @@
         $TypeJSON = "application/json"
         Write-Verbose $FullURL
 
-        if ([String]::IsNullOrEmpty($ZertoUser) ) {
-            $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'"
-        } else {
-            $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'" -UserName $ZertoUser
+        IF ($PSCmdlet.ParameterSetName -eq 'Username'){
+            if ([String]::IsNullOrEmpty($ZertoUser) ) {
+                $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'"
+            } else {
+                $cred = Get-Credential -Message "Enter your Zerto credentials for '$ZertoServer'" -UserName $ZertoUser
+            }
         }
 
         If ($cred -NE $null) {
@@ -1973,10 +1976,11 @@
         param(
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server or ENV:\ZertoServer')] [string] $ZertoServer = ( Get-EnvZertoServer ) ,
             [Parameter(Mandatory=$false, HelpMessage = 'Zerto Server URL Port')] [string] $ZertoPort = ( Get-EnvZertoPort ),
-            [Parameter( HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser 
+            [Parameter(ParameterSetName='Username', HelpMessage  = 'User to connect to Zerto')] [string] $ZertoUser,
+            [Parameter(ParameterSetName='Credential', HelpMessage  = 'Credential used to connect to Zerto')][pscredential]$Cred
         )
         
-        Set-Item ENV:ZertoToken ( (Get-ZertoAuthToken -ZertoServer $ZertoServer -ZertoPort $ZertoPort -ZertoUser $ZertoUser) | ConvertTo-Json -Compress) 
+        Set-Item ENV:ZertoToken ( (Get-ZertoAuthToken @PSBoundParameters) | ConvertTo-Json -Compress) 
         #Set our Zerto Version
         Set-Item ENV:ZertoVersion (Get-ZertoLocalSite).version
     }
